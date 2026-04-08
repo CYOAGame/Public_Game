@@ -23,13 +23,14 @@ nodes:
   start:
     id: start
     text: >-
-      Three knocks. Not loud careful. It is two hours past midnight and you were
+      Three knocks. Not loud, careful. It is two hours past midnight and you were
       not sleeping well anyway. The candle is still burning. Outside: silence between
       each knock. Not drunk. Not panicking. Whoever {visitor.name} is, they chose this
-      hour deliberately, and they know you are awake.
+      hour deliberately, and they know you are awake. You can hear them breathe through
+      the gap under the door.
     choices:
       - id: open_door
-        label: Open the door you want to know what this is
+        label: Open the door, you want to know what this is
         consequences:
           - type: stat
             target: cunning
@@ -41,7 +42,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: opened
       - id: call_out_first
-        label: Call out without opening ask who is there
+        label: Call out without opening, ask who is there
         consequences:
           - type: stat
             target: cunning
@@ -60,18 +61,34 @@ nodes:
             axis: trust
         exhaustionCost: 0
         nextNodeId: pretended
+      - id: open_with_weapon_in_hand
+        label: Open the door, but armed, a midnight caller deserves caution
+        preconditions:
+          - type: trait
+            key: strength
+            min: 3
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: opened_armed
 
   opened:
     id: opened
     text: >-
       {visitor.name} steps inside quickly and closes the door behind them. Their hands
       are shaking but their voice is steady. "I need you to hold something for me. Just
-      for two days. I cannot explain why, not fully. But if you are searched and you
-      will not be, I promise you need to say you found it. Not that I gave it to you."
+      for two days. I cannot explain why, not fully. But if you are searched, and you
+      will not be, I promise, you need to say you found it. Not that I gave it to you."
       They press a sealed packet into your hands. It is warm and heavier than it looks.
     choices:
       - id: agree_to_hold
-        label: Agree two days is not forever, and something about this feels important
+        label: Agree, two days is not forever, and something about this feels important
         consequences:
           - type: relationship
             target: '{visitor.id}'
@@ -98,7 +115,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: demanded_answers
       - id: refuse_outright
-        label: Refuse no explanation means no deal
+        label: Refuse, no explanation means no deal
         consequences:
           - type: relationship
             target: '{visitor.id}'
@@ -106,6 +123,45 @@ nodes:
             axis: rivalry
         exhaustionCost: 0
         nextNodeId: refused
+      - id: ask_who_is_searching
+        label: Ask specifically who they expect to search your home
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: searching_explained
+
+  opened_armed:
+    id: opened_armed
+    text: >-
+      {visitor.name} sees the weapon and goes very still. A long breath. They raise their
+      hands slowly, and in one of them is a sealed packet. "I am not here to threaten you.
+      The opposite." Their eyes move from the weapon to your face. "I need help. I chose
+      you because I trust you. That trust is still here, even if the welcome is not what
+      I hoped for." They are not angry. They are, if anything, relieved that you are taking
+      this seriously.
+    choices:
+      - id: lower_weapon_and_hear_them
+        label: Lower the weapon and listen to what they need
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: opened
+      - id: keep_weapon_and_hear_them
+        label: Keep the weapon but gesture them to speak
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: demanded_answers
 
   called_out:
     id: called_out
@@ -114,7 +170,7 @@ nodes:
       fact that they came here means something. You weigh the door between you.
     choices:
       - id: open_after_all
-        label: Open the door the voice tells you enough
+        label: Open the door, the voice tells you enough
         consequences:
           - type: stat
             target: cunning
@@ -136,17 +192,97 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: sent_away
+      - id: ask_through_door_what_they_need
+        label: Ask through the door what they need, keep the barrier between you
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: door_conversation
+
+  door_conversation:
+    id: door_conversation
+    text: >-
+      There is a long pause. Then, through the door: "I cannot say it through a door.
+      Someone may be watching this street. If I am wrong, I will owe you an apology.
+      If I am right, staying out here much longer puts us both at risk." Another pause.
+      "I have something that certain people want. I cannot keep it at my home. I thought
+      of you. That is the whole of it."
+    choices:
+      - id: open_after_explanation
+        label: Open the door, they have given you enough to act on
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: opened
+      - id: refuse_even_now
+        label: Still refuse, this is not your problem to carry
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: -2
+            axis: trust
+          - type: world_fact
+            target: missed_midnight_message
+            value: true
+        exhaustionCost: 0
+        nextNodeId: refused
+
+  searching_explained:
+    id: searching_explained
+    text: >-
+      {visitor.name} hesitates, then names a faction or a powerful person in the town with
+      quiet exactness, not dramatically but with the tone of someone who has thought about
+      this longer than you have. "They are looking for what is in this packet. They will
+      search places they associate with me first. You are not one of those places. Yet."
+      They meet your eyes. "I would not be here if I had another option."
+    choices:
+      - id: agree_knowing_the_risk
+        label: Agree with full knowledge of who is searching and why
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: hidden_packet_held
+            value: true
+          - type: world_fact
+            target: knows_who_searches
+            value: true
+        exhaustionCost: 2
+        nextNodeId: agreed
+      - id: refuse_knowing_the_risk
+        label: Refuse, knowing who is involved changes everything, this is too dangerous
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: -1
+            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: refused
 
   pretended:
     id: pretended
     text: >-
       Three more knocks. Then silence. The sound of footsteps retreating. You lie still
       in the dark listening to the town breathe. An hour later you are still awake and
-      the question has not gone anywhere.
+      the question has not gone anywhere. Whatever {visitor.name} needed you for, the need
+      does not disappear because you pretended not to hear it.
     choices:
       - id: feel_the_right_call
-        label: It was the right call. Midnight visitors mean trouble.
+        label: Tell yourself it was the right call. Midnight visitors mean trouble.
         consequences:
           - type: stat
             target: cunning
@@ -154,7 +290,7 @@ nodes:
         exhaustionCost: 0
         nextNodeId: null
       - id: regret_it
-        label: You should have answered. Something important just walked away from your door.
+        label: Admit you should have answered. Something important just walked away from your door.
         consequences:
           - type: stat
             target: cunning
@@ -164,13 +300,25 @@ nodes:
             value: true
         exhaustionCost: 0
         nextNodeId: null
+      - id: get_up_and_follow
+        label: Get up now and try to catch {visitor.name} before they are gone
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: called_out
 
   agreed:
     id: agreed
     text: >-
       {visitor.name} is gone in seconds. You sit with the packet in your lap. You do not
-      open it. The seal is unfamiliar wax, no crest. It weighs like a decision. Two days,
-      they said.
+      open it. The seal is unfamiliar wax with no crest. It weighs like a decision. Two days,
+      they said. By that time you will know whether the promise was worth the trust you gave.
     choices:
       - id: hide_it_well
         label: Find a secure hiding place behind the flue, under the floorboard
@@ -179,9 +327,9 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: waiting_two_days
       - id: open_it
-        label: Open the seal you need to know what you are holding
+        label: Open the seal, you need to know what you are holding
         consequences:
           - type: stat
             target: cunning
@@ -194,17 +342,126 @@ nodes:
             value: -1
             axis: trust
         exhaustionCost: 0
+        nextNodeId: packet_contents
+      - id: sleep_on_it
+        label: Put it aside for tonight, decide where to hide it in the morning with a clear head
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: waiting_two_days
+
+  packet_contents:
+    id: packet_contents
+    text: >-
+      Inside: a folded letter and a small carved token, a kind you have not seen before,
+      smooth ivory with a symbol pressed into one face. The letter is in a coded hand,
+      unreadable without a key, but the heading is not coded. It names three officials in
+      this town and one in the next. Whatever this document represents, it is specific,
+      recent, and clearly dangerous to someone. You reseal it as best you can and feel,
+      for the first time, the weight of what you agreed to.
+    choices:
+      - id: hide_it_after_reading
+        label: Hide it securely and wait, you know enough now to be careful
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: hidden_packet_held
+            value: true
+        exhaustionCost: 1
+        nextNodeId: waiting_two_days
+      - id: go_to_someone_trustworthy
+        label: Take the contents to someone trustworthy who can help you understand what you have
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: packet_contents_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: waiting_two_days
+
+  waiting_two_days:
+    id: waiting_two_days
+    text: >-
+      The two days pass. On the first day, nothing. On the second day, someone you do not
+      know asks you, casually, in the market, if you have seen {visitor.name} recently.
+      Too casually. You give a neutral answer and they move on. That evening, a knock.
+      {visitor.name} again. Right on schedule.
+    choices:
+      - id: hand_it_back_as_agreed
+        label: Hand back the packet immediately, as promised
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: packet_returned
+            value: true
+        exhaustionCost: 0
+        nextNodeId: visitor_returns
+      - id: ask_questions_first
+        label: Ask your questions before returning it, the person in the market worries you
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: visitor_returns
+
+  visitor_returns:
+    id: visitor_returns
+    text: >-
+      {visitor.name} takes the packet with visible relief. Whatever you ask or do not ask,
+      their answer is the same: "It is handled. You are safe. Thank you." They look at you
+      for a moment with something that sits between gratitude and apology. "I would not have
+      come to you if I had thought it would touch you. I may have been wrong about that. The
+      person in the market, I am handling it." They leave. The room feels different without
+      the packet in it.
+    choices:
+      - id: trust_them_completely
+        label: Trust that they handled it, move on
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 2
+            axis: affection
+          - type: relationship_tag
+            target: '{visitor.id}'
+            value: trusted_with_secret
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: keep_watching
+        label: Trust but watch, keep an eye on anyone asking unusual questions
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: watching_for_searchers
+            value: true
+        exhaustionCost: 0
         nextNodeId: null
 
   demanded_answers:
     id: demanded_answers
     text: >-
-      {visitor.name} hesitates. Then they tell you part of it enough to understand the
-      shape of the danger without naming it. Someone important wants this. {visitor.name}
+      {visitor.name} hesitates. Then they tell you part of it, enough to understand the
+      shape of the danger without naming it fully. Someone powerful wants this. {visitor.name}
       cannot keep it themselves. "Two days," they say again. "Then it is gone from your life."
+      The partial truth is enough to understand that this is real, and that it carries weight.
     choices:
       - id: agree_with_knowledge
-        label: With that much known agree to hold it
+        label: With that much known, agree to hold it
         consequences:
           - type: world_fact
             target: hidden_packet_held
@@ -214,7 +471,7 @@ nodes:
             value: 2
             axis: trust
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: agreed
       - id: still_refuse
         label: Still not enough. Tell them no.
         consequences:
@@ -222,20 +479,301 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: refused
 
   refused:
     id: refused
     text: >-
-      {visitor.name} takes the packet back without argument. "I understand," they say,
-      and mean it. They close the door quietly. You hear them move away. You do not know
-      if you made the right call. You do know you will hear about this later.
+      {visitor.name} takes the packet back without argument. "I understand," they say, and
+      mean it. They close the door quietly. You hear them move away into the night. You do
+      not know if you made the right call. You do know you will hear about this later. The
+      shape of it, the faction, the danger, the packet, is still out there. It is just no
+      longer in your hands.
     choices:
-      - id: lock_the_door
+      - id: lock_the_door_and_sleep
         label: Lock the door and try to sleep
         consequences:
           - type: stat
             target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reconsider_and_follow
+        label: Reconsider immediately, open the door and catch up to {visitor.name}
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: called_out
+
+  sent_away:
+    id: sent_away
+    text: >-
+      Footsteps retreat. Silence. You listen for ten minutes to make sure they are gone.
+      They are. Whatever {visitor.name} needed is now someone else's problem to solve,
+      or no one's. You tell yourself this is a clean outcome. You are not sure you believe it.
+    choices:
+      - id: sleep
+        label: Go back to bed, there is nothing to do now
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: watch_from_window
+        label: Watch from the window to see if anyone else comes to check your door
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: watching_for_searchers
+            value: true
+        exhaustionCost: 1
+        nextNodeId: window_vigil
+
+  window_vigil:
+    id: window_vigil
+    text: >-
+      You watch. An hour passes. Then someone does come, not to your door, but to the
+      one across the lane. They knock twice and wait. No answer. They move on. They have
+      a lantern but are trying not to use it, holding it low and half-shuttered. You do
+      not recognize their face. But you recognize the posture of someone doing something
+      they need not to be seen doing.
+    choices:
+      - id: follow_the_second_person
+        label: Follow them quietly before they get too far
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: watching_for_searchers
+            value: true
+          - type: world_fact
+            target: midnight_network_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: searcher_followed
+      - id: memorize_the_face
+        label: Memorize the face as best you can in the low light and stay put
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: midnight_searcher_identified
+            value: true
+        exhaustionCost: 0
+        nextNodeId: two_days_end
+
+  searcher_followed:
+    id: searcher_followed
+    text: >-
+      The figure moves through the back lanes with the efficiency of someone who has done
+      this before. They check three addresses. None answer. At the fourth, a window opens
+      and a brief exchange happens, too quiet to hear. Something passes between them. Then
+      they are gone, back toward the market district, the lantern still barely lit. You
+      stand in an alley in the dark realizing you are standing in the outer edge of a
+      network. {visitor.name} is one node in it.
+    choices:
+      - id: go_to_visitor_now
+        label: Go to {visitor.name} now and tell them their network has a searcher out
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: midnight_network_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: two_days_end
+      - id: keep_the_knowledge
+        label: Keep the knowledge, learn more before acting
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: midnight_network_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: two_days_end
+
+  two_days_end:
+    id: two_days_end
+    text: >-
+      The two days that {visitor.name} promised end and something has shifted. You know
+      more than you did. The packet is either held, returned, or someone else's problem.
+      The person who was searching the street, whoever they were, has not come back.
+      {visitor.name} is somewhere in the town, or not, managing a situation that extends
+      beyond what either of you said in the doorway. The midnight knock set something in
+      motion. It is still moving.
+    choices:
+      - id: seek_out_visitor
+        label: Seek out {visitor.name} proactively, you want to know more
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: midnight_network_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: wait_to_be_found
+        label: Wait to be found, you made yourself available once, that is enough
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: report_what_you_know_to_guard
+        label: Report what you witnessed, the street search, the network, to the guard
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: midnight_searcher_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  packet_source:
+    id: packet_source
+    text: >-
+      A week after the packet is gone, you see a letter on the town noticeboard. Not unusual,
+      except that the seal on it matches, almost exactly, the description of the one on the
+      packet you held or refused. Someone in Ironhaven is using the same network. They have
+      been the whole time. {visitor.name} came to you because they needed a break in the chain,
+      someone outside the existing pattern. That choice, and what you did with it, is still
+      reverberating.
+    choices:
+      - id: read_the_noticeboard_letter
+        label: Read the letter carefully without removing it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: midnight_network_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: two_days_end
+      - id: report_the_letter_to_guard
+        label: Report the letter to the town guard immediately
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: midnight_searcher_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: two_days_end
+
+  visitor_is_trustworthy:
+    id: visitor_is_trustworthy
+    text: >-
+      Whether or not you held the packet, {visitor.name} kept their word about the search.
+      No one came to your door with authority. No one asked uncomfortable questions. The
+      two days passed and it was over, or as over as these things get. {visitor.name}'s
+      trustworthiness, demonstrated under pressure, is a resource. The question is whether
+      you choose to use it.
+    choices:
+      - id: reach_out_to_visitor
+        label: Seek out {visitor.name} and tell them you want to understand more of what is happening
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 3
+            axis: trust
+          - type: relationship_tag
+            target: '{visitor.id}'
+            value: trusted_with_secret
+          - type: world_fact
+            target: midnight_network_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: maintain_distance
+        label: Maintain distance, trustworthy is not the same as safe
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: watching_for_searchers
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  the_promise_kept:
+    id: the_promise_kept
+    text: >-
+      {visitor.name} kept their promise. The two days ended cleanly. When you see them
+      again in the ordinary course of the week, in the market, by the well, at the
+      edge of the square, they catch your eye once. The look means: I remember. I am
+      grateful. It does not mean the danger is over. It means you are on a different
+      footing with them than before, and that footing has implications you cannot fully
+      see yet.
+    choices:
+      - id: acknowledge_the_look
+        label: Acknowledge the look with a small nod, you see it and accept what it means
+        consequences:
+          - type: relationship
+            target: '{visitor.id}'
+            value: 2
+            axis: trust
+          - type: relationship_tag
+            target: '{visitor.id}'
+            value: trusted_with_secret
+        exhaustionCost: 0
+        nextNodeId: visitor_is_trustworthy
+      - id: look_away
+        label: Look away, you are not ready to acknowledge the new footing yet
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{visitor.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: visitor_is_trustworthy
+
+  final_resolution_note:
+    id: final_resolution_note
+    text: >-
+      The specific events of this episode settle into the longer story of the week. What
+      happened here will shape future interactions with {visitor.name} and with everyone
+      who witnessed your choices or heard about them. The town remembers how people
+      behaved under pressure. That memory accumulates. You are part of the record now.
+    choices:
+      - id: accept_the_record
+        label: Accept that this is now part of your story here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reflect_on_what_was_learned
+        label: Take time to reflect on what this week taught you about yourself
+        consequences:
+          - type: stat
+            target: charisma
             value: 1
         exhaustionCost: 0
         nextNodeId: null

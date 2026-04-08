@@ -37,11 +37,12 @@ nodes:
   start:
     id: start
     text: >-
-      They are in your woodshed you only found them because a board creaked wrong. {deserter.name}
+      They are in your woodshed, you only found them because a board creaked wrong. {deserter.name}
       is in partial armor, shaking, one hand raised. "Please." Their tabard still has the army's
-      mark on it. "I will not hurt anyone. I just I cannot go back. You have no idea what is
+      mark on it. "I will not hurt anyone. I just, I cannot go back. You have no idea what is
       happening at the front." Outside, {guard_patrol.name} is making their rounds. The next pass
-      is in ten minutes.
+      is in ten minutes. The light is too thin to read {deserter.name}'s expression clearly, but
+      the shaking is unmistakable.
     choices:
       - id: hide_them
         label: Pull the door shut and hide them properly
@@ -62,7 +63,7 @@ nodes:
         exhaustionCost: 2
         nextNodeId: hid
       - id: turn_in
-        label: Alert {guard_patrol.name} desertion undermines the defense
+        label: Alert {guard_patrol.name}, desertion undermines the defense
         consequences:
           - type: stat
             target: cunning
@@ -91,17 +92,63 @@ nodes:
             axis: trust
         exhaustionCost: 1
         nextNodeId: listened
+      - id: stall_them
+        label: Tell them to stay still and quiet while you think, buy yourself a minute
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: stalling
+
+  stalling:
+    id: stalling
+    text: >-
+      You hold up a hand and {deserter.name} goes still. You step back to the woodshed
+      door and watch {guard_patrol.name}'s lantern swing past the far end of the lane.
+      Ten seconds. Twenty. The light moves on. You have a little more time, not much.
+      {deserter.name} is watching you with the particular focus of someone who has placed
+      everything on this one decision.
+    choices:
+      - id: listen_then_decide
+        label: Use the time to listen to what they have to say
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{deserter.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: listened
+      - id: hide_without_listening
+        label: Decide now, hide them, ask questions later
+        consequences:
+          - type: world_fact
+            target: hid_deserter
+            value: true
+          - type: faction
+            target: town_guard
+            value: -2
+          - type: relationship
+            target: '{deserter.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 2
+        nextNodeId: hid
 
   hid:
     id: hid
     text: >-
-      {guard_patrol.name}'s footsteps pass. Then quiet. {deserter.name} lets out a long, shaking
-      breath. "Thank you." In the narrow dark of the woodshed, they tell you everything the
-      front line position overrun, the officers abandoning their posts, the thing they saw tear
-      apart a fortified gate in under a minute. It is worse than the town knows.
+      {guard_patrol.name}'s footsteps pass. Then quiet. {deserter.name} lets out a long,
+      shaking breath. "Thank you." In the narrow dark of the woodshed, they tell you
+      everything: the front line position overrun, the officers abandoning their posts,
+      the thing they saw tear apart a fortified gate in under a minute. They speak in
+      fragments, like someone picking through wreckage. It is worse than the town knows.
     choices:
       - id: report_intelligence
-        label: Report what they told you the town needs to know without naming the deserter
+        label: Report what they told you, the town needs to know, without naming the deserter
         consequences:
           - type: questline
             target: 'demon_invasion:border_intelligence'
@@ -113,7 +160,7 @@ nodes:
             target: town_guard
             value: 1
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: intelligence_dilemma
       - id: keep_secret
         label: Keep it all quiet and help them get further away
         consequences:
@@ -128,14 +175,15 @@ nodes:
             target: town_guard
             value: -1
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: search_party
 
   turned_in:
     id: turned_in
     text: >-
       {guard_patrol.name} moves quickly. {deserter.name} does not fight. They look at you once
-      as they are led away not with anger, which would be easier. The guard nods at you.
-      "Right thing to do." You stand in the empty woodshed and try to agree with them.
+      as they are led away, not with anger, which would be easier. The guard nods at you.
+      "Right thing to do." You stand in the empty woodshed and try to agree with them. The
+      army mark on {deserter.name}'s tabard catches the lantern light as they round the corner.
     choices:
       - id: advocate_for_leniency
         label: Follow up with the captain and advocate for leniency
@@ -151,7 +199,18 @@ nodes:
             value: 1
             axis: trust
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: deserter_fate
+      - id: ask_what_they_saw
+        label: Ask to speak to {deserter.name} briefly before they are taken, you need to know what they saw
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_intelligence'
+            value: 1
+          - type: world_fact
+            target: border_report_received
+            value: true
+        exhaustionCost: 1
+        nextNodeId: deserter_fate
       - id: leave_it
         label: Leave it. You did what was right.
         consequences:
@@ -159,19 +218,19 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: deserter_fate
 
   listened:
     id: listened
     text: >-
-      They talk fast. What they describe from the front is catastrophic supply lines cut,
+      They talk fast. What they describe from the front is catastrophic: supply lines cut,
       three senior commanders dead, the line retreating faster than anyone in town has been
       told. "I am not a coward," {deserter.name} says. "I ran because there was nothing left
-      to stand in front of." You believe them. {guard_patrol.name} is on their next pass.
-      You have seconds.
+      to stand in front of." You believe them. {guard_patrol.name} is beginning their next
+      pass. You have seconds to act.
     choices:
       - id: hide_after_hearing
-        label: Hide them what they know is worth protecting
+        label: Hide them, what they know is worth protecting
         consequences:
           - type: world_fact
             target: hid_deserter
@@ -187,9 +246,9 @@ nodes:
             value: 3
             axis: trust
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: intelligence_dilemma
       - id: turn_in_after_hearing
-        label: Turn them in anyway the army needs to know one of its own broke
+        label: Turn them in anyway, the army needs to know one of its own broke
         consequences:
           - type: faction
             target: town_guard
@@ -202,4 +261,544 @@ nodes:
             value: -3
             axis: trust
         exhaustionCost: 1
+        nextNodeId: turned_in
+      - id: help_them_escape
+        label: Help them get out of the town entirely, they cannot stay here
+        consequences:
+          - type: world_fact
+            target: deserter_escaped
+            value: true
+          - type: relationship
+            target: '{deserter.id}'
+            value: 2
+            axis: trust
+          - type: faction
+            target: town_guard
+            value: -2
+        exhaustionCost: 2
+        nextNodeId: search_party
+
+  intelligence_dilemma:
+    id: intelligence_dilemma
+    text: >-
+      You have information the town needs and a person who needs protecting. The two are
+      connected: to share the intelligence is to explain how you got it. {deserter.name}
+      watches you from behind a feed sack, understanding the shape of the problem better than
+      you might think. "Tell them," they say quietly. "Tell them I exist. I will take what
+      comes. The town matters more than whether I hang."
+    choices:
+      - id: report_with_name
+        label: Report everything, including {deserter.name}'s identity, and advocate for their protection
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_intelligence'
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: border_report_received
+            value: true
+          - type: world_fact
+            target: turned_in_deserter
+            value: true
+        exhaustionCost: 2
+        nextNodeId: deserter_fate
+      - id: report_without_name
+        label: Report the intelligence but protect their identity, find a way to frame it as your own deduction
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_intelligence'
+            value: 1
+          - type: world_fact
+            target: border_report_received
+            value: true
+          - type: world_fact
+            target: hid_deserter
+            value: true
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: search_party
+
+  search_party:
+    id: search_party
+    text: >-
+      By morning, the garrison knows someone matching {deserter.name}'s description came through
+      Ironhaven. {guard_patrol.name} knocks on doors. Someone says they saw a figure moving at
+      night. The questions reach you. {guard_patrol.name} is not accusatory, but the eyes are
+      steady and the question is direct: "Did you see anything unusual last night?"
+    choices:
+      - id: lie_convincingly
+        label: Lie cleanly, you saw nothing unusual
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: town_guard
+            value: -1
+          - type: world_fact
+            target: lied_to_guard
+            value: true
+        exhaustionCost: 1
+        nextNodeId: aftermath
+      - id: deflect_without_lying
+        label: Deflect without lying, redirect {guard_patrol.name}'s attention without direct falsehood
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: aftermath
+      - id: confess_and_explain
+        label: Confess and explain, give the context and hope it matters
+        consequences:
+          - type: faction
+            target: town_guard
+            value: -1
+          - type: world_fact
+            target: hid_deserter
+            value: true
+          - type: world_fact
+            target: turned_in_deserter
+            value: true
+        exhaustionCost: 2
+        nextNodeId: deserter_fate
+
+  deserter_fate:
+    id: deserter_fate
+    text: >-
+      The outcome arrives two days later. If {deserter.name} was turned in, they are held in
+      the garrison, their intelligence extracted, their fate pending military adjudication.
+      If they escaped, word comes that someone matching their description was seen a village east,
+      still moving. The captain closes the file without flourish. The intelligence about the
+      front, however it arrived, is being acted on. That much, at least, is clear.
+    choices:
+      - id: follow_up_on_deserter
+        label: Press the captain about {deserter.name}'s treatment, demand accountability
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: relationship
+            target: '{deserter.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_it_close
+        label: Let the matter close, you did what you could
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  aftermath:
+    id: aftermath
+    text: >-
+      Whether {deserter.name} is gone, caught, or still hiding, the garrison's attention
+      has moved on. The front is moving. The intelligence from the woodshed conversation,
+      however it reached the captain, has changed the defense planning in visible ways:
+      the east wall is getting reinforcement that was not scheduled before. Someone acted
+      on what you found out. The woodshed is just a woodshed again, its secret either spent
+      or buried, depending on what you chose.
+    choices:
+      - id: check_your_conscience
+        label: Sit with what you did and whether you would do it the same way again
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: woodshed_reflection
+      - id: inform_yourself_about_front
+        label: Use the intelligence to get ahead of what is coming, talk to the engineers
+        consequences:
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+          - type: world_fact
+            target: border_report_received
+            value: true
+        exhaustionCost: 1
+        nextNodeId: intelligence_used
+
+  woodshed_reflection:
+    id: woodshed_reflection
+    text: >-
+      You sit in the woodshed, the door open, the afternoon light coming in sideways.
+      It is a small space. A person was frightened in it. You made a decision that will
+      have consequences you cannot yet see. The moral question is not whether you made the
+      right choice. The question is whether you were the person you intended to be when
+      you made it. Those are not always the same question.
+    choices:
+      - id: satisfied_with_choice
+        label: You would make the same choice again
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: deserter_choice_settled
+            value: true
+        exhaustionCost: 0
+        nextNodeId: word_from_front
+      - id: uncertain_about_choice
+        label: You are not sure, and the uncertainty feels honest
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: deserter_choice_unsettled
+            value: true
+        exhaustionCost: 0
+        nextNodeId: word_from_front
+
+  intelligence_used:
+    id: intelligence_used
+    text: >-
+      The engineers take the intelligence seriously. Schematics are revised. The east wall
+      gets two new reinforcement points based on what {deserter.name} described about how
+      the demons attacked gates. The captain wants to know where the information came from.
+      You give an answer that is close enough to true. The captain accepts it with the
+      particular acceptance of someone who does not ask follow-up questions because they
+      do not want to know.
+    choices:
+      - id: ask_captain_about_deserter_fate
+        label: Use the goodwill to ask {guard_patrol.name} quietly what happened to {deserter.name}
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{deserter.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: word_from_front
+      - id: leave_it_there
+        label: Leave it there, the intelligence is where it needs to be
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: word_from_front
+
+  word_from_front:
+    id: word_from_front
+    text: >-
+      Ten days later, a rider comes in from the army's rear position. They carry the
+      week's casualty and movement report. Somewhere in it, if you read carefully or know
+      someone who does, is a single line about a deserter from the eastern garrison, status
+      unresolved, case open. Alive or not, free or not, the file stays open. As do most
+      things that do not reach a clean ending.
+    choices:
+      - id: try_to_get_more_information
+        label: Try to find out more through your connections, you want to know what happened to {deserter.name}
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{deserter.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: deserter_fate_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_it_close
+        label: Let the file stay open, you have done what you could
+        consequences:
+          - type: world_fact
+            target: turned_in_deserter
+            value: false
+        exhaustionCost: 0
+        nextNodeId: deserter_echoes
+
+  deserter_echoes:
+    id: deserter_echoes
+    text: >-
+      Two weeks later, the east wall reinforcements inspired by {deserter.name}'s intelligence
+      are tested. The demon army probes that section first, as if expecting the old weakness.
+      The new bracing holds. The probe fails. The captain orders the section held. Nobody
+      outside a small circle knows why the east wall was the priority, or that the priority
+      came from a shaking soldier in your woodshed. But the wall held.
+    choices:
+      - id: feel_the_weight_of_it
+        label: Sit with the fact that a deserter's testimony may have saved lives
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: deserter_intelligence_mattered
+            value: true
+        exhaustionCost: 0
+        nextNodeId: loyalty_question
+      - id: tell_the_captain_quietly
+        label: Tell {guard_patrol.name} quietly what the intelligence source actually was
+        consequences:
+          - type: relationship
+            target: '{guard_patrol.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: deserter_intelligence_mattered
+            value: true
+        exhaustionCost: 1
+        nextNodeId: loyalty_question
+
+  loyalty_question:
+    id: loyalty_question
+    text: >-
+      The question that the deserter episode raised has not gone away: what do you owe
+      to authority, and what do you owe to individuals inside a system that is under
+      stress? {deserter.name} broke their oath. They also saved lives. The two things
+      are both true. The army does not have a form for this. The moral ledger does not
+      have a column for it either. You are left to do the accounting yourself.
+    choices:
+      - id: conclude_it_was_right
+        label: Conclude that protecting them was right, the outcome proves it
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: deserter_choice_settled
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: conclude_outcomes_dont_justify
+        label: Conclude that outcome-based morality is a trap, what you did was still a gamble
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: deserter_choice_unsettled
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: write_it_down
+        label: Write the whole account down, exactly as it happened, for no one in particular
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: deserter_account_written
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  deserter_rumor:
+    id: deserter_rumor
+    text: >-
+      A rumor surfaces in the market two weeks after your woodshed encounter: someone saw
+      a deserter in Ironhaven, may have been helped by a local. The garrison is not
+      investigating officially, the front is too active for that. But the rumor floats.
+      People look at each other sideways. No one has named you. The story is still soft,
+      still shapeable.
+    choices:
+      - id: let_the_rumor_die
+        label: Let the rumor die, say nothing, contribute nothing, it will fade
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: woodshed_reflection
+      - id: actively_redirect_the_rumor
+        label: Redirect the rumor toward a plausible but false direction
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: lied_to_guard
+            value: true
+        exhaustionCost: 1
+        nextNodeId: woodshed_reflection
+      - id: confirm_you_helped
+        label: Confirm you helped, and explain why, let the town judge
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -1
+        exhaustionCost: 2
+        nextNodeId: loyalty_question
+
+  guard_return:
+    id: guard_return
+    text: >-
+      {guard_patrol.name} comes to speak with you again, twelve days later. More official
+      this time. The garrison has sent a formal inquiry. Not about the deserter specifically,
+      but about any unusual activity in the week the deserter would have passed through.
+      The questions are careful. {guard_patrol.name} watches your face more than they
+      watch their own notes.
+    choices:
+      - id: answer_carefully
+        label: Answer carefully, truthful about some things, silent about others
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{guard_patrol.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: loyalty_question
+      - id: tell_the_truth
+        label: Tell the truth and accept whatever follows
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: turned_in_deserter
+            value: true
+        exhaustionCost: 2
+        nextNodeId: loyalty_question
+
+  family_of_the_deserter:
+    id: family_of_the_deserter
+    text: >-
+      A letter arrives, addressed vaguely, asking about {deserter.name}. A family member,
+      somewhere east, trying to find them. They know {deserter.name} passed through this
+      area. They do not know the specifics. They ask only whether their person is alive.
+      The question carries the specific weight of people who have been waiting without
+      news long enough that they are asking strangers.
+    choices:
+      - id: write_back_honestly
+        label: Write back honestly within what you know, they are alive when last you knew
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: deserter_family_contacted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: loyalty_question
+      - id: do_not_write_back
+        label: Do not write back, you do not know enough and getting involved risks exposure
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: loyalty_question
+
+  front_report_changes:
+    id: front_report_changes
+    text: >-
+      A month after the woodshed encounter, the official front reports begin to shift.
+      The eastern garrison is described as having "sustained significant losses in the
+      vanguard engagement." Reading between that language, what {deserter.name} described
+      is confirmed. They were not exaggerating. They were reporting accurately what they
+      saw, which the garrison chose not to communicate up the chain. The desertion begins
+      to look different in this new light.
+    choices:
+      - id: feel_the_validation
+        label: Feel the validation of what {deserter.name} told you being borne out
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: deserter_intelligence_mattered
+            value: true
+        exhaustionCost: 0
+        nextNodeId: deserter_echoes
+      - id: note_it_and_move_on
+        label: Note it and move on, the past is settled, the siege is coming
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: border_report_received
+            value: true
+        exhaustionCost: 0
+        nextNodeId: deserter_echoes
+
+  deserter_aid_network:
+    id: deserter_aid_network
+    text: >-
+      You discover, through a careful chain of conversations, that {deserter.name} was
+      not the only one. At least two others passed through Ironhaven in the same week,
+      moving through different routes, using different contacts. Someone is organizing
+      safe passage for deserters. It is either a criminal operation or a mercy network,
+      and the difference depends entirely on what the front is actually like.
+    choices:
+      - id: try_to_make_contact_with_network
+        label: Try to make contact with whoever is running the network
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: hid_deserter
+            value: true
+          - type: world_fact
+            target: deserter_account_written
+            value: true
+        exhaustionCost: 2
+        nextNodeId: loyalty_question
+      - id: report_network_to_garrison
+        label: Report the network to the garrison, whatever the reason, it undermines military order
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: turned_in_deserter
+            value: true
+        exhaustionCost: 1
+        nextNodeId: loyalty_question
+
+  final_resolution_note:
+    id: final_resolution_note
+    text: >-
+      The specific events of this episode settle into the longer story of the week. What
+      happened here will shape future interactions with {deserter.name} and with everyone
+      who witnessed your choices or heard about them. The town remembers how people
+      behaved under pressure. That memory accumulates. You are part of the record now.
+    choices:
+      - id: accept_the_record
+        label: Accept that this is now part of your story here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reflect_on_what_was_learned
+        label: Take time to reflect on what this week taught you about yourself
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 0
         nextNodeId: null

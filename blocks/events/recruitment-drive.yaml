@@ -6,7 +6,7 @@ tags:
   - social
 storyline: demon_war
 chapter: 1
-reentry_recap: null
+reentry_recap: "The army recruiter is still in the square. The sign says defenders wanted. The question of who goes and who stays has not been settled."
 escalation:
   chance_base: 0.2
   advances_to: siege_preparations
@@ -39,9 +39,10 @@ nodes:
     id: start
     text: >-
       {recruiter.name} has set up a table in the square with a hand-painted sign: DEFENDERS
-      WANTED GOOD PAY, THREE MEALS. {neighbor.name} is standing in front of it with the
+      WANTED. GOOD PAY. THREE MEALS. {neighbor.name} is standing in front of it with the
       particular expression of someone who has not quite decided yet. {recruiter.name} spots
-      you. "You look capable. The army needs capable people."
+      you. "You look capable. The army needs capable people." Behind them, two names are already
+      on the sheet. Neither of those people looked like soldiers either.
     choices:
       - id: volunteer
         label: Step up and volunteer yourself
@@ -71,8 +72,16 @@ nodes:
             value: -1
         exhaustionCost: 1
         nextNodeId: dodged
+      - id: ask_about_terms
+        label: Ask {recruiter.name} what the terms actually mean before committing
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: terms_explained
       - id: help_recruit_others
-        label: Decline for yourself, but help recruit others in town
+        label: Decline for yourself, but spend the morning helping recruit others
         consequences:
           - type: stat
             target: charisma
@@ -89,9 +98,11 @@ nodes:
   volunteered:
     id: volunteered
     text: >-
-      {recruiter.name} takes your name with businesslike efficiency. "Report to the garrison in
-      three days." {neighbor.name} watches you sign and seems to straighten slightly. "If you can
-      do it," they say quietly, half to themselves. The table looks different once your name is on it.
+      {recruiter.name} takes your name with businesslike efficiency. "Report to the garrison
+      in three days." {neighbor.name} watches you sign and seems to straighten slightly. "If
+      you can do it," they say quietly, half to themselves. The table looks different once your
+      name is on it. {recruiter.name} already has their eyes on the next person passing the
+      square.
     choices:
       - id: encourage_neighbor
         label: Encourage {neighbor.name} to join too
@@ -104,27 +115,27 @@ nodes:
             target: 'demon_invasion:border_defense'
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: neighbor_pressured
       - id: wish_them_luck
-        label: Wish them well whatever they decide and go prepare
+        label: Wish {neighbor.name} well whatever they decide and go prepare yourself
         consequences:
           - type: relationship
             target: '{neighbor.id}'
             value: 1
             axis: respect
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: pre_departure
 
   dodged:
     id: dodged
     text: >-
-      {recruiter.name} looks at you a beat too long. "Essential work," they repeat. "Right." They
-      mark something on their sheet that may or may not be your name. {neighbor.name} sees the
-      exchange and looks conflicted. You walk away feeling the weight of the lie, and the weight
-      of what you chose to protect.
+      {recruiter.name} looks at you a beat too long. "Essential work," they repeat. "Right."
+      They mark something on their sheet that may or may not be your name. {neighbor.name}
+      sees the exchange and looks conflicted. You walk away feeling the weight of the lie,
+      and the weight of what you chose to protect. That weight does not go away.
     choices:
       - id: check_on_neighbor
-        label: Stop and talk to {neighbor.name} before you go
+        label: Stop and speak to {neighbor.name} before you go
         consequences:
           - type: relationship
             target: '{neighbor.id}'
@@ -134,23 +145,75 @@ nodes:
             target: charisma
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: neighbor_conversation
+      - id: reconsider_and_sign
+        label: Stop. Go back. Sign.
+        consequences:
+          - type: world_fact
+            target: volunteered_for_army
+            value: true
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: volunteered
       - id: just_leave
-        label: Just leave
+        label: Keep walking
         consequences:
           - type: stat
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: moral_weight
+
+  terms_explained:
+    id: terms_explained
+    text: >-
+      {recruiter.name} does not flinch. Three months minimum, longer if the campaign extends.
+      Pay is honest but modest. You fight where you are told. If you fall, your family
+      receives a death stipend, a single payment, the amount printed on a card they hand you.
+      You turn it over. It is enough to bury you and not much else. "The real pay," {recruiter.name}
+      says, "is that there is still a town to come home to."
+    choices:
+      - id: sign_with_eyes_open
+        label: Sign, knowing exactly what you are agreeing to
+        consequences:
+          - type: world_fact
+            target: volunteered_for_army
+            value: true
+          - type: faction
+            target: town_guard
+            value: 3
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 2
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: pre_departure
+      - id: decline_on_terms
+        label: Decline. The terms are not right for you. Find another way to help.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -1
+        exhaustionCost: 0
+        nextNodeId: helped_recruit
 
   helped_recruit:
     id: helped_recruit
     text: >-
-      You spend the morning moving through the market, making the case good pay, necessary work,
-      the town's survival. By midday, four names are on the sheet that would not have been otherwise.
-      {recruiter.name} nods at you with something like professional appreciation. {neighbor.name}
-      is one of the four.
+      You spend the morning moving through the market, making the case: good pay, necessary
+      work, the town's survival. By midday, four names are on the sheet that would not have
+      been otherwise. {recruiter.name} nods at you with something like professional appreciation.
+      {neighbor.name} is one of the four. They signed quietly, without celebration.
     choices:
       - id: see_them_off
         label: Make sure {neighbor.name} and the others know what they are walking into
@@ -163,9 +226,563 @@ nodes:
             target: charisma
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: neighbor_conversation
       - id: step_away
-        label: Your work is done step away
+        label: Your work is done, step away
         consequences: []
+        exhaustionCost: 0
+        nextNodeId: moral_weight
+
+  neighbor_pressured:
+    id: neighbor_pressured
+    text: >-
+      {neighbor.name} listens. Their expression is the specific one of someone being moved
+      by something they wish were not moving them. They sign. {recruiter.name} records their
+      name efficiently. {neighbor.name} does not look at you after, which tells you something
+      about how much of the decision was truly theirs. The question of whether you helped them
+      or pushed them will depend on how the campaign goes.
+    choices:
+      - id: acknowledge_the_weight
+        label: Acknowledge to yourself that you pushed them, and carry that
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: neighbor_conscripted_by_pressure
+            value: true
+        exhaustionCost: 0
+        nextNodeId: pre_departure
+      - id: check_they_are_okay
+        label: Ask {neighbor.name} privately if they are sure, give them an out
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 2
+            axis: respect
+          - type: world_fact
+            target: neighbor_given_out
+            value: true
+        exhaustionCost: 1
+        nextNodeId: pre_departure
+
+  neighbor_conversation:
+    id: neighbor_conversation
+    text: >-
+      {neighbor.name} is quiet for a moment. Then: "I keep thinking about my father's farm.
+      If the town falls there is nothing to go back to. If I go and the town survives but
+      I do not." They stop. "I do not know which fear is bigger." They are not asking you
+      to decide for them. They are asking you to sit with them in the uncertainty. The
+      recruiter's table is still in view.
+    choices:
+      - id: speak_honestly
+        label: Speak honestly about what you think, even if the answer is hard
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 2
+            axis: trust
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: moral_weight
+      - id: tell_them_to_trust_themselves
+        label: Tell them only they can make this call and you will stand by whatever they decide
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 3
+            axis: respect
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 1
+            axis: affection
+        exhaustionCost: 0
+        nextNodeId: moral_weight
+
+  moral_weight:
+    id: moral_weight
+    text: >-
+      By the end of the day, the recruiter has packed up the table. Fourteen names on the
+      sheet. Some volunteered cleanly. Some were talked into it. Some signed because they
+      felt the eyes of the square on them. {recruiter.name} has done this before, in other
+      towns, with other crises. The machine of it is well-oiled. You were, in some small way,
+      part of the machine today, one way or another.
+    choices:
+      - id: reflect_on_the_day
+        label: Sit with what the day meant before it becomes too distant to feel
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: recruitment_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: pre_departure
+      - id: ask_recruiter_about_conscription
+        label: Catch {recruiter.name} before they leave, ask what happens if volunteers are not enough
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: conscription_threat_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: conscription_warning
+
+  conscription_warning:
+    id: conscription_warning
+    text: >-
+      {recruiter.name} answers without flinching. "If the front pushes further west, the
+      council has authority to compel service. Every adult under forty who is not doing
+      essential work." They fold their ledger. "I prefer voluntary. The men who come by
+      choice fight better. But choice is a luxury the campaign may not afford." They
+      shoulder their bag. "Your name is not on that sheet. That may matter more than you
+      think, depending on how the next week goes."
+    choices:
+      - id: sign_now
+        label: Sign before they close the book
+        consequences:
+          - type: world_fact
+            target: volunteered_for_army
+            value: true
+          - type: faction
+            target: town_guard
+            value: 3
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: pre_departure
+      - id: note_the_warning
+        label: Note the warning and say nothing, you will decide when the time comes
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: conscription_threat_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: pre_departure
+
+  pre_departure:
+    id: pre_departure
+    text: >-
+      Three days pass quickly. The morning of the garrison report date arrives cool and
+      overcast. Whether you signed or not, whether {neighbor.name} signed or not, the
+      town is a slightly different place. The square is quieter. Some faces are missing
+      from the usual corners. The recruiter is gone. The army is moving.
+    choices:
+      - id: see_neighbor_off
+        label: Go to the gate and say goodbye to {neighbor.name} before the column leaves
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 3
+            axis: affection
+          - type: world_fact
+            target: farewell_given
+            value: true
+        exhaustionCost: 1
+        nextNodeId: gate_farewell
+      - id: stay_in
+        label: Stay inside, you have said what needed to be said
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: after_they_leave
+
+  gate_farewell:
+    id: gate_farewell
+    text: >-
+      The column forms at dawn. {neighbor.name} is near the back in civilian clothes,
+      a pack too large for them, expression unreadable. They see you and something shifts
+      in their face. You have time for a few words before the column moves. The recruiter
+      is already calling the pace.
+    choices:
+      - id: say_something_real
+        label: Say something true, not reassuring
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 3
+            axis: trust
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: farewell_honest
+            value: true
+        exhaustionCost: 0
+        nextNodeId: column_departs
+      - id: say_something_encouraging
+        label: Tell them they will do well, and mean it
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 2
+            axis: affection
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: column_departs
+      - id: give_them_something
+        label: Press something into their hand, a coin, a charm, anything to carry
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 3
+            axis: affection
+          - type: relationship_tag
+            target: '{neighbor.id}'
+            value: token_given
+        exhaustionCost: 0
+        nextNodeId: column_departs
+
+  column_departs:
+    id: column_departs
+    text: >-
+      The column moves. {recruiter.name} at the front, the volunteers in a loose shape
+      behind, some with weapons that do not quite fit their hands. {neighbor.name} does
+      not look back, which is either discipline or self-preservation. The sound of boots
+      on packed earth fades. The gate closes. The square is quiet in the specific way it
+      gets when something has left it.
+    choices:
+      - id: go_back_to_work
+        label: Go back to what you were doing before all this
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: after_they_leave
+      - id: find_recruiter_to_ask_about_training
+        label: Find {recruiter.name} and ask what training {neighbor.name} will receive before fighting
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: training_inquiry_made
+            value: true
+        exhaustionCost: 1
+        nextNodeId: after_they_leave
+
+  after_they_leave:
+    id: after_they_leave
+    text: >-
+      A week passes. Word comes back from the garrison, a brief letter on garrison paper,
+      saying the volunteers arrived and training has begun. Nothing about individuals.
+      Nothing about conditions. {neighbor.name}'s family asks you if you have heard anything.
+      You have not. This is what you signed up for, or stood by for, or sent someone else
+      into, depending on the choices you made. The waiting is its own form of commitment.
+    choices:
+      - id: write_to_neighbor
+        label: Write {neighbor.name} a letter, even if you do not know if it will reach them
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: letter_sent_to_neighbor
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: check_in_with_family
+        label: Check in on {neighbor.name}'s family, make sure they have what they need
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: prepare_for_the_next_phase
+        label: Focus forward, the siege is coming and {neighbor.name} will be part of the defense
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 1
+          - type: world_fact
+            target: volunteers_recruited
+            value: true
+        exhaustionCost: 0
+        nextNodeId: recruitment_ripple
+
+  recruitment_ripple:
+    id: recruitment_ripple
+    text: >-
+      The departure reshapes the town in ways you notice a week later. The smithy is
+      quieter. Two farms are one person short at the critical moment before harvest.
+      The tavern has three regulars who are not coming back for months, if they come back
+      at all. The people who did not go are filling gaps they were not trained to fill.
+      This is what a recruitment drive leaves behind: not just the people who went, but
+      the shape of their absence.
+    choices:
+      - id: help_fill_the_gaps
+        label: Help fill the gaps in practical ways, wherever the need is most visible
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 3
+        exhaustionCost: 3
+        nextNodeId: news_from_the_front
+      - id: check_on_families_left_behind
+        label: Check in on families whose members went, see who is struggling
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: news_from_the_front
+      - id: note_what_is_still_missing
+        label: Note carefully which roles are unfilled, the next crisis will hit those gaps hard
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: manpower_gaps_mapped
+            value: true
+        exhaustionCost: 1
+        nextNodeId: news_from_the_front
+
+  news_from_the_front:
+    id: news_from_the_front
+    text: >-
+      A rider arrives from the garrison with an official dispatch. The town's volunteers are
+      assigned to the fourth defensive company, eastern approach. The dispatch does not name
+      individuals but {recruiter.name} has written a brief note at the bottom in their own
+      hand: "Your people are holding. Keep the town worth coming back to." It is the most
+      personal thing you have read from a military document.
+    choices:
+      - id: share_the_note
+        label: Share the note publicly, the town needs to hear it
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: volunteers_recruited
+            value: true
+        exhaustionCost: 0
+        nextNodeId: recruitment_ends
+      - id: keep_the_note
+        label: Keep the note yourself, it was not meant for a crowd
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: volunteers_recruited
+            value: true
+        exhaustionCost: 0
+        nextNodeId: recruitment_ends
+
+  second_wave_pressure:
+    id: second_wave_pressure
+    text: >-
+      Three weeks after the first column left, {recruiter.name} returns. The sign goes up
+      again. This time it says: DEFENDERS NEEDED. The word "wanted" is gone. The pay is
+      the same. The meals are the same. The tone is not. The square is quieter today than
+      it was the first time. Some of the easy volunteers are already gone.
+    choices:
+      - id: step_up_again
+        label: Step up again, or step up for the first time
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 3
+          - type: world_fact
+            target: volunteered_for_army
+            value: true
+        exhaustionCost: 3
+        nextNodeId: recruitment_ends
+      - id: help_without_signing
+        label: Help find volunteers without signing yourself
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: recruitment_ends
+      - id: note_the_change_in_tone
+        label: Note the change in tone and what it means for how the war is going
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: conscription_threat_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: recruitment_ends
+
+  recruitment_ends:
+    id: recruitment_ends
+    text: >-
+      {recruiter.name} packs up the table for the second or final time. The sign comes
+      down. The garrison has what it can get from this town for now. What comes next is
+      either the siege, or the wait before the siege, or the news that the line has held
+      somewhere east and the wait stretches longer. Whatever it is, the town faces it
+      slightly smaller than it was before the recruitment drive began.
+    choices:
+      - id: look_forward
+        label: Look forward, you have done your part in the recruitment, now prepare for what follows
+        consequences:
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+          - type: world_fact
+            target: volunteers_recruited
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: tend_the_town
+        label: Tend to the town itself, smaller towns need more from each person that remains
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: conscription_arrives
+
+  conscription_arrives:
+    id: conscription_arrives
+    text: >-
+      Three weeks after the first drive, the rumor {recruiter.name} hinted at becomes
+      real. A council notice goes up: all adults under forty without essential designations
+      are to report for service assessment. Not required service yet. Assessment. The word
+      lands hard. {neighbor.name}'s family has two members who have not yet left.
+    choices:
+      - id: support_the_families_facing_assessment
+        label: Help families navigate the assessment process fairly
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: conscription_threat_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: recruit_final
+      - id: argue_against_conscription_at_council
+        label: Speak at the council meeting against the assessment's scope
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: faction
+            target: town_guard
+            value: -1
+        exhaustionCost: 2
+        nextNodeId: recruit_final
+      - id: accept_the_assessment
+        label: Accept that this is how it has to be and cooperate
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: conscription_threat_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: recruit_final
+
+  recruit_final:
+    id: recruit_final
+    text: >-
+      The town has now sent more than a fifth of its working adults to the front. The
+      gaps are visible: slower harvests, longer market days, children doing work that
+      was not children's work before. What {recruiter.name} called necessary the town
+      now calls normal, which is a different thing. Whether it was the right choice is
+      a question for after. For now, the town survives with what it has left.
+    choices:
+      - id: commit_to_the_home_front
+        label: Commit to the home front, your contribution is here
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: volunteers_recruited
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: find_ways_to_support_the_front
+        label: Find ways to support those who left from here, supply, information, morale
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 1
+          - type: world_fact
+            target: volunteers_recruited
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  recruiter_returns_alone:
+    id: recruiter_returns_alone
+    text: >-
+      Three months after the drive, {recruiter.name} comes back through Ironhaven. Alone,
+      on foot, without the table and the sign. They stop at the tavern. When you see them,
+      they look different, not older exactly, but reduced, the way a fire looks when it has
+      burned through most of its fuel. They do not recruit. They drink quietly and do not
+      speak to anyone first.
+    choices:
+      - id: approach_recruiter
+        label: Approach {recruiter.name} and ask what they can share about the front
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{recruiter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: border_report_received
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: leave_recruiter_alone
+        label: Leave them alone, they came back for a reason that is not you
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
         exhaustionCost: 0
         nextNodeId: null

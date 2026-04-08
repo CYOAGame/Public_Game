@@ -38,11 +38,11 @@ nodes:
   start:
     id: start
     text: >-
-      {captain.name} has called every able body to the square. {engineer.name} unrolls a map of
-      the town walls patched, old, not designed for what is coming. "We have perhaps a week,"
-      {captain.name} says. "Maybe less. The question is how we spend it." They look around the
-      crowd. "I need three things: stronger walls, food stores that will last, and a plan if the
-      walls fail. Who is doing what?"
+      {captain.name} has called every able body to the square. {engineer.name} unrolls a map
+      of the town walls, patched and old and not designed for what is coming. "We have perhaps
+      a week," {captain.name} says. "Maybe less. The question is how we spend it." They look
+      around the crowd. "I need three things: stronger walls, food stores that will last, and
+      a plan if the walls fail. Who is doing what?" The crowd is silent. Someone has to move first.
     choices:
       - id: fortify_walls
         label: Join the wall-fortification crew under {engineer.name}
@@ -62,7 +62,7 @@ nodes:
         exhaustionCost: 4
         nextNodeId: fortified
       - id: stockpile_food
-        label: Organize the food stockpile logistics will win or lose this
+        label: Organize the food stockpile, logistics will win or lose this
         consequences:
           - type: stat
             target: cunning
@@ -89,14 +89,29 @@ nodes:
             value: true
         exhaustionCost: 2
         nextNodeId: planned_escape
+      - id: raise_morale
+        label: Focus on morale, keep people steady so they do not fall apart before the fight begins
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: morale_maintained
+            value: true
+        exhaustionCost: 2
+        nextNodeId: morale_work
 
   fortified:
     id: fortified
     text: >-
-      Three days of hauling stone and hammering braces. Your hands blister and your back screams.
-      {engineer.name} works beside you without complaint and twice says "good" which, you learn,
-      is their highest form of praise. The north wall is now solid enough to matter. The east wall
-      is another question.
+      Three days of hauling stone and hammering braces. Your hands blister and your back
+      screams. {engineer.name} works beside you without complaint and twice says "good,"
+      which, you learn, is their highest form of praise. The north wall is now solid enough
+      to matter. The east wall is another question. {engineer.name} examines it with the
+      expression of someone doing arithmetic that does not come out right.
     choices:
       - id: keep_going_east
         label: Push through exhaustion and tackle the east wall too
@@ -104,14 +119,14 @@ nodes:
           - type: stat
             target: strength
             value: 1
-          - type: exhaustion
-            target: self
-            value: 3
           - type: questline
             target: 'demon_invasion:siege_preparation'
             value: 1
+          - type: world_fact
+            target: east_wall_reinforced
+            value: true
         exhaustionCost: 4
-        nextNodeId: null
+        nextNodeId: wall_assessment
       - id: rest_and_brief_others
         label: Rest and brief the next crew on what you learned
         consequences:
@@ -122,7 +137,19 @@ nodes:
             target: 'demon_invasion:siege_preparation'
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: wall_assessment
+      - id: ask_engineer_for_honest_assessment
+        label: Ask {engineer.name} what they really think of our chances with these walls
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{engineer.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: engineers_assessment
 
   stockpiled:
     id: stockpiled
@@ -130,7 +157,8 @@ nodes:
       The numbers are not encouraging. At current population, including refugees, you have food
       for twelve days if rationing is strict. You present this to {captain.name}, who nods once,
       sharply. "Then we will be strict." They look at you. "I want you managing the distribution.
-      You have the head for it."
+      You have the head for it." Behind the numbers is a harder truth: twelve days assumes nothing
+      is spoiled, nothing is stolen, and no more people arrive at the gate.
     choices:
       - id: accept_distribution_role
         label: Accept the responsibility
@@ -147,27 +175,45 @@ nodes:
           - type: questline
             target: 'demon_invasion:siege_preparation'
             value: 1
+          - type: world_fact
+            target: distribution_role_accepted
+            value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: rationing_tensions
       - id: decline_distribution_role
-        label: Decline you have other skills needed elsewhere
+        label: Decline, you have other skills needed elsewhere
         consequences:
           - type: stat
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: morale_work
+      - id: flag_the_spoilage_risk
+        label: Flag the spoilage risk before accepting, the numbers need a cushion
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+          - type: world_fact
+            target: food_stores_assessed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: rationing_tensions
 
   planned_escape:
     id: planned_escape
     text: >-
-      You walk the town perimeter after dark. The old tannery has a collapsed section of outer wall
-      that has been quietly ignored for years. Beyond it, a dry drainage channel runs northeast
-      for half a mile before opening into the forest. Passable. Defensible from pursuit, briefly.
-      You make careful notes and share them with no one yet.
+      You walk the town perimeter after dark. The old tannery has a collapsed section of outer
+      wall that has been quietly ignored for years. Beyond it, a dry drainage channel runs
+      northeast for half a mile before opening into the forest. Passable. Defensible from
+      pursuit, briefly. You make careful notes and share them with no one yet. The knowing
+      sits in you like a coin you are not sure whether to spend.
     choices:
       - id: share_with_captain
-        label: Share the route with {captain.name} they need contingency plans
+        label: Share the route with {captain.name}, they need contingency plans
         consequences:
           - type: faction
             target: town_guard
@@ -179,10 +225,27 @@ nodes:
           - type: questline
             target: 'demon_invasion:siege_preparation'
             value: 1
+          - type: world_fact
+            target: escape_route_shared
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: wall_assessment
+      - id: share_with_refugees
+        label: Share it with the refugee leader, civilians need to know first
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: escape_route_shared
+            value: true
+          - type: world_fact
+            target: refugees_know_escape
+            value: true
+        exhaustionCost: 1
+        nextNodeId: wall_assessment
       - id: keep_private
-        label: Keep it private knowledge of an exit is power
+        label: Keep it private, knowledge of an exit is power
         consequences:
           - type: stat
             target: cunning
@@ -190,5 +253,624 @@ nodes:
           - type: world_fact
             target: secret_exit_known
             value: true
+        exhaustionCost: 0
+        nextNodeId: wall_assessment
+
+  morale_work:
+    id: morale_work
+    text: >-
+      You move through the town the way water finds cracks: a word here, a hand on a
+      shoulder there, someone's fire tended while they carry stones. By evening, the mood
+      has not changed but the people have. Small things accumulate. The baker's apprentice
+      stops crying. Two neighbors who were arguing this morning share a meal. {captain.name}
+      watches you from across the square with an expression you cannot read.
+    choices:
+      - id: address_the_crowd
+        label: Speak directly to the gathered workers as the day ends, make it count
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: morale_speech_given
+            value: true
+        exhaustionCost: 2
+        nextNodeId: rationing_tensions
+      - id: find_the_doubters
+        label: Seek out the people who look most frightened and spend time with them specifically
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 3
+        exhaustionCost: 2
+        nextNodeId: rationing_tensions
+      - id: keep_it_quiet
+        label: Keep the work quiet, visible leadership draws attention you may not want
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: morale_maintained
+            value: true
+        exhaustionCost: 1
+        nextNodeId: wall_assessment
+
+  engineers_assessment:
+    id: engineers_assessment
+    text: >-
+      {engineer.name} looks at the east wall for a long moment. Then: "The north will hold a
+      sustained assault for perhaps four hours. The east will hold for two, maybe less. The
+      south gate is sound but it is also the widest gap." They do not say what follows from
+      that arithmetic. They do not need to. "We are not building a fortress," they say. "We
+      are buying time. What you do with that time is someone else's department."
+    choices:
+      - id: take_assessment_to_captain
+        label: Take this assessment directly to {captain.name}, they need the full picture
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: wall_limits_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: rationing_tensions
+      - id: ask_what_more_can_be_done
+        label: Ask {engineer.name} what one more day of work on the east wall would buy
+        consequences:
+          - type: world_fact
+            target: east_wall_reinforced
+            value: true
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+        exhaustionCost: 3
+        nextNodeId: wall_assessment
+
+  wall_assessment:
+    id: wall_assessment
+    text: >-
+      {engineer.name} gives their final assessment on the fourth day: the north wall is sound,
+      the east is improved but not trusted, the south gate is as good as it will get without
+      materials they do not have. "A professional siege would still break this in a day," they
+      say. "We are not preparing for a professional siege." A pause. "We are preparing for
+      something faster and worse."
+    choices:
+      - id: ask_about_the_demon_army
+        label: Ask {engineer.name} what specifically they have heard about the enemy's tactics
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_intelligence'
+            value: 1
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: rationing_tensions
+      - id: focus_on_the_gate
+        label: Spend another day on the south gate, it is the last line
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: south_gate_reinforced
+            value: true
+        exhaustionCost: 3
+        nextNodeId: rationing_tensions
+
+  rationing_tensions:
+    id: rationing_tensions
+    text: >-
+      The rations arrive the same day as the news that the western road is now watched.
+      Half portions for most. Less for those who cannot work. The townspeople accept it
+      with the particular silence of people deciding how they feel later. But later comes
+      fast: by evening a small argument at the distribution point about what counts as
+      essential labor has turned into something larger and louder than it should be.
+    choices:
+      - id: step_in_to_mediate
+        label: Step in and settle the dispute, this is the kind of thing that breaks morale
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: rationing_dispute_resolved
+            value: true
+        exhaustionCost: 2
+        nextNodeId: final_night
+      - id: let_captain_handle_it
+        label: Step back and let {captain.name} handle it, that is their role
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: faction
+            target: village_folk
+            value: -1
+        exhaustionCost: 0
+        nextNodeId: final_night
+
+  final_night:
+    id: final_night
+    text: >-
+      The night before the expected arrival, the town is quieter than it has ever been. No
+      children playing past dark. Lanterns left burning. {captain.name} walks the walls once
+      with you, not speaking, just checking each section with their eyes. "We did what we could,"
+      they say finally. It is not reassurance. It is accounting. You have the sense of everything
+      you built over the past week balancing on what comes next.
+    choices:
+      - id: spend_night_on_wall
+        label: Volunteer for the watch, spend the night on the wall
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: final_watch_kept
+            value: true
+        exhaustionCost: 3
+        nextNodeId: night_on_wall
+      - id: rest_before_the_fight
+        label: Sleep while you can, you will need it tomorrow
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: dawn_comes
+      - id: say_something_to_captain
+        label: Tell {captain.name} one true thing before the night closes in
+        consequences:
+          - type: relationship
+            target: '{captain.id}'
+            value: 3
+            axis: trust
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: affection
+        exhaustionCost: 0
+        nextNodeId: captain_speaks
+
+  night_on_wall:
+    id: night_on_wall
+    text: >-
+      The night on the wall passes through four watches. Cold, clear, and silent until
+      the third watch when {engineer.name} climbs up and stands beside you without being
+      asked. For an hour they say nothing. Then: "I built things to stand. My whole life.
+      This is the first time I have built something hoping it will be unnecessary." They
+      look at the dark fields. "The east wall will hold longer than I told them. I added
+      margin. I always add margin. I just do not always say so."
+    choices:
+      - id: thank_engineer
+        label: Thank {engineer.name}, that margin may be everything
+        consequences:
+          - type: relationship
+            target: '{engineer.id}'
+            value: 3
+            axis: trust
+          - type: relationship
+            target: '{engineer.id}'
+            value: 2
+            axis: affection
+        exhaustionCost: 0
+        nextNodeId: dawn_comes
+      - id: ask_engineer_for_assessment
+        label: Ask {engineer.name} for their honest assessment of how tomorrow goes
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: engineers_real_assessment_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: dawn_comes
+
+  captain_speaks:
+    id: captain_speaks
+    text: >-
+      {captain.name} listens to what you say. Whatever it is, they do not dismiss it.
+      When you finish, they are quiet for long enough that you wonder if they will answer.
+      Then: "I became the captain because no one else would. Not because I was best. Because
+      I was willing." They look at the town behind you. "Willingness is underrated. I see it
+      in you." A pause. "Get some sleep. I need you able tomorrow."
+    choices:
+      - id: go_rest
+        label: Take the order and go rest
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: respect
+        exhaustionCost: 0
+        nextNodeId: dawn_comes
+      - id: stay_and_stand_watch_together
+        label: Stay on the wall beside {captain.name} for a while longer
+        consequences:
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: final_watch_kept
+            value: true
+        exhaustionCost: 1
+        nextNodeId: dawn_comes
+
+  dawn_comes:
+    id: dawn_comes
+    text: >-
+      Dawn. The horns are already sounding when you wake or when your watch shifts.
+      The demon army has been seen on the south road and the north ridge simultaneously.
+      It is not a siege. It is an encirclement. {captain.name} is already at the wall.
+      {engineer.name} is already at the east section with a chisel in their hand for
+      reasons you do not have time to ask about. Everything you prepared is about to
+      be tested. All of it at once.
+    choices:
+      - id: take_your_position
+        label: Take the position you planned for and hold it
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: siege_prepared
+            value: true
+        exhaustionCost: 3
+        nextNodeId: null
+      - id: check_the_escape_route
+        label: Verify the escape route is clear before the fighting starts
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: siege_prepared
+            value: true
+          - type: world_fact
+            target: escape_route_planned
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: find_captain_for_final_orders
+        label: Find {captain.name} for final orders and station assignment
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: siege_prepared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  morale_crisis:
+    id: morale_crisis
+    text: >-
+      Three days into preparations, something breaks. Not the wall. A family, well-known
+      in the market, packs a cart before dawn and tries to leave through the south gate.
+      The guard stops them. Word spreads in an hour. By noon, two more families are
+      standing at the gate with their things. The crowd watches. {captain.name} looks
+      at you. This is not a military problem. It is a human one.
+    choices:
+      - id: speak_to_the_families
+        label: Go to the gate and speak to the families directly
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: morale_maintained
+            value: true
+        exhaustionCost: 2
+        nextNodeId: rationing_tensions
+      - id: support_their_right_to_leave
+        label: Argue that they should be allowed to leave, forcing people to stay is wrong
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -1
+          - type: world_fact
+            target: gate_opened_for_civilians
+            value: true
+        exhaustionCost: 1
+        nextNodeId: rationing_tensions
+      - id: ask_what_they_need_to_stay
+        label: Ask each family what would make them willing to stay
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: rationing_tensions
+
+  supply_crisis:
+    id: supply_crisis
+    text: >-
+      On the fifth day, the wagon that was bringing additional arrow stock from the
+      regional garrison fails to arrive. {captain.name} sends a rider, who returns
+      with bad news: the road is watched, the garrison is under its own pressure,
+      the arrows are not coming. You have what you have. {engineer.name} suggests
+      repurposing metal fittings from the tannery and the old mill as improvised
+      projectiles. It is not elegant. It might work.
+    choices:
+      - id: support_improvised_projectiles
+        label: Support the improvisation and help gather the materials
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+          - type: world_fact
+            target: siege_improvised_supplies
+            value: true
+        exhaustionCost: 3
+        nextNodeId: final_night
+      - id: try_another_supply_route
+        label: Try to source supplies from the refugees who came through, they may have left caches
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: refugee_caches_sought
+            value: true
+        exhaustionCost: 2
+        nextNodeId: final_night
+
+  volunteer_training:
+    id: volunteer_training
+    text: >-
+      On the third day, {captain.name} organizes a half-day of basic combat drills for
+      non-soldiers. Farmers with pitchforks. A baker's apprentice with a smithy hammer.
+      An older woman who turns out to have served as a medic in a conflict you had not
+      heard of. You are part of this group, or you watch it, or you help run it. The
+      mood is somewhere between grim and determined and defiant.
+    choices:
+      - id: participate_fully
+        label: Participate fully in the drills
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 1
+        exhaustionCost: 3
+        nextNodeId: rationing_tensions
+      - id: help_the_medic
+        label: Work with the former medic, field medicine is as valuable as a sword
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: siege_prepared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: rationing_tensions
+      - id: organize_the_less_able
+        label: Organize the people who cannot fight into support roles, every body counts
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: morale_maintained
+            value: true
+        exhaustionCost: 2
+        nextNodeId: rationing_tensions
+
+  children_and_elderly:
+    id: children_and_elderly
+    text: >-
+      On the fourth day, the question arises that no one wanted to raise: what about
+      children and the elderly if the walls fail? The escape route plan, if it exists,
+      is only useful if people know about it and can move. {engineer.name} points out
+      that the drainage channel is too narrow for a loaded cart. Children can walk it.
+      Elderly with walking sticks can manage it. No one else has a plan.
+    choices:
+      - id: organize_civilian_evacuation_plan
+        label: Take responsibility for the civilian evacuation plan
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: escape_route_planned
+            value: true
+          - type: world_fact
+            target: siege_prepared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: final_night
+      - id: raise_it_with_captain
+        label: Raise it with {captain.name} and insist on a formal plan
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: escape_route_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: final_night
+
+  engineer_personal_moment:
+    id: engineer_personal_moment
+    text: >-
+      On the sixth day, you find {engineer.name} alone on the north wall at dusk, looking
+      at the horizon. Not at the approaching army. At the town behind them. "I built the
+      granary stairs," they say without turning. "And the mill wheel housing. And the
+      well casing on the south side." A pause. "I have spent thirty years building things
+      so they would last. I would like to believe that matters tomorrow." They do not ask
+      you to reassure them. They are making a statement of principle.
+    choices:
+      - id: affirm_the_work
+        label: Tell {engineer.name} their work has mattered and will matter tomorrow
+        consequences:
+          - type: relationship
+            target: '{engineer.id}'
+            value: 3
+            axis: affection
+          - type: relationship
+            target: '{engineer.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: final_night
+      - id: stand_beside_them_in_silence
+        label: Stand beside them without speaking, some things do not need a response
+        consequences:
+          - type: relationship
+            target: '{engineer.id}'
+            value: 3
+            axis: trust
+          - type: relationship_tag
+            target: '{engineer.id}'
+            value: shared_vigil
+        exhaustionCost: 0
+        nextNodeId: final_night
+
+  defensive_innovation:
+    id: defensive_innovation
+    text: >-
+      {engineer.name} has an idea they have not shared with {captain.name} yet: collapsible
+      barricades inside the gate tunnel, deployable in thirty seconds if the outer gate is
+      breached. Three days to build. It buys six minutes. "Six minutes of defensible inner
+      ground," {engineer.name} says, "is the difference between an organized retreat and a
+      rout." They are asking your opinion before they bring it to the captain.
+    choices:
+      - id: support_the_idea
+        label: Support the idea and help make the case to {captain.name}
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: siege_prepared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: rationing_tensions
+      - id: help_build_it
+        label: Skip the meeting and start building
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+          - type: world_fact
+            target: siege_prepared
+            value: true
+        exhaustionCost: 3
+        nextNodeId: rationing_tensions
+
+  the_sick_and_wounded:
+    id: the_sick_and_wounded
+    text: >-
+      On the fifth day, the medic who was at the drill comes to you with a problem. The
+      people who are ill or injured and cannot work, three children with fever, an old man
+      with a bad leg, two people who were hurt in the wall work, these are not in the
+      rationing plan. The plan assumes everyone either works or is counted as civilian burden.
+      Nobody accounted for the ones in between.
+    choices:
+      - id: advocate_for_the_sick
+        label: Take this to {captain.name} and {engineer.name} and push for an adjustment
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: rationing_implemented
+            value: true
+        exhaustionCost: 2
+        nextNodeId: final_night
+      - id: organize_informal_support
+        label: Organize informal support for them outside the official plan
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: community_integrated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: final_night
+
+  final_resolution_note:
+    id: final_resolution_note
+    text: >-
+      The specific events of this episode settle into the longer story of the week. What
+      happened here will shape future interactions with {captain.name} and with everyone
+      who witnessed your choices or heard about them. The town remembers how people
+      behaved under pressure. That memory accumulates. You are part of the record now.
+    choices:
+      - id: accept_the_record
+        label: Accept that this is now part of your story here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reflect_on_what_was_learned
+        label: Take time to reflect on what this week taught you about yourself
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
         exhaustionCost: 0
         nextNodeId: null

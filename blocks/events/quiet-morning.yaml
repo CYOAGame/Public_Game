@@ -23,7 +23,7 @@ nodes:
       You wake before dawn. The air is cool, the village is quiet, and pale light creeps
       through the shutters. You lie still for a moment, listening to the town breathe.
       Somewhere outside: a dog barking twice and then stopping. The well-rope groaning
-      in the wind. A morning like any other except for something you cannot name, a
+      in the wind. A morning like any other, except for something you cannot name, a
       low-grade alertness behind your sternum.
     choices:
       - id: visit_well
@@ -42,6 +42,17 @@ nodes:
             value: 1
         exhaustionCost: 0
         nextNodeId: watching_window
+      - id: walk_the_perimeter
+        label: Take a slow walk around the edge of the village before anyone else is out
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: perimeter_walk
 
   at_the_well:
     id: at_the_well
@@ -50,10 +61,10 @@ nodes:
       motions with the particular economy of someone who has not slept. They manage a
       smile when they see you. "Could not sleep either? Strange lights on the ridge last
       night. Did you see them?" They set their bucket down and lower their voice. "Three
-      of them. Moving slow. Not lanterns lanterns swing. These floated."
+      of them. Moving slow. Not lanterns, lanterns swing. These floated."
     choices:
       - id: ask_lights
-        label: Ask what exactly they saw press for details
+        label: Ask what exactly they saw, press for details
         consequences:
           - type: stat
             target: cunning
@@ -76,6 +87,18 @@ nodes:
             value: 1
         exhaustionCost: 1
         nextNodeId: neighbor_describes
+      - id: downplay_lights
+        label: Suggest it was probably lanterns from a late hunter, nothing unusual
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{neighbor.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: neighbor_pushes_back
 
   watching_window:
     id: watching_window
@@ -87,7 +110,7 @@ nodes:
       urgently, then hold a finger to their lips.
     choices:
       - id: go_down
-        label: Go down something is wrong
+        label: Go down, something is wrong
         consequences:
           - type: relationship
             target: '{neighbor.id}'
@@ -99,7 +122,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: neighbor_describes
       - id: signal_wait
-        label: Hold up a hand wait there and pull on your boots first
+        label: Hold up a hand, signal them to wait while you pull on your boots
         consequences:
           - type: stat
             target: cunning
@@ -107,15 +130,79 @@ nodes:
         exhaustionCost: 0
         nextNodeId: neighbor_describes
 
+  perimeter_walk:
+    id: perimeter_walk
+    text: >-
+      The east side of the village backs onto a slope of rough scrub and old fence posts.
+      At the second post from the north corner, you stop. The ground is disturbed where
+      it should not be, a soft depression in the dew-wet grass, roughly circular. You
+      crouch and look at it without touching it. The dew has not filled it back in yet.
+      Whatever made this mark did so in the last few hours.
+    choices:
+      - id: examine_mark_closely
+        label: Examine the mark carefully before deciding what it is
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_marks_discovered
+            value: true
+        exhaustionCost: 1
+        nextNodeId: neighbor_describes
+      - id: find_neighbor_first
+        label: Go find {neighbor.name} before investigating further, two sets of eyes
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: neighbor_describes
+
+  neighbor_pushes_back:
+    id: neighbor_pushes_back
+    text: >-
+      {neighbor.name} looks at you steadily. "I have lived here for twenty years. I know
+      what hunters' lanterns look like." They pick up their bucket. "Three lights. Equidistant.
+      Moving as one. Then they went out, all three, within ten seconds of each other." They
+      turn to go, then pause. "I went up the shepherd track this morning before you were
+      awake. There are marks in the ground up there. I did not go close." They walk off
+      without waiting for you to respond.
+    choices:
+      - id: follow_neighbor
+        label: Follow {neighbor.name} and apologize, hear the rest of it
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 1
+            axis: trust
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: neighbor_describes
+      - id: go_to_ridge_alone
+        label: Go up to the shepherd track yourself without waiting
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_marks_discovered
+            value: true
+        exhaustionCost: 2
+        nextNodeId: at_the_ridge
+
   neighbor_describes:
     id: neighbor_describes
     text: >-
       {neighbor.name} speaks in a low, rapid rush. Last night, just past the second
       watch-bell, they saw three lights moving across the ridge above the Ashwood. Slow,
       deliberate, too evenly spaced to be animals. They came down toward the old shepherd
-      track and then simply stopped. Went out one by one. "I went up this morning
-      before you were awake," {neighbor.name} says. "There is something there. Marks in
-      the ground. I did not go close." They are watching your face carefully.
+      track and then simply stopped. Went out one by one. "I went up this morning before
+      you were awake," {neighbor.name} says. "There is something there. Marks in the
+      ground. I did not go close." They are watching your face carefully.
     choices:
       - id: offer_to_go_look
         label: Offer to go up together and see what the marks are
@@ -144,11 +231,11 @@ nodes:
       {neighbor.name} hesitates. "No one. I came straight to you." Something in their
       voice says that was a considered decision, not a convenient one. "I did not want
       to cause a fuss if it is nothing. But I also did not want to go back up there
-      alone." They pause. "And... I have seen you pay attention to things most people
+      alone." They pause. "And, I have seen you pay attention to things most people
       walk past."
     choices:
       - id: accept_the_trust
-        label: Accept that go up to the ridge with them
+        label: Accept that, go up to the ridge with them
         consequences:
           - type: relationship
             target: '{neighbor.id}'
@@ -179,7 +266,7 @@ nodes:
       three shallow circles, each about a foot across, pressed into the soft earth in a
       perfect equilateral triangle. The grass inside each circle is yellowed. Dead, but
       not burned. In the centre of the triangle, a single smooth stone that was not there
-      before you can see the undisturbed moss around where it was placed. {neighbor.name}
+      before, you can see the undisturbed moss around where it was placed. {neighbor.name}
       grips your arm. "Someone put that there on purpose."
     choices:
       - id: take_the_stone
@@ -192,9 +279,9 @@ nodes:
             target: ridge_stone_taken
             value: true
         exhaustionCost: 1
-        nextNodeId: morning_reflection
+        nextNodeId: stone_examination
       - id: leave_stone_in_place
-        label: Leave everything as you found it you want to watch this spot
+        label: Leave everything as you found it, you want to watch this spot
         consequences:
           - type: stat
             target: cunning
@@ -218,6 +305,81 @@ nodes:
             value: 1
         exhaustionCost: 1
         nextNodeId: morning_reflection
+      - id: look_for_more_marks
+        label: Search the surrounding area for more signs before leaving
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_searched_thoroughly
+            value: true
+        exhaustionCost: 2
+        nextNodeId: wider_search
+
+  stone_examination:
+    id: stone_examination
+    text: >-
+      Back in your room, in proper light, the stone is river-smooth, pale grey, with a
+      faint mark on one face that is not natural. A line and a curve, barely incised, as
+      if scored with a pin. You have not seen the symbol before, but the precision of it
+      is unmistakable. It was made by someone who knew what they were making. {neighbor.name}
+      watches you turn it over. "Do you recognize it?" No. But you know someone who might.
+    choices:
+      - id: take_stone_to_scholar
+        label: Take the stone to the most learned person you know in town
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_stone_identified
+            value: true
+        exhaustionCost: 1
+        nextNodeId: morning_reflection
+      - id: sketch_it_and_ask_around_quietly
+        label: Sketch the symbol and ask around quietly without showing the stone itself
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_stone_sketch_made
+            value: true
+        exhaustionCost: 1
+        nextNodeId: morning_reflection
+
+  wider_search:
+    id: wider_search
+    text: >-
+      Twenty minutes of careful looking turns up two more marks, further apart, less clear,
+      as if the triangle you found is only one part of a larger pattern. You pace out the
+      distances. If the geometry holds, the full shape would encompass most of the north
+      slope of the ridge. Whatever was done here was not small. {neighbor.name} has gone
+      pale and quiet. "We should go back down," they say. "Now."
+    choices:
+      - id: agree_go_down
+        label: Agree, you have enough for now
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_larger_pattern_found
+            value: true
+        exhaustionCost: 0
+        nextNodeId: morning_reflection
+      - id: stay_and_map_it
+        label: Stay long enough to map the full pattern, even if {neighbor.name} goes first
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_pattern_mapped
+            value: true
+        exhaustionCost: 2
+        nextNodeId: morning_reflection
 
   morning_reflection:
     id: morning_reflection
@@ -230,7 +392,7 @@ nodes:
       you with its ordinary noise, the ridge behind the roofline, out of sight.
     choices:
       - id: stay_alert
-        label: Keep this to yourself and stay alert wait and see what comes next
+        label: Keep this to yourself and stay alert, wait and see what comes next
         consequences:
           - type: stat
             target: cunning
@@ -239,7 +401,7 @@ nodes:
             target: ridge_lights_witnessed
             value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: ordinary_day
       - id: write_it_down
         label: Go home and write down every detail while it is fresh
         consequences:
@@ -250,4 +412,347 @@ nodes:
             target: ridge_lights_recorded
             value: true
         exhaustionCost: 0
+        nextNodeId: scholar_consultation
+      - id: tell_someone_trustworthy
+        label: Find one person you trust completely and tell them what you found
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: ridge_secret_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: confided
+
+  scholar_consultation:
+    id: scholar_consultation
+    text: >-
+      The notes sit on your table: three circles in an equilateral triangle, yellowed
+      grass, a smooth stone with a mark. You know the person in town most likely to have
+      seen something like this: the old record-keeper who keeps ledgers going back six
+      generations and has opinions about most of them. You take the sketch there. They put
+      on their spectacles. A long silence. "I have seen this configuration once before,"
+      they say. "In a margin note. Forty years ago. Where did you find this?"
+    choices:
+      - id: tell_record_keeper_everything
+        label: Tell them everything, they deserve the full account
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_stone_identified
+            value: true
+        exhaustionCost: 1
+        nextNodeId: record_keeper_knowledge
+      - id: give_partial_account
+        label: Tell them about the stone but not the lights, not yet
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: record_keeper_knowledge
+
+  record_keeper_knowledge:
+    id: record_keeper_knowledge
+    text: >-
+      The record-keeper finds the margin note in a ledger from the year of the Long Frost.
+      A traveler passed through, described as "a surveyor of old places," and asked about
+      the ridge. The note says the traveler left a mark on a stone "as a waypoint." The
+      handwriting is shaky but the implication is clear: someone has been using the ridge
+      as a landmark for at least forty years. Someone who was passing through then is
+      passing through again now.
+    choices:
+      - id: ask_about_the_traveler
+        label: Ask the record-keeper if there is anything else about the traveler
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: ordinary_day
+      - id: take_the_ledger_page
+        label: Ask to borrow the ledger, or at minimum copy the page
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_lights_recorded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: ordinary_day
+
+  confided:
+    id: confided
+    text: >-
+      The person you trust listens without interrupting. When you finish, they are quiet.
+      Then: "I have seen something on that ridge too. Not lights. A figure, once, at dusk,
+      standing at the top and looking down at the town. I thought I had imagined it." They
+      meet your eyes. "We have not imagined the same thing. What does that tell us?" It
+      tells you the lights are not new. They are ongoing. The town has not been told.
+    choices:
+      - id: decide_to_tell_the_town
+        label: Decide together to bring this to the village formally
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: ridge_lights_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: ordinary_day
+      - id: keep_investigating_first
+        label: Agree to keep investigating before alarming anyone
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_investigation_ongoing
+            value: true
+        exhaustionCost: 0
+        nextNodeId: ordinary_day
+
+  ordinary_day:
+    id: ordinary_day
+    text: >-
+      The morning resolves into afternoon and then evening. The village does what villages
+      do: bread is made, animals are fed, small arguments are had and mostly forgotten.
+      {neighbor.name} waves at you across the square with an expression that says they
+      have been thinking about the ridge too. The stone or its sketch or its absence sits
+      with you. Whatever began this morning has not ended. It has only paused.
+    choices:
+      - id: go_back_at_dusk
+        label: Go back to the ridge at dusk to see if the lights return
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_site_watched
+            value: true
+        exhaustionCost: 2
         nextNodeId: null
+      - id: let_it_rest_for_now
+        label: Let it rest, you have done what you can for one day
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_lights_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  ridge_pattern_continues:
+    id: ridge_pattern_continues
+    text: >-
+      The lights appear again on the third night. {neighbor.name} knocks on your door
+      at the second watch-bell, which means they have been watching too. You both stand
+      at the window and count. Four this time, not three. Same spacing, different
+      position, as if the triangle has rotated. Or as if a new placement is being made.
+      The ridge is doing something you cannot read yet.
+    choices:
+      - id: go_up_at_night_this_time
+        label: Go up to the ridge at night while the lights are still there
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_site_watched
+            value: true
+        exhaustionCost: 3
+        nextNodeId: what_was_seen
+      - id: record_from_below
+        label: Stay at the window and record precisely what you can see from here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_pattern_mapped
+            value: true
+        exhaustionCost: 1
+        nextNodeId: what_was_seen
+
+  what_was_seen:
+    id: what_was_seen
+    text: >-
+      You have now seen the lights twice, or been in the aftermath of them twice. What you
+      know: they are deliberate, they are geometrically precise, they come on the same nights
+      as the second watch-bell, and they relate to marks in the earth that persist after.
+      What you do not know: who is making them, why, or what they are communicating. The
+      not-knowing is a space that is beginning to feel like pressure.
+    choices:
+      - id: take_everything_to_a_scholar
+        label: Take everything to the most learned person in or near Ironhaven
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_stone_identified
+            value: true
+        exhaustionCost: 2
+        nextNodeId: morning_reflection
+      - id: share_with_the_night_watch
+        label: Share everything with the night watch, formally, this is now their problem too
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: ridge_lights_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: morning_reflection
+
+  neighbor_decides:
+    id: neighbor_decides
+    text: >-
+      {neighbor.name} makes a decision without telling you first. They go to the village
+      headman and report what they saw, described carefully and without embellishment.
+      The headman listens and thanks them and does nothing visible. But that evening you
+      notice the night watch has been changed, a longer route added that takes in the
+      east side of the ridge. The machine has begun to move, slowly, without announcement.
+    choices:
+      - id: support_neighbor_decision
+        label: Tell {neighbor.name} they did the right thing
+        consequences:
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 2
+            axis: trust
+          - type: relationship
+            target: '{neighbor.id}'
+            value: 1
+            axis: affection
+        exhaustionCost: 0
+        nextNodeId: morning_reflection
+      - id: wish_they_had_waited
+        label: Privately wish they had waited, now the initiative belongs to others
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_lights_reported
+            value: true
+        exhaustionCost: 0
+        nextNodeId: morning_reflection
+
+  dusk_return:
+    id: dusk_return
+    text: >-
+      You go back to the ridge at dusk. {neighbor.name} comes with you or does not,
+      depending on whether you asked. The shepherd track in the evening light is different
+      from the morning, longer-looking, the edges less clear. The flat section of ground
+      is as you left it, or the stone is gone, or the moss has been disturbed again.
+      Whatever the ridge is doing, it has not stopped because you looked at it.
+    choices:
+      - id: wait_for_the_lights
+        label: Stay and wait to see if the lights return tonight
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_site_watched
+            value: true
+        exhaustionCost: 3
+        nextNodeId: lights_return
+      - id: search_more_carefully
+        label: Search the surrounding area more carefully while the light is still good
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_larger_pattern_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: morning_reflection
+
+  lights_return:
+    id: lights_return
+    text: >-
+      They come. Not at the same time as before, later, close to the third watch-bell.
+      You count them: three, then a fourth that appears further up the ridge and stays
+      separate. The three make the triangle. The fourth watches. The geometry is precise.
+      The fourth light moves last, and in a direction that does not make sense for someone
+      walking, too smooth, too steady. Then darkness. The cold of the ridge settles in.
+      {neighbor.name}, if they are beside you, says nothing for a long time.
+    choices:
+      - id: go_to_where_the_fourth_was
+        label: Move to where the fourth light was before the darkness can obscure the spot
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_stone_taken
+            value: true
+        exhaustionCost: 2
+        nextNodeId: morning_reflection
+      - id: leave_immediately
+        label: Leave now, this is too deliberate and too unknown, you need better preparation
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_site_watched
+            value: true
+        exhaustionCost: 0
+        nextNodeId: morning_reflection
+
+  ridge_sketch_shared:
+    id: ridge_sketch_shared
+    text: >-
+      The sketch of the symbol, drawn carefully from memory or from the stone itself,
+      makes its way to three different people through three different conversations.
+      Each one has a slightly different reaction. The herbalist has seen the plant
+      associated with the yellowed grass circles before. It only grows where certain
+      ritual preparations have been made. The blacksmith says nothing but their hands
+      still. The old record-keeper opens a ledger from forty years ago.
+    choices:
+      - id: follow_the_herbalist_lead
+        label: Follow the herbalist's knowledge, it is the most specific and least frightening
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ridge_stone_identified
+            value: true
+        exhaustionCost: 1
+        nextNodeId: morning_reflection
+      - id: follow_the_record_keeper
+        label: Sit with the record-keeper and go through the ledger
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ridge_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: morning_reflection

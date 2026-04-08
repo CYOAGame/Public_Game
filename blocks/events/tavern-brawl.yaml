@@ -32,14 +32,15 @@ nodes:
   start:
     id: start
     text: >-
-      It starts over a spilled drink or so it looks. {fighter_a.name} has had their
+      It starts over a spilled drink, or so it looks. {fighter_a.name} has had their
       fill of whatever came before this moment. {fighter_b.name} is on their feet and
       the table between them has gone over. The room picks sides in seconds. {barkeep.name}
       is already reaching under the counter. You are three steps from the door and two
-      steps from the middle of it.
+      steps from the middle of it. In the back of your mind, you notice that {fighter_b.name}
+      does not look as surprised as someone should who just had a drink spilled on them.
     choices:
       - id: join_fight
-        label: Wade in on {fighter_a.name}'s side they are a regular here
+        label: Wade in on {fighter_a.name}'s side, they are a regular here
         consequences:
           - type: stat
             target: strength
@@ -69,6 +70,14 @@ nodes:
             value: 1
         exhaustionCost: 2
         nextNodeId: broke_it_up
+      - id: watch_closely
+        label: Stay back and watch carefully, something about this does not feel spontaneous
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: watching_the_brawl
       - id: slip_out
         label: Drain your cup and slip out while everyone is looking at the brawl
         consequences:
@@ -86,10 +95,10 @@ nodes:
       a cudgel on the counter and the room freezes. In the ringing silence, {fighter_a.name}
       grins at you, sweat and satisfaction. "Good to know who's got your back." {fighter_b.name}
       stands apart, breathing hard, dabbing at a split lip. They are looking at you, not
-      with anger with assessment.
+      with anger, with assessment.
     choices:
       - id: press_advantage
-        label: Keep pressure on {fighter_b.name} this is not over
+        label: Keep pressure on {fighter_b.name}, this is not over
         consequences:
           - type: stat
             target: strength
@@ -104,7 +113,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: guard_arrives
       - id: accept_the_pause
-        label: Let the moment settle accept {barkeep.name}'s authority
+        label: Let the moment settle, accept {barkeep.name}'s authority
         consequences:
           - type: relationship
             target: '{barkeep.id}'
@@ -112,6 +121,17 @@ nodes:
             axis: trust
         exhaustionCost: 0
         nextNodeId: aftermath
+      - id: study_fighter_b
+        label: Study {fighter_b.name}'s expression in the pause, what does that assessment mean?
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: fighter_b_observed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: fighter_b_angle
 
   broke_it_up:
     id: broke_it_up
@@ -123,7 +143,7 @@ nodes:
       They turn back and look at you with an expression you cannot quite read yet.
     choices:
       - id: let_fighter_b_leave
-        label: Let {fighter_b.name} go this is done
+        label: Let {fighter_b.name} go, this is done
         consequences:
           - type: faction
             target: village_folk
@@ -131,7 +151,7 @@ nodes:
         exhaustionCost: 0
         nextNodeId: aftermath
       - id: follow_fighter_b
-        label: Follow {fighter_b.name} outside something about them does not add up
+        label: Follow {fighter_b.name} outside, something about them does not add up
         consequences:
           - type: stat
             target: cunning
@@ -141,18 +161,63 @@ nodes:
             value: true
         exhaustionCost: 1
         nextNodeId: outside_with_fighter_b
+      - id: ask_fighter_a_what_started_it
+        label: Sit with {fighter_a.name} and ask what actually happened before the cup went over
+        consequences:
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 1
+            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: fighter_a_account
+
+  watching_the_brawl:
+    id: watching_the_brawl
+    text: >-
+      From the corner you see what the participants cannot: {fighter_b.name} is not angry.
+      They are performing anger, efficiently and without waste. When {barkeep.name}'s cudgel
+      hits the counter, they stop immediately, much faster than someone genuinely enraged
+      would. They scan the room once, quickly, and their eyes land on a specific corner for
+      two seconds before the neutral expression returns. Whoever they were looking at is
+      already gone.
+    choices:
+      - id: note_the_corner
+        label: Note which corner {fighter_b.name} looked at and go examine it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: fighter_b_contact_spotted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: fighter_b_angle
+      - id: follow_whoever_left_early
+        label: Try to identify who left the corner table during the brawl
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: fighter_b_contact_spotted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: outside_with_fighter_b
 
   slipped_out:
     id: slipped_out
     text: >-
       The cold air is a relief. Behind you the tavern window shows silhouettes swinging.
-      You are halfway across the square when someone else slips out of the tavern door
+      You are halfway across the square when someone else slips out of the tavern door,
       {fighter_b.name}, moving fast, in the wrong direction. Not toward the road. Toward
       the lane behind the guildhall. They do not look like someone who lost a fight.
       They look like someone who is late for something.
     choices:
       - id: follow_fighter_b
-        label: Follow them something is off
+        label: Follow them, something is off
         consequences:
           - type: stat
             target: cunning
@@ -163,7 +228,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: outside_with_fighter_b
       - id: go_home
-        label: Let it go not your concern
+        label: Let it go, not your concern
         consequences:
           - type: stat
             target: cunning
@@ -171,14 +236,81 @@ nodes:
         exhaustionCost: 0
         nextNodeId: morning_after
 
+  fighter_a_account:
+    id: fighter_a_account
+    text: >-
+      {fighter_a.name} takes a long drink and lowers their voice. "{fighter_b.name} came
+      to this table. Sat down like they knew me. Started asking about the caravans, who
+      comes through, what gets stored where. Not local questions. Too specific." They look
+      at their hands. "I told them to go away. They did not. The cup was an excuse. I
+      wanted them out of the building." A pause. "I should have done it quieter. But they
+      were taking notes. On a small card. I saw it."
+    choices:
+      - id: ask_about_the_card
+        label: Ask {fighter_a.name} what exactly was on the card
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: fighter_b_angle
+      - id: share_with_barkeep
+        label: Tell {barkeep.name} what {fighter_a.name} just said
+        consequences:
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: aftermath
+
+  fighter_b_angle:
+    id: fighter_b_angle
+    text: >-
+      Whoever {fighter_b.name} is, the brawl was not their primary concern. The corner
+      they looked at during the fight, or the specific questions they asked {fighter_a.name},
+      or the route they took out of the building, all of it points in one direction: the guild
+      factor's office. Someone there is collecting information about this town. The fight was a
+      way to be in the building without standing still. Brilliant, in a cold sort of way.
+    choices:
+      - id: go_to_factor_office
+        label: Go to the factor's office now and see what you can learn
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: factor_office_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: outside_with_fighter_b
+      - id: tell_barkeep_what_you_know
+        label: Tell {barkeep.name} what you have pieced together, they should know their tavern was used
+        consequences:
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: guard_arrives
+
   outside_with_fighter_b:
     id: outside_with_fighter_b
     text: >-
       You follow at a distance. {fighter_b.name} moves with purpose through two alleys and
-      stops at a door the side entrance to the factor's office, the one that handles
-      guild accounts. They knock twice, pause, knock once. The door opens. Someone reaches
-      out and pulls them inside. The door closes. You stand in the alley with the sound of
-      your own breathing. The brawl was not random. You are sure of it now.
+      stops at a door, the side entrance to the factor's office, the one that handles guild
+      accounts. They knock twice, pause, knock once. The door opens. Someone reaches out
+      and pulls them inside. The door closes. You stand in the alley with the sound of your
+      own breathing. The brawl was not random. You are certain of it now.
     choices:
       - id: wait_and_watch
         label: Wait in the alley and see who else comes or goes
@@ -202,18 +334,29 @@ nodes:
             value: true
         exhaustionCost: 1
         nextNodeId: guard_arrives
+      - id: knock_on_the_factor_door
+        label: Knock on the door yourself, three knocks, with confidence
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: factor_office_approached
+            value: true
+        exhaustionCost: 2
+        nextNodeId: guard_arrives
 
   guard_arrives:
     id: guard_arrives
     text: >-
-      The watch arrives whether summoned or simply routine, they come. {fighter_a.name}
-      is held for questioning. {fighter_b.name} is either inside the factor's office or
-      already gone into the night, depending on which thread brought you here. Either way,
-      the guard sergeant pulls you aside. You are a witness. They want your account. What
-      you say now will shape what the watch investigates and what it chooses to ignore.
+      The watch arrives, whether summoned or simply routine. {fighter_a.name} is held for
+      questioning. {fighter_b.name} is either inside the factor's office or already gone
+      into the night, depending on which thread brought you here. Either way, the guard
+      sergeant pulls you aside. You are a witness. They want your account. What you say
+      now will shape what the watch investigates and what it chooses to ignore.
     choices:
       - id: give_full_account
-        label: Give the full account everything you saw, including the factor's office
+        label: Give the full account, everything you saw, including the factor's office
         consequences:
           - type: faction
             target: town_guard
@@ -227,7 +370,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: aftermath
       - id: keep_factor_secret
-        label: Give your account of the brawl only keep the factor's office to yourself
+        label: Give your account of the brawl only, keep the factor's office to yourself
         consequences:
           - type: stat
             target: cunning
@@ -242,7 +385,7 @@ nodes:
     id: aftermath
     text: >-
       The tavern returns to its normal hum, one chair short and one story richer. {barkeep.name}
-      finds you a good seat and brings something unasked a marker, a small gesture of
+      finds you a good seat and brings something unasked, a marker, a small gesture of
       debt. {fighter_a.name} raises a cup from across the room, or is gone, or is telling
       someone else what happened. The version of the story that gets told will be yours, mostly.
       It always is, for the person who was in the middle of it.
@@ -262,6 +405,19 @@ nodes:
             value: true
         exhaustionCost: 1
         nextNodeId: null
+      - id: sit_with_fighter_a
+        label: Pull up a chair with {fighter_a.name}, they owe you a drink and a story
+        consequences:
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 2
+            axis: trust
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 1
+            axis: affection
+        exhaustionCost: 1
+        nextNodeId: null
       - id: leave_quietly
         label: Finish your drink and leave it behind
         consequences:
@@ -275,9 +431,9 @@ nodes:
     id: morning_after
     text: >-
       Three hours later you hear the full accounting: {fighter_a.name} broke a table and
-      spent the night in the guardhouse. {fighter_b.name} left town before dawn no one
+      spent the night in the guardhouse. {fighter_b.name} left town before dawn, no one
       saw them go. {barkeep.name} was not hurt. The factor's office was locked when the
-      watch checked it. Small mercies, and one loose thread.
+      watch checked it. Small mercies, and one loose thread that nobody is pulling. Yet.
     choices:
       - id: check_on_barkeep
         label: Go back and check on {barkeep.name} in the morning
@@ -290,9 +446,9 @@ nodes:
             target: fighter_b_left_town
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: barkeep_morning
       - id: note_fighter_b
-        label: Note that {fighter_b.name} left town in the night file that away
+        label: Note that {fighter_b.name} left town in the night, file that away
         consequences:
           - type: stat
             target: cunning
@@ -300,5 +456,386 @@ nodes:
           - type: world_fact
             target: fighter_b_left_town
             value: true
+        exhaustionCost: 0
+        nextNodeId: factor_thread
+
+  barkeep_morning:
+    id: barkeep_morning
+    text: >-
+      {barkeep.name} is already open, cleaning the table that went over last night. They
+      look up when you come in and something in their posture relaxes. "I was hoping someone
+      sensible would come by." They pour two cups without being asked. "The factor's office
+      had a light in it last night. After midnight. The watch says no one was there when
+      they checked. But I saw the light." They hold your gaze. "I have been running this
+      tavern for sixteen years. I know when something uses my house as cover."
+    choices:
+      - id: believe_barkeep
+        label: Believe them, the brawl was cover and someone knows the barkeep noticed
+        consequences:
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: factor_office_meeting_witnessed
+            value: true
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: factor_thread
+      - id: counsel_caution
+        label: Counsel caution, whoever did this already knows this town, going after them is dangerous
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: factor_thread
+
+  factor_thread:
+    id: factor_thread
+    text: >-
+      The factor's office sits on the guild row. By daylight it looks ordinary. But now
+      you know what you know. The guild factor is a quiet person, present at markets,
+      absent from gossip. The kind of person you do not think about because they have
+      arranged it that way. You walk past the office twice. On the third pass, the factor
+      sees you from the window and looks away very quickly, which is an answer.
+    choices:
+      - id: confront_the_factor
+        label: Go in and confront the factor directly
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: factor_confronted
+            value: true
+          - type: faction
+            target: merchants_guild
+            value: -1
+        exhaustionCost: 2
+        nextNodeId: brawl_resolved
+      - id: report_to_guard_with_full_picture
+        label: Go to the guard now with everything you have
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 3
+          - type: world_fact
+            target: factor_office_reported
+            value: true
+          - type: world_fact
+            target: brawl_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brawl_resolved
+      - id: watch_and_gather_more
+        label: Keep watching, you need more before acting
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: factor_watched
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brawl_resolved
+
+  brawl_resolved:
+    id: brawl_resolved
+    text: >-
+      {fighter_a.name} is released from the guardhouse with a fine and a warning. The
+      brawl is officially closed: a dispute, disorderly conduct, no charges beyond property
+      damage. The factor's office is either confronted, reported, or still unseen by
+      authorities, depending on what you chose. {barkeep.name} replaces the broken table.
+      The tavern reopens for the evening trade. Whatever moved through this room last night
+      has not gone far. It has merely become quieter.
+    choices:
+      - id: thank_barkeep
+        label: Make a point of thanking {barkeep.name} publicly, they held the room together
+        consequences:
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: affection
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: sit_with_fighter_a
+        label: Buy {fighter_a.name} a drink, they may know more than they have said
+        consequences:
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 2
+            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: keep_watching_the_factor
+        label: Let the evening pass but keep your attention on who the factor talks to
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: factor_watched
+            value: true
+        exhaustionCost: 0
+        nextNodeId: factor_observation
+
+  factor_observation:
+    id: factor_observation
+    text: >-
+      Two evenings of watching the factor pays off. They meet with three different people,
+      none of them guild members. One is a rider who arrives from the east road and leaves
+      within the hour. One is an older woman who lives near the mill. One is someone who
+      you last saw at the edge of the crowd during the brawl, watching {fighter_b.name}
+      with entirely too much focus. A pattern is forming.
+    choices:
+      - id: connect_to_barkeep
+        label: Connect this to {barkeep.name}, they saw the factor's window light after midnight
+        consequences:
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: factor_office_meeting_witnessed
+            value: true
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brawl_deeper
+      - id: approach_the_rider
+        label: Try to intercept the rider from the east road before they leave town
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: brawl_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: brawl_deeper
+
+  brawl_deeper:
+    id: brawl_deeper
+    text: >-
+      The brawl was not about {fighter_a.name} and {fighter_b.name}. It was about the
+      tavern as a place where information moves. {fighter_b.name} was sent to listen, and
+      the brawl was their exit when they had what they needed. The factor's office is where
+      the information goes next. Whatever it is being used for, it has been running through
+      this tavern for at least as long as {barkeep.name} has been serving drinks.
+    choices:
+      - id: brief_watch_captain
+        label: Brief the watch captain with everything you know
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 3
+          - type: world_fact
+            target: brawl_investigated
+            value: true
+          - type: world_fact
+            target: factor_office_reported
+            value: true
+        exhaustionCost: 2
+        nextNodeId: three_days_after_brawl
+      - id: set_a_trap
+        label: Work with {barkeep.name} to set a trap at the tavern for the next visit
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: factor_watched
+            value: true
+        exhaustionCost: 2
+        nextNodeId: three_days_after_brawl
+      - id: step_back_from_it
+        label: This is bigger than one night and one brawl, step back and let it unfold
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: three_days_after_brawl
+
+  three_days_after_brawl:
+    id: three_days_after_brawl
+    text: >-
+      Three days later, the tavern is back to normal, or close enough that most people
+      cannot tell the difference. {barkeep.name} has replaced the table. {fighter_a.name}
+      is back on their usual stool with the particular dignity of someone who has served
+      their time and expects no further commentary. The factor's office is shut. The rider
+      from the east has not returned. For now.
+    choices:
+      - id: check_in_with_barkeep
+        label: Make checking in with {barkeep.name} a regular thing
+        consequences:
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: barkeep_as_contact
+            value: true
+        exhaustionCost: 0
+        nextNodeId: brawl_aftermath_final
+      - id: ask_fighter_a_to_keep_eyes_open
+        label: Ask {fighter_a.name} discreetly to let you know if the stranger type returns
+        consequences:
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: fighter_a_as_informant
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brawl_aftermath_final
+
+  brawl_aftermath_final:
+    id: brawl_aftermath_final
+    text: >-
+      The tavern holds its history the same way old wood holds its grain: invisibly, until
+      the light hits right. What happened in this room and in the alley behind the guildhall
+      and in the factor's office is now part of the story of this place. {barkeep.name}
+      knows more than they say. {fighter_a.name} knows less than you might think. You know
+      more than either of them realizes. The next chapter starts the next time someone walks
+      in who should not be there.
+    choices:
+      - id: stay_alert_in_the_tavern
+        label: Make the tavern part of your intelligence routine
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: let_the_tavern_be_a_tavern
+        label: Let it go, let the tavern be a tavern again
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  fighter_a_story:
+    id: fighter_a_story
+    text: >-
+      On the second evening after the brawl, you sit with {fighter_a.name} properly.
+      They are not a complicated person but they are not a simple one either. The note-taking,
+      the specific questions about caravans and storage: {fighter_b.name} was mapping supply
+      lines. {fighter_a.name} knew it because they have seen it before, in another town,
+      two years ago, before they came here. "I did not want to believe it was happening again,"
+      they say. "So I made sure it stopped before it went further."
+    choices:
+      - id: ask_about_the_other_town
+        label: Ask about the other town, what happened there
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: brawl_origin_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brawl_aftermath_final
+      - id: thank_fighter_a
+        label: Thank {fighter_a.name} for acting even if the method was costly
+        consequences:
+          - type: relationship
+            target: '{fighter_a.id}'
+            value: 3
+            axis: respect
+          - type: relationship_tag
+            target: '{fighter_a.id}'
+            value: reliable_irregular
+        exhaustionCost: 0
+        nextNodeId: brawl_aftermath_final
+
+  barkeep_knows_more:
+    id: barkeep_knows_more
+    text: >-
+      Three days after the brawl, {barkeep.name} calls you to one side before the
+      evening trade. They have done their own investigation, quietly, by asking no
+      unusual questions and listening to every ordinary one. What they have found: the
+      factor has been receiving visitors from outside town every fortnight for two years.
+      Always the same day of the week. Always through the side entrance. "I do not know
+      what it means," {barkeep.name} says. "But I know it is a pattern. And now you
+      know too."
+    choices:
+      - id: take_the_pattern_to_guard
+        label: Take what {barkeep.name} knows to the guard, added to everything else it is enough
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: relationship
+            target: '{barkeep.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: factor_office_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brawl_aftermath_final
+      - id: keep_watching_for_the_fortnight
+        label: Wait for the next scheduled visit and be there when it happens
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: factor_watched
+            value: true
+        exhaustionCost: 0
+        nextNodeId: brawl_aftermath_final
+
+  final_resolution_note:
+    id: final_resolution_note
+    text: >-
+      The specific events of this episode settle into the longer story of the week. What
+      happened here will shape future interactions with {barkeep.name} and with everyone
+      who witnessed your choices or heard about them. The town remembers how people
+      behaved under pressure. That memory accumulates. You are part of the record now.
+    choices:
+      - id: accept_the_record
+        label: Accept that this is now part of your story here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reflect_on_what_was_learned
+        label: Take time to reflect on what this week taught you about yourself
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
         exhaustionCost: 0
         nextNodeId: null

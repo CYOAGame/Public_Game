@@ -24,8 +24,9 @@ nodes:
     id: start
     text: >-
       The morning line at the well is gone because there is no water to draw. {elder.name} stands
-      at the rim, looking down with a grim expression. "It has not been dry in my lifetime," they
-      say. Around the square, people look worried.
+      at the rim looking down with a grim expression. "It has not been dry in my lifetime," they
+      say. Around the square, people look worried. Someone says the north creek is still running,
+      but the walk is long and the path is rough for anyone carrying. The day is already warming.
     choices:
       - id: investigate
         label: Offer to climb down and see what is wrong
@@ -67,13 +68,56 @@ nodes:
             value: 1
         exhaustionCost: 1
         nextNodeId: merchant_deal
+      - id: examine_the_outside
+        label: Look carefully at the well from the outside before deciding what to do
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: external_examination
+
+  external_examination:
+    id: external_examination
+    text: >-
+      You walk the circumference of the well slowly. The stones around the rim are undisturbed
+      but the ground on the north side is subtly compacted, the kind of compression that comes
+      from repeated standing in the same spot over days, not from this morning. Someone has
+      been coming here regularly at a time when the square is empty. The rope shows wear at
+      an odd angle, as if lowered with an unusual grip.
+    choices:
+      - id: ask_elder_who_uses_well_at_night
+        label: Ask {elder.name} who in the village keeps unusual hours
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{elder.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: elder_knowledge
+      - id: go_down_yourself_now
+        label: Lower yourself down, whatever made this dry was deliberate
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: investigated_well
+            value: true
+        exhaustionCost: 3
+        nextNodeId: down_the_well
 
   down_the_well:
     id: down_the_well
     text: >-
-      You descend on a rope. The stone walls are damp but not wet the water table has simply
-      dropped. At the bottom, you find something lodged in a crack: a bundle of cloth, deliberately
-      stuffed to block a secondary channel. Someone did this on purpose.
+      You descend on a rope. The stone walls are damp but not wet, the water table has simply
+      dropped, or been blocked. At the bottom, wedged in a crack where the secondary channel
+      runs in, you find a bundle of cloth stuffed with packed sand, deliberately forced into
+      place. It would take effort to do this. It would take knowledge of where the channel
+      sits. Someone did this on purpose, and they knew this well well.
     choices:
       - id: clear_it
         label: Clear the blockage and climb back up
@@ -88,7 +132,7 @@ nodes:
             target: well_sabotaged
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: after_well_restored
       - id: leave_it_as_evidence
         label: Leave it in place and report to the guard first
         consequences:
@@ -99,17 +143,61 @@ nodes:
             target: well_sabotaged
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: sabotage_report
+      - id: take_sample_then_clear
+        label: Take a sample of the cloth before clearing it, keep evidence
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: well_restored
+            value: true
+          - type: world_fact
+            target: well_sabotaged
+            value: true
+          - type: world_fact
+            target: sabotage_evidence_kept
+            value: true
+        exhaustionCost: 2
+        nextNodeId: after_well_restored
 
   work_party:
     id: work_party
     text: >-
       By midday you have assembled six neighbors with shovels and strong backs. {elder.name}
-      coordinates. The work is heavy and slow, but communal. By evening the well is three feet
-      deeper and beginning to fill.
+      coordinates. The work is heavy and slow, but communal. Someone brings bread. A boy keeps
+      the rope dry. By evening the well is three feet deeper and beginning to fill. And then
+      one of the diggers calls out: there is a bundle wedged in the channel wall. Someone put
+      this here.
     choices:
+      - id: take_the_bundle
+        label: Bring it up and examine it, everyone should know what stopped the well
+        consequences:
+          - type: world_fact
+            target: well_restored
+            value: true
+          - type: world_fact
+            target: well_sabotaged
+            value: true
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: after_well_restored
+      - id: call_guard_before_touching
+        label: Call the guard before touching it, this is now a crime scene
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: well_sabotaged
+            value: true
+        exhaustionCost: 1
+        nextNodeId: sabotage_report
       - id: stay_til_done
-        label: Stay until the work is finished
+        label: Keep digging, the water is more important than the mystery right now
         consequences:
           - type: stat
             target: strength
@@ -121,25 +209,19 @@ nodes:
             target: well_restored
             value: true
         exhaustionCost: 3
-        nextNodeId: null
-      - id: leave_early
-        label: Head home when your back gives out
-        consequences:
-          - type: faction
-            target: village_folk
-            value: 1
-        exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: after_well_restored
 
   merchant_deal:
     id: merchant_deal
     text: >-
-      {merchant.name} already has barrels on a cart, ready to sell. "Terrible tragedy," they say,
-      not looking terribly troubled. "Supply and demand." They name a price that is almost
-      insultingly high.
+      {merchant.name} already has barrels on a cart, ready to sell. "Terrible tragedy," they
+      say, not looking terribly troubled. "Supply and demand." They name a price that is almost
+      insultingly high. Behind them, their assistant is watching the square, counting how many
+      people are looking this direction. They have been ready for this since before the well
+      stopped working.
     choices:
       - id: pay_it
-        label: Pay what they ask the town needs water
+        label: Pay what they ask, the town needs water
         consequences:
           - type: faction
             target: village_folk
@@ -148,9 +230,9 @@ nodes:
             target: merchant_guild
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: merchant_angle
       - id: haggle_hard
-        label: Refuse to be gouged negotiate a fair price
+        label: Refuse to be gouged, negotiate a fair price
         preconditions:
           - type: skill
             key: haggling
@@ -165,4 +247,619 @@ nodes:
             target: haggled_water_price
             value: true
         exhaustionCost: 2
+        nextNodeId: merchant_angle
+      - id: ask_how_they_had_barrels_ready
+        label: Ask {merchant.name} how they happened to have barrels ready this morning
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: merchant_foreknowledge_suspected
+            value: true
+        exhaustionCost: 1
+        nextNodeId: merchant_angle
+
+  merchant_angle:
+    id: merchant_angle
+    text: >-
+      {merchant.name} deflects smoothly. "I always keep stock. A careful business is a
+      prepared business." But the evasion is too polished. You press, gently or directly
+      depending on your approach, and find a crack: they received a tip the evening before
+      that the well would be dry by morning. From a contact they will not name. "It was just
+      business," they say. "I did not do anything to the well." That you half believe.
+    choices:
+      - id: press_for_the_contact
+        label: Press harder for the name of the contact
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: sabotage_conspiracy_suspected
+            value: true
+        exhaustionCost: 2
+        nextNodeId: sabotage_report
+      - id: take_the_information_and_go
+        label: Note what you learned and go tell {elder.name}
+        consequences:
+          - type: relationship
+            target: '{elder.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: merchant_foreknowledge_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: elder_knowledge
+
+  elder_knowledge:
+    id: elder_knowledge
+    text: >-
+      {elder.name} listens carefully. When you finish, they are quiet for longer than feels
+      comfortable. "There have been two other small acts of disruption this year," they say
+      finally. "The mill wheel pin that sheared in harvest season. The grain store lock that
+      stopped working for a week in the cold. We called them accidents." They look at the
+      well. "Someone is testing how we respond to pressure. Not to destroy us. To learn us."
+    choices:
+      - id: connect_this_to_bigger_pattern
+        label: Ask {elder.name} who benefits from seeing the town stressed and slow
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: sabotage_report
+      - id: focus_on_the_well_first
+        label: Focus on the well first, deal with the larger pattern once water is flowing
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: well_priority_set
+            value: true
+        exhaustionCost: 1
+        nextNodeId: after_well_restored
+
+  sabotage_report:
+    id: sabotage_report
+    text: >-
+      The guard takes it seriously. A captain comes, looks at the bundle or the evidence or
+      the notes, depending on what you brought them. "Deliberate," they agree. They post a
+      watch on the well and begin asking quiet questions in the market. {merchant.name} is
+      spoken to. They are not arrested. The questions, however, find their way back to whoever
+      tipped them off, and that person is seen leaving town quickly, before noon.
+    choices:
+      - id: try_to_follow_the_person_leaving
+        label: Try to intercept or follow the person who is leaving
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: saboteur_pursued
+            value: true
+        exhaustionCost: 2
+        nextNodeId: after_well_restored
+      - id: let_the_guard_handle_it
+        label: Let the guard handle it, your part is done
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: after_well_restored
+
+  after_well_restored:
+    id: after_well_restored
+    text: >-
+      The well runs again by evening. Water comes up clear and cold and people queue with
+      their buckets, quieter than usual. {elder.name} makes a short speech about community
+      resilience, which would be more stirring if everyone had not noticed that it took outside
+      interference to make the well stop, not a drought. Someone asks who did it. {elder.name}
+      does not answer. You know more than they said. The question is what you do with it.
+    choices:
+      - id: share_what_you_know_publicly
+        label: Speak up and share what you have learned with the gathered town
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: sabotage_exposed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: community_reckoning
+      - id: tell_elder_privately
+        label: Wait and tell {elder.name} privately what you found, let them decide how to handle it
+        consequences:
+          - type: relationship
+            target: '{elder.id}'
+            value: 2
+            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: community_reckoning
+      - id: keep_it
+        label: Keep what you know close for now
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: sabotage_known_privately
+            value: true
+        exhaustionCost: 0
+        nextNodeId: community_reckoning
+
+  community_reckoning:
+    id: community_reckoning
+    text: >-
+      Over the next two days, the town processes what happened. Some people are angry.
+      Some are frightened by the idea that someone would do this deliberately. A few, quietly,
+      say the well was probably always going to fail eventually and the sabotage story is an
+      excuse for poor maintenance. The truth of it settles into the community's memory as
+      whatever version is repeated most often. Your version, and how loudly you said it, is
+      part of that.
+    choices:
+      - id: continue_investigating
+        label: Continue pulling the thread, the sabotage pattern is bigger than the well
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: sabotage_investigation_ongoing
+            value: true
+        exhaustionCost: 1
+        nextNodeId: pattern_investigation
+      - id: let_it_settle
+        label: Let it settle, the well is running, the person is gone, that is enough for now
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: town_guard_follow_up
+
+  pattern_investigation:
+    id: pattern_investigation
+    text: >-
+      You start asking careful questions about the other incidents {elder.name} mentioned.
+      The mill wheel pin failure in harvest season: the pin showed tool marks, not metal
+      fatigue, a smith confirms this quietly when asked. The grain store lock: a locksmith
+      says the mechanism was packed with fine grit, not rust. Deliberate. Professional.
+      Someone with specific technical knowledge and access to multiple parts of the town
+      has been running an experiment. On this town.
+    choices:
+      - id: bring_pattern_to_elder
+        label: Bring the full pattern to {elder.name} and demand a council response
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: council_response
+      - id: approach_guard_with_pattern
+        label: Take the pattern to the town guard and push for a formal investigation
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: council_response
+      - id: keep_investigating_alone
+        label: Keep investigating privately, you are not ready to show your hand yet
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: sabotage_investigation_ongoing
+            value: true
+        exhaustionCost: 1
+        nextNodeId: town_guard_follow_up
+
+  council_response:
+    id: council_response
+    text: >-
+      The council meets within the day. {elder.name} chairs it. You present what you found.
+      The council is quiet in the particular way of people who suspected something and
+      hoped to be wrong. A motion is passed to post a formal watch on the well, the mill,
+      and the grain store. It is not enough. Everyone in the room knows it is not enough.
+      But it is what a council can do with what it has, and it is better than nothing.
+    choices:
+      - id: volunteer_for_the_watch
+        label: Volunteer for the new watch rota, you have the most context
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: sabotage_watch_posted
+            value: true
+        exhaustionCost: 2
+        nextNodeId: town_guard_follow_up
+      - id: push_for_more
+        label: Push the council for more, a watch is not an investigation
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: sabotage_investigation_ongoing
+            value: true
+        exhaustionCost: 1
+        nextNodeId: town_guard_follow_up
+
+  town_guard_follow_up:
+    id: town_guard_follow_up
+    text: >-
+      The guard's follow-up is thorough but slow. Three days later, they find the person
+      who left town quickly, or at least find where they were staying: a rented room above
+      the tannery, paid for two months. Empty now. Clean. The only thing left is a mark on
+      the inside of the shutter, the same symbol from the cloth in the well. Whatever this
+      is, it connects to something older and wider than one dry morning in one village.
+    choices:
+      - id: take_the_symbol_seriously
+        label: Record the symbol and treat it as part of a larger pattern
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: sabotage_symbol_connected
+            value: true
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: report_to_record_keeper
+        label: Take the symbol to the town record-keeper, someone here may recognize it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: sabotage_symbol_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: close_the_case_for_now
+        label: Let the guard close the case, the well runs, the threat is gone for now
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: well_restored
+            value: true
+        exhaustionCost: 0
+        nextNodeId: well_week_later
+
+  well_week_later:
+    id: well_week_later
+    text: >-
+      A week after the well ran dry, it is still running. The rope at the correct angle,
+      the water clear and cold. The mark on the shutter of the rented room above the tannery
+      has been painted over by the new tenant, a tinker who arrived two days ago and asked
+      no questions about the previous occupant. The guard's file is listed as resolved.
+      {elder.name} says nothing more about it in public. But in private, they are watching.
+    choices:
+      - id: speak_with_elder_privately
+        label: Arrange to speak with {elder.name} privately about what both of you suspect
+        consequences:
+          - type: relationship
+            target: '{elder.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: tinker_question
+      - id: investigate_the_tinker
+        label: Look into the new tinker, the timing of their arrival is notable
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: tinker_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: tinker_question
+      - id: let_it_rest
+        label: Let it rest, the pattern may not lead anywhere you want to go
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: well_restored
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  tinker_question:
+    id: tinker_question
+    text: >-
+      The tinker is unremarkable, which is a kind of remarkability. They fix pots and
+      knives and wheel rims, they pay on time, they ask nothing about the previous tenant.
+      But once, watching them work, you see their hands pause when someone mentions the well.
+      Just a pause. Two seconds. Then they continue. They know about the well. They arrived
+      two days after the person with the symbol left. The gap is small but there.
+    choices:
+      - id: ask_directly
+        label: Ask the tinker directly about the previous tenant
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: tinker_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: well_final
+      - id: watch_more
+        label: Watch more before asking, you only get one chance at directness
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: sabotage_investigation_ongoing
+            value: true
+        exhaustionCost: 1
+        nextNodeId: well_final
+      - id: report_the_tinker_to_guard
+        label: Report the tinker to the guard, let them investigate more formally
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: sabotage_watch_posted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: well_final
+
+  well_final:
+    id: well_final
+    text: >-
+      The well runs. The town drinks. The crisis is contained even if not resolved.
+      Whatever organization has been testing Ironhaven's resilience, they now have data:
+      the town responded within a day, found the blockage, restored service, and began
+      asking questions. That data will go somewhere. The next test, if it comes, will be
+      different. For now, the rope hangs straight and the bucket comes up full. That is
+      what survival looks like, specific and ordinary and enough for today.
+    choices:
+      - id: prepare_for_the_next_test
+        label: Begin preparing for whatever the next test might look like
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: sabotage_investigation_ongoing
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: share_your_suspicions_with_elder
+        label: Share your suspicions about a coordinated pattern with {elder.name}
+        consequences:
+          - type: relationship
+            target: '{elder.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: focus_on_the_day
+        label: Focus on the day, the well runs, that is the ground you stand on
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  well_new_well:
+    id: well_new_well
+    text: >-
+      The town debates digging a second well, in a different location, less central,
+      harder to access but harder to sabotage. {elder.name} supports it. The cost is
+      significant. The labor is significant. The case for redundancy is self-evident
+      after what just happened. The question is who organizes it and who pays.
+    choices:
+      - id: organize_the_second_well
+        label: Volunteer to lead the organization of the second well project
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: second_well_planned
+            value: true
+        exhaustionCost: 3
+        nextNodeId: well_final
+      - id: contribute_but_not_lead
+        label: Contribute labor and resources without taking the lead
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: well_final
+      - id: argue_for_better_security_instead
+        label: Argue that improving security of the existing well is more practical than a second one
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: sabotage_watch_posted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: well_final
+
+  elder_private_conversation:
+    id: elder_private_conversation
+    text: >-
+      {elder.name} asks to speak with you privately, three days after the well is restored.
+      They are not their public self in this conversation. They are older and more frightened
+      and more honest. "The pattern you described. I have been afraid to name it because naming
+      it means acting on it and acting on it means admitting how exposed we are." They fold
+      their hands. "Tell me what you think should be done. I want an opinion that is not
+      also protecting a position."
+    choices:
+      - id: give_full_honest_assessment
+        label: Give your full honest assessment of what you think they should do
+        consequences:
+          - type: relationship
+            target: '{elder.id}'
+            value: 3
+            axis: trust
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: sabotage_pattern_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: reflect_the_question_back
+        label: Reflect the question back, ask {elder.name} what they already know but have not said
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{elder.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: null
+
+  water_committee:
+    id: water_committee
+    text: >-
+      {elder.name} forms a water committee: three townspeople, including you if you want,
+      responsible for monitoring and securing the water supply long-term. It is a small
+      thing in form but a larger thing in meaning. The town is acknowledging that the well
+      situation was not an accident and that passive trust in infrastructure is no longer
+      appropriate. Something changed in the week the well ran dry.
+    choices:
+      - id: join_the_committee
+        label: Join the water committee
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: world_fact
+            target: well_restored
+            value: true
+          - type: world_fact
+            target: sabotage_watch_posted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: recommend_someone_else
+        label: Recommend someone more suited and step back
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: relationship
+            target: '{elder.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: null
+
+  final_resolution_note:
+    id: final_resolution_note
+    text: >-
+      The specific events of this episode settle into the longer story of the week. What
+      happened here will shape future interactions with {elder.name} and with everyone
+      who witnessed your choices or heard about them. The town remembers how people
+      behaved under pressure. That memory accumulates. You are part of the record now.
+    choices:
+      - id: accept_the_record
+        label: Accept that this is now part of your story here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reflect_on_what_was_learned
+        label: Take time to reflect on what this week taught you about yourself
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  dry_well_lesson:
+    id: dry_well_lesson
+    text: >-
+      In the end, the well taught the town something about its own assumptions. Water
+      was always there, so water would always be there. The certainty was the vulnerability.
+      Whatever else happened during this episode, that assumption is gone. The town is a
+      little more awake than it was before the rope came up empty. You were part of how
+      that waking happened.
+    choices:
+      - id: take_the_lesson_forward
+        label: Carry this awareness forward into how you think about other assumed certainties
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: well_restored
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: share_the_lesson
+        label: Find a way to share the lesson with others without making it a lecture
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 1
         nextNodeId: null

@@ -34,12 +34,12 @@ nodes:
   start:
     id: start
     text: >-
-      The horns are not a warning they are a confirmation. The demon army arrives at dawn, and
+      The horns are not a warning, they are a confirmation. The demon army arrives at dawn, and
       it is larger than the worst estimate. {captain.name} stands at the gate with a face made
-      of stone. {companion.name} is beside you, weapon in hand, not saying anything because there
-      is nothing left to say that has not already been said. The wall behind you is as strong as
-      you could make it. The people behind you are as prepared as they can be. This is the moment
-      everything was leading toward.
+      of stone. {companion.name} is beside you, weapon in hand, not saying anything because
+      there is nothing left to say that has not already been said. The wall behind you is as
+      strong as you could make it. The people behind you are as prepared as they can be.
+      Everything was leading here.
     choices:
       - id: fight_at_wall
         label: Take your place at the wall and fight
@@ -60,7 +60,7 @@ nodes:
         exhaustionCost: 4
         nextNodeId: at_the_wall
       - id: flee
-        label: Take the escape route you found get as many out as you can
+        label: Take the escape route you found and get as many out as you can
         consequences:
           - type: stat
             target: cunning
@@ -77,7 +77,7 @@ nodes:
         exhaustionCost: 2
         nextNodeId: fled
       - id: sacrifice
-        label: Volunteer to lead the diversion buy time for the others
+        label: Volunteer to lead the diversion, buy time for the others
         consequences:
           - type: stat
             target: charisma
@@ -94,19 +94,40 @@ nodes:
           - type: questline
             target: 'demon_invasion:last_stand'
             value: 3
-          - type: death
-            target: self
-            value: possible
+          - type: world_fact
+            target: led_diversion
+            value: true
         exhaustionCost: 4
         nextNodeId: sacrificed
+      - id: coordinate_defense
+        label: Stay back from the wall and coordinate the overall defense, someone needs to see the whole picture
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: questline
+            target: 'demon_invasion:last_stand'
+            value: 2
+          - type: world_fact
+            target: coordinated_defense
+            value: true
+        exhaustionCost: 3
+        nextNodeId: coordinating
 
   at_the_wall:
     id: at_the_wall
     text: >-
       The first wave breaks on the wall. The second wave is worse. You fight beside {companion.name}
-      and {captain.name} until your arm stops feeling like an arm. Hours pass that feel like minutes
-      and minutes that feel like lifetimes. Then the horns again. Reinforcements. The heroes have
-      held the road. The siege breaks. Not victory. But survival.
+      and {captain.name} until your arm stops feeling like an arm. Hours pass that feel like
+      minutes and minutes that feel like lifetimes. Somewhere on the east side, the wall groans
+      under something heavier than siege equipment. Then the horns again, different horns. Reinforcements.
+      The heroes have held the road. The siege breaks. Not victory. Survival.
     choices:
       - id: check_on_companion
         label: Find {companion.name} in the aftermath
@@ -123,7 +144,7 @@ nodes:
             target: '{companion.id}'
             value: trusted_ally
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: wall_aftermath
       - id: help_wounded
         label: Start helping the wounded before anything else
         consequences:
@@ -134,15 +155,28 @@ nodes:
             target: village_folk
             value: 3
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: wall_aftermath
+      - id: report_to_captain
+        label: Find {captain.name} and report on the east wall's condition
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: respect
+        exhaustionCost: 1
+        nextNodeId: wall_aftermath
 
   fled:
     id: fled
     text: >-
-      You lead a group of civilians through the tannery wall and into the drainage channel. Forty
-      people, moving fast and quiet. Behind you, the sounds of the battle diminish. You do not
-      look back until you are in the forest. The town is still standing you can see the smoke
-      from here, but no flames. Whether that continues without you is not something you can know.
+      You lead a group of civilians through the tannery wall and into the drainage channel.
+      Forty people, moving fast and quiet. Behind you, the sounds of the battle diminish.
+      You do not look back until you are in the forest. The town is still standing, you can
+      see the smoke from here but no flames. Whether that continues without you is not
+      something you can know from this distance.
     choices:
       - id: return_to_help
         label: Leave the civilians in safety and return to the fight
@@ -157,9 +191,9 @@ nodes:
             target: 'demon_invasion:last_stand'
             value: 1
         exhaustionCost: 4
-        nextNodeId: null
+        nextNodeId: late_return
       - id: stay_with_civilians
-        label: Stay with the people you brought out they still need a leader
+        label: Stay with the people you brought out, they still need a leader
         consequences:
           - type: stat
             target: charisma
@@ -172,16 +206,16 @@ nodes:
             value: 1
             axis: respect
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: civilian_camp
 
   sacrificed:
     id: sacrificed
     text: >-
-      You take a dozen volunteers and make enough noise and fire and chaos on the east flank to pull
-      a third of the demon force's attention for six critical minutes. Most of the volunteers survive.
-      You survive barely, and differently than before. When it is over, {captain.name} looks at you
-      across the square with an expression that does not have a word in the common tongue. {companion.name}
-      does not let go of your arm for a long time.
+      You take a dozen volunteers and make enough noise and fire and chaos on the east flank
+      to pull a third of the demon force's attention for six critical minutes. Most of the
+      volunteers survive. You survive, barely, and differently than before. When it is over,
+      {captain.name} looks at you across the square with an expression that does not have a
+      word in the common tongue. {companion.name} does not let go of your arm for a long time.
     choices:
       - id: accept_what_happened
         label: Sit with {companion.name} and let it land
@@ -201,9 +235,9 @@ nodes:
             target: charisma
             value: 2
         exhaustionCost: 0
-        nextNodeId: null
-      - id: report_to_captain
-        label: Report to {captain.name} duty is not finished
+        nextNodeId: reckoning
+      - id: report_to_captain_sacrifice
+        label: Report to {captain.name}, duty is not finished
         consequences:
           - type: faction
             target: town_guard
@@ -216,4 +250,613 @@ nodes:
             target: strength
             value: 1
         exhaustionCost: 2
+        nextNodeId: reckoning
+
+  coordinating:
+    id: coordinating
+    text: >-
+      From the square, you can see what the wall fighters cannot: the demon force testing
+      each section, learning the weak points. Your voice carries the adjustments to the
+      captains on each wall in time to matter twice, maybe three times. Whether it is
+      enough to tip the balance you will not know for hours. {companion.name} stays at
+      your side through all of it, relaying your orders to people who are faster than you.
+    choices:
+      - id: call_the_retreat
+        label: Call the retreat from the east wall before it is breached, save the defenders
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: east_wall_abandoned
+            value: true
+        exhaustionCost: 2
+        nextNodeId: coordinating_aftermath
+      - id: hold_every_position
+        label: Hold every position, no retreating, the walls must not look weak
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 3
+          - type: world_fact
+            target: walls_held_full
+            value: true
+        exhaustionCost: 3
+        nextNodeId: coordinating_aftermath
+
+  coordinating_aftermath:
+    id: coordinating_aftermath
+    text: >-
+      When the reinforcements come and the demon army pulls back, {captain.name} finds you
+      in the square. "I saw what you did from the gate," they say. "That call on the east wall,
+      right or wrong, it saved seventeen people." They extend their hand. It is not a gesture
+      {captain.name} makes easily. "Whatever title you want, you have earned something here."
+    choices:
+      - id: accept_the_acknowledgment
+        label: Accept it, this cost too much to be modest about
+        consequences:
+          - type: relationship
+            target: '{captain.id}'
+            value: 3
+            axis: respect
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: recognized_by_guard
+            value: true
+        exhaustionCost: 0
+        nextNodeId: reckoning
+      - id: redirect_to_the_fallen
+        label: Redirect to the people who did not make it, this is not the moment for titles
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: stat
+            target: charisma
+            value: 2
+        exhaustionCost: 1
+        nextNodeId: reckoning
+
+  late_return:
+    id: late_return
+    text: >-
+      You arrive back inside the walls with the battle still in its final phase. {captain.name}
+      sees you cross the gate and their expression passes through something complicated. You
+      take the nearest position and hold it. Whether your absence was noticed or how it was
+      read will shape what comes after. The wall is still standing. For now, that is the
+      only accounting that matters.
+    choices:
+      - id: join_the_fight_without_explanation
+        label: Join the fight, no explanation, let the action speak
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 1
+        exhaustionCost: 3
+        nextNodeId: reckoning
+      - id: explain_to_captain
+        label: Find {captain.name} and explain what you did with the civilians before rejoining
+        consequences:
+          - type: relationship
+            target: '{captain.id}'
+            value: 1
+            axis: trust
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: reckoning
+
+  civilian_camp:
+    id: civilian_camp
+    text: >-
+      The drainage channel opens into a clearing the trees close enough to offer cover.
+      The forty people with you are frightened but alive. Children are crying quietly.
+      Two elderly neighbors are being supported by others. You keep them moving northeast
+      until the sounds from the town become distant. Then you make camp, cold and nervous,
+      and wait for dawn to tell you what survived.
+    choices:
+      - id: send_back_a_scout
+        label: Send a volunteer back toward the town to see what is happening
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: civilian_scout_sent
+            value: true
+        exhaustionCost: 1
+        nextNodeId: reckoning
+      - id: keep_everyone_together_and_wait
+        label: Keep everyone together and wait, moving in the dark does more harm than good
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: reckoning
+
+  wall_aftermath:
+    id: wall_aftermath
+    text: >-
+      The square is changed. Stones displaced, scorch marks, the particular smell of a night
+      that was very nearly worse. {captain.name} is accounting for losses with the particular
+      efficiency of someone who has done it before and hates that they have to. The town
+      lives. The walls held, barely, and with cost. {companion.name} has a cut above their eye
+      that will scar. You feel it too, the specific exhaustion of having survived something that
+      required everything.
+    choices:
+      - id: stay_for_the_count
+        label: Stay and help {captain.name} account for all the defenders
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: reckoning
+      - id: find_companion_first
+        label: Find {companion.name} first, the count can wait a few minutes
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 3
+            axis: affection
+          - type: relationship_tag
+            target: '{companion.id}'
+            value: trusted_ally
+        exhaustionCost: 0
+        nextNodeId: reckoning
+
+  reckoning:
+    id: reckoning
+    text: >-
+      Three days after the siege breaks, Ironhaven holds a count. People, walls, stores.
+      What made it through and what did not. The names of those who fell are read in the
+      square. The town is smaller than it was, in every sense. What you did during the
+      preparations and during the fight sits with you differently now that the urgency is
+      gone. The demon army has retreated, not destroyed. The word from the east is that
+      this was not the main force.
+    choices:
+      - id: commit_to_rebuilding
+        label: Commit yourself to the rebuilding, the town needs you still
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: committed_to_ironhaven
+            value: true
+        exhaustionCost: 2
+        nextNodeId: reading_the_names
+      - id: speak_with_companion_after
+        label: Speak with {companion.name} alone, process what you both came through
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 3
+            axis: trust
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: affection
+          - type: relationship_tag
+            target: '{companion.id}'
+            value: forged_in_fire
+        exhaustionCost: 0
+        nextNodeId: companion_after
+      - id: think_about_what_comes_next
+        label: Sit quietly with the knowledge that this was not the main force and plan accordingly
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: questline
+            target: 'demon_invasion:last_stand'
+            value: 1
+          - type: world_fact
+            target: aware_of_larger_threat
+            value: true
+        exhaustionCost: 0
+        nextNodeId: reading_the_names
+
+  reading_the_names:
+    id: reading_the_names
+    text: >-
+      {captain.name} reads the names aloud in the square. Fifteen. More than hoped, fewer
+      than feared. Each name lands differently on different people in the crowd. You can
+      see the ripple of it move through familiar faces. Some of those names are people you
+      knew. Some are people who made choices in these same days that you had a hand in.
+      The weight of that is not guilt, exactly. It is something more complicated than guilt.
+    choices:
+      - id: stay_for_the_full_reading
+        label: Stay for every name, bear witness to all of them
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 1
+        nextNodeId: what_holds
+      - id: find_a_family
+        label: Find the family of someone you knew among the fallen and stand with them
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 2
+        exhaustionCost: 1
+        nextNodeId: what_holds
+
+  companion_after:
+    id: companion_after
+    text: >-
+      You find a place away from the square. {companion.name} sits close. Neither of you
+      speaks for a long time. At some point one of you says something small, not about the
+      battle, and the other responds, and then you are talking, not about what happened
+      but around it, the way people talk around something too large to face directly. By
+      the time you part, something has been established between you that did not exist before.
+    choices:
+      - id: name_what_was_established
+        label: Before you part, name it, tell {companion.name} what they mean to you now
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 4
+            axis: affection
+          - type: relationship_tag
+            target: '{companion.id}'
+            value: named_bond
+        exhaustionCost: 0
+        nextNodeId: what_holds
+      - id: let_it_rest_unspoken
+        label: Let it rest unspoken, some things do not need to be named to be real
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: relationship_tag
+            target: '{companion.id}'
+            value: forged_in_fire
+        exhaustionCost: 0
+        nextNodeId: what_holds
+
+  what_holds:
+    id: what_holds
+    text: >-
+      Ironhaven holds. The demon army is out there still. The word from the road is that
+      the main force has not yet moved. This was a probe, a test, a first question. The
+      town answered it. What that answer cost, and whether it was enough, will only be known
+      when the second question comes. You are still here. That is not nothing. It is, in
+      fact, the only starting point that matters.
+    choices:
+      - id: stay_and_rebuild
+        label: Commit to Ironhaven, this is where you make your stand
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: committed_to_ironhaven
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: prepare_for_the_next_wave
+        label: Begin preparing for what comes next, this cannot be where it ends
+        consequences:
+          - type: questline
+            target: 'demon_invasion:last_stand'
+            value: 1
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: aware_of_larger_threat
+            value: true
+        exhaustionCost: 1
+        nextNodeId: in_the_days_after
+
+  in_the_days_after:
+    id: in_the_days_after
+    text: >-
+      The days after the siege are strange. The urgency is gone but the adrenaline lingers
+      for longer than expected. You find yourself waking before dawn, listening for horns
+      that do not come. The town is repairing. People are eating. Children are playing again,
+      but closer to the walls than they used to. Everyone is carrying something that was not
+      there before. The question is what you do with yours.
+    choices:
+      - id: help_the_practical_recovery
+        label: Focus on practical recovery, there is too much to do to stop moving
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: captain_debrief
+      - id: take_time_to_be_still
+        label: Take time to be still, the body needs recovery the way walls need rebuilding
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: captain_debrief
+
+  captain_debrief:
+    id: captain_debrief
+    text: >-
+      {captain.name} calls a debrief on the fourth day. Formal, around a table, with notes.
+      What worked. What failed. What they would do differently. The east wall held three hours
+      longer than projected. The south gate was tested twice and held both times. The escape
+      route, if it was used, served its purpose. {captain.name} looks at you at various points
+      in the debrief. You contributed to more than one item on this list.
+    choices:
+      - id: speak_honestly_in_debrief
+        label: Speak honestly in the debrief about what worked and what did not from your perspective
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: relationship
+            target: '{captain.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: horizon
+      - id: listen_more_than_speak
+        label: Listen more than you speak, let the professionals draw their own conclusions
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{captain.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: horizon
+
+  horizon:
+    id: horizon
+    text: >-
+      The main demon force is still out there. The word from the eastern road is that
+      what arrived at Ironhaven was a vanguard, perhaps a quarter of the full army.
+      The real siege, if it comes, will be larger and longer. Ironhaven survived the
+      first question. The second question is already being written somewhere east,
+      in a language you cannot read, by forces you have not fully understood yet.
+      But you are here. The town is here. That is the ground you stand on.
+    choices:
+      - id: commit_to_staying
+        label: Commit to Ironhaven, whatever comes next, you face it here
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 3
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: committed_to_ironhaven
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: begin_intelligence_gathering
+        label: Start gathering intelligence about the main force before it arrives
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: questline
+            target: 'demon_invasion:last_stand'
+            value: 1
+          - type: world_fact
+            target: aware_of_larger_threat
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  the_cost_counted:
+    id: the_cost_counted
+    text: >-
+      A full accounting eventually emerges. Fifteen dead. Nine seriously wounded. The
+      east wall will need three weeks of repair. The food stores were drawn down by
+      a third. The refugee unit held the north approach and lost no one, which is the
+      kind of outcome that changes how a town thinks about who is and is not one of theirs.
+      {captain.name} presents this in the square with the flat voice of someone who has
+      done this accounting before.
+    choices:
+      - id: speak_after_captain
+        label: Speak after {captain.name}, add the human layer to the accounting
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 3
+        exhaustionCost: 1
+        nextNodeId: reckoning
+      - id: let_the_numbers_speak
+        label: Let the numbers speak, some things do not need more words
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: reckoning
+
+  before_the_break:
+    id: before_the_break
+    text: >-
+      In the hours before the demon army pulls back, there is a moment when the outcome
+      is genuinely unclear. The south gate is holding by one person's stubborn refusal
+      to yield ground. The north is fine. The east is cracking. {captain.name} has to
+      make a call: reinforce the east and risk the south, or hold both and risk neither
+      fully. They look at you. You know the east wall better than anyone.
+    choices:
+      - id: recommend_east
+        label: Recommend reinforcing the east, the south will hold a little longer
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: east_wall_reinforced
+            value: true
+        exhaustionCost: 1
+        nextNodeId: wall_aftermath
+      - id: recommend_holding_both
+        label: Recommend holding both, spread thin is better than a gap
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: wall_aftermath
+      - id: go_to_the_east_yourself
+        label: Stop talking and go to the east wall yourself
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 3
+        exhaustionCost: 3
+        nextNodeId: wall_aftermath
+
+  the_moment_before:
+    id: the_moment_before
+    text: >-
+      In the quiet between the horns and the first wave, there is a moment that lasts
+      longer than a moment. You are standing on or near the wall, or heading toward the
+      escape route, or at the diversion point, depending on your choice. But for three
+      or four breaths, everything is still. {companion.name} is somewhere near. The
+      town is behind you. Whatever you chose, you chose it. This is where it lands.
+    choices:
+      - id: find_companion_for_a_moment
+        label: Find {companion.name} and say what you need to say before it starts
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: affection
+          - type: relationship_tag
+            target: '{companion.id}'
+            value: last_words_before_battle
+        exhaustionCost: 0
+        nextNodeId: start
+      - id: use_the_moment_alone
+        label: Use the moment to be still, alone, and ready
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: start
+
+  last_conversation_before:
+    id: last_conversation_before
+    text: >-
+      The night before, someone who you would not have expected stops you. They are not
+      a soldier, not a planner. They have spent the whole week doing ordinary things:
+      feeding animals, baking, mending. And now they want to know from you, someone
+      who has been in the middle of everything, whether the town is going to survive.
+      Not as policy. As an honest opinion.
+    choices:
+      - id: say_yes_honestly
+        label: Say yes, and mean it, you believe it
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: final_night
+      - id: say_you_do_not_know
+        label: Say you do not know, but that you are staying to find out
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: stat
+            target: charisma
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: final_night
+
+  final_resolution_note:
+    id: final_resolution_note
+    text: >-
+      The specific events of this episode settle into the longer story of the week. What
+      happened here will shape future interactions with {companion.name} and with everyone
+      who witnessed your choices or heard about them. The town remembers how people
+      behaved under pressure. That memory accumulates. You are part of the record now.
+    choices:
+      - id: accept_the_record
+        label: Accept that this is now part of your story here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reflect_on_what_was_learned
+        label: Take time to reflect on what this week taught you about yourself
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 0
         nextNodeId: null

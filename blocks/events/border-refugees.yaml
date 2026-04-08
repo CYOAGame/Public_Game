@@ -6,7 +6,7 @@ tags:
   - questline
 storyline: demon_war
 chapter: 1
-reentry_recap: null
+reentry_recap: "Refugees from the fallen border camps have arrived at Ironhaven's gate. The town is deciding how to respond, and you are part of that decision."
 escalation:
   chance_base: 0.2
   advances_to: war_profiteer
@@ -37,14 +37,14 @@ nodes:
   start:
     id: start
     text: >-
-      They arrive at dawn forty, maybe fifty people. Families with loaded carts, soldiers
+      They arrive at dawn, forty or maybe fifty people. Families with loaded carts, soldiers
       without armor. {refugee_leader.name} leads them, exhausted but upright. "The border is
       gone," they say to whoever will listen. "Three villages in two days. We had nowhere else
       to come." {town_elder.name} stands at the gate and looks at you, waiting for someone
-      else to decide.
+      else to decide. The crowd behind the refugees is growing. This will not wait long.
     choices:
       - id: help_them
-        label: Step up help get the refugees settled inside the walls
+        label: Step up and help get the refugees settled inside the walls
         consequences:
           - type: stat
             target: charisma
@@ -85,8 +85,23 @@ nodes:
             value: true
         exhaustionCost: 1
         nextNodeId: exploited
+      - id: push_for_vote
+        label: Call on {town_elder.name} to hold a proper town vote before the gates open
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: relationship
+            target: '{town_elder.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: town_debate
       - id: ignore_them
-        label: Stay out of it let the town elder deal with it
+        label: Stay out of it and let the town elder deal with it
         consequences:
           - type: faction
             target: village_folk
@@ -100,7 +115,8 @@ nodes:
       You find floor space in the warehouse, negotiate with the baker for bread, and help a young
       family carry a bed frame they should not have tried to bring. {refugee_leader.name} finds
       you at the end of it. "You did not have to do that." They press something small into your
-      hand a carved token, worn smooth. "Where we came from, this means you are kin."
+      hand, a carved token worn smooth. "Where we came from, this means you are kin." Around you,
+      the warehouse is settling into a kind of order, children quieting, a fire being laid.
     choices:
       - id: ask_about_the_border
         label: Ask {refugee_leader.name} exactly what they saw at the border
@@ -115,26 +131,27 @@ nodes:
             target: border_report_received
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: border_account
       - id: let_them_rest
-        label: Tell them to rest there will be time for questions later
+        label: Tell them to rest, there will be time for questions later
         consequences:
           - type: relationship
             target: '{refugee_leader.id}'
             value: 2
             axis: affection
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: tensions_surface
 
   exploited:
     id: exploited
     text: >-
-      {refugee_leader.name} agrees they have no other options. You profit. The transaction is
+      {refugee_leader.name} agrees, they have no other options. You profit. The transaction is
       clean. But the warehouse that night is quiet in a way that weighs on you, and you catch
-      {refugee_leader.name} watching you with an expression that is not gratitude.
+      {refugee_leader.name} watching you with an expression that is not gratitude. The town's
+      folk know what terms were offered. The merchants approve. The rest do not.
     choices:
       - id: feel_regret
-        label: Feel the wrongness of it consider making it right
+        label: Feel the wrongness of it and consider making it right
         consequences:
           - type: stat
             target: charisma
@@ -146,22 +163,62 @@ nodes:
             target: village_folk
             value: 1
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: making_amends
       - id: justify_it
-        label: Tell yourself it was fair trade in hard times
+        label: Tell yourself it was fair trade in hard times and move on
         consequences:
           - type: stat
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: tensions_surface
+
+  town_debate:
+    id: town_debate
+    text: >-
+      {town_elder.name} calls the vote. The square fills. People talk over each other: fear of
+      food shortages, fear of plague, fear of simply having more mouths. {refugee_leader.name}
+      stands at the edge of the crowd, holding a child's hand, saying nothing. Three minutes of
+      argument and one glance at the family behind them does more than any speech. The vote
+      passes, narrowly. The gate opens.
+    choices:
+      - id: speak_for_them
+        label: Add your voice to the debate and speak in their favor
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: helped_refugees
+            value: true
+        exhaustionCost: 1
+        nextNodeId: helped
+      - id: stay_neutral_in_debate
+        label: Stay neutral, let the vote happen without your thumb on it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: helped_refugees
+            value: true
+        exhaustionCost: 0
+        nextNodeId: tensions_surface
 
   ignored:
     id: ignored
     text: >-
       {town_elder.name} makes the decisions without you. The refugees are allowed inside but
       given little. {refugee_leader.name} glances at you once, then looks away. You were there
-      and did nothing. That is its own kind of answer.
+      and did nothing. That is its own kind of answer. By evening the warehouse is crowded, cold,
+      and the mood is fragile.
     choices:
       - id: help_after_the_fact
         label: Help quietly after the formal decision is made
@@ -177,9 +234,639 @@ nodes:
             value: 1
             axis: trust
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: tensions_surface
       - id: carry_on
         label: Carry on with the day
         consequences: []
+        exhaustionCost: 0
+        nextNodeId: tensions_surface
+
+  border_account:
+    id: border_account
+    text: >-
+      {refugee_leader.name} speaks quietly so the children cannot hear. The eastern garrison
+      fell in a single night. Not overrun, collapsed, defenders scattered before any wall
+      was breached. Whatever the demon army is, it moves faster than any report prepared the
+      defenders for. "They do not fight like soldiers," {refugee_leader.name} says. "They do
+      not need to rest. They do not stop for the dark." They look at your face. "You needed to
+      know that."
+    choices:
+      - id: report_to_guard
+        label: Take this intelligence to {town_elder.name} and the guard captain immediately
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_intelligence'
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: garrison_report_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: logistics_pressure
+      - id: keep_intelligence_private
+        label: Keep it private for now, no need to cause a panic in the warehouse
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: garrison_report_private
+            value: true
+        exhaustionCost: 0
+        nextNodeId: logistics_pressure
+
+  making_amends:
+    id: making_amends
+    text: >-
+      You go back. Quietly. With bread from your own stores and the contract you wrote,
+      and you tear it up in front of {refugee_leader.name}. They watch you do it. "Why?"
+      they ask. You do not have a clean answer. They nod once, fold the pieces, and put
+      them in their pocket. "I will remember this too," they say. The two memories will live
+      alongside each other. That is how it works.
+    choices:
+      - id: ask_what_they_need
+        label: Ask what they actually need, start fresh
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: trust
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: logistics_pressure
+      - id: leave_it_there
+        label: Leave it at that, the gesture is enough
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: tensions_surface
+
+  tensions_surface:
+    id: tensions_surface
+    text: >-
+      By the second day, what was discomfort becomes friction. Some of the town's folk
+      are grumbling about the well queue, the grain store, the smell of too many people
+      in too small a space. A refugee child broke a market stall by accident. The
+      stallholder is furious. {refugee_leader.name} stands between the two camps trying
+      to hold something together that is starting to crack.
+    choices:
+      - id: mediate_dispute
+        label: Step in and help {refugee_leader.name} mediate
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 2
+        nextNodeId: logistics_pressure
+      - id: side_with_locals
+        label: Side with the stallholder, the refugees need to understand local rules
+        consequences:
+          - type: faction
+            target: merchants_guild
+            value: 1
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: -1
+            axis: trust
+          - type: faction
+            target: village_folk
+            value: -1
+        exhaustionCost: 1
+        nextNodeId: logistics_pressure
+      - id: ignore_dispute
+        label: Stay out of it, these things settle themselves
+        consequences:
+          - type: faction
+            target: village_folk
+            value: -1
+        exhaustionCost: 0
+        nextNodeId: logistics_pressure
+
+  logistics_pressure:
+    id: logistics_pressure
+    text: >-
+      {town_elder.name} pulls you aside. The numbers are not working. At current consumption,
+      feeding the refugees through the week will draw down the grain store by a third. And there
+      are rumors that more are coming, perhaps a hundred, perhaps more, from the villages further
+      east. "We cannot feed an army," {town_elder.name} says. "We can barely feed ourselves.
+      Someone needs to make hard choices." They are looking at you when they say it.
+    choices:
+      - id: propose_rationing
+        label: Propose formal rationing, shared equally between townsfolk and refugees
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: rationing_implemented
+            value: true
+        exhaustionCost: 2
+        nextNodeId: refugee_contribution
+      - id: propose_labor_exchange
+        label: Propose that refugees contribute labor to earn their food
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: merchants_guild
+            value: 1
+          - type: world_fact
+            target: labor_exchange_agreed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: refugee_contribution
+      - id: push_back_further_refugees
+        label: Advocate for closing the gate to any additional arrivals
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: faction
+            target: village_folk
+            value: -2
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: -2
+            axis: trust
+          - type: world_fact
+            target: gate_closed_to_refugees
+            value: true
+        exhaustionCost: 1
+        nextNodeId: gate_decision
+
+  refugee_contribution:
+    id: refugee_contribution
+    text: >-
+      {refugee_leader.name} convenes the people they came with. Word comes back: three
+      builders, a field surgeon, two former soldiers who kept their blades, a woman who
+      can preserve food with techniques this town has not seen. The refugees have skills.
+      The town had not asked. The exchange begins, awkwardly at first, and then with the
+      particular warmth that comes from mutual usefulness.
+    choices:
+      - id: work_alongside_them
+        label: Spend a day working alongside the refugees to model the exchange
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: community_integrated
+            value: true
+        exhaustionCost: 3
+        nextNodeId: resolution
+      - id: step_back_and_observe
+        label: Step back, you have done your part, watch how it develops
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: community_integrated
+            value: true
+        exhaustionCost: 0
+        nextNodeId: resolution
+
+  gate_decision:
+    id: gate_decision
+    text: >-
+      The gate is barred. Forty-three more people arrive the next morning from further east.
+      They stand outside in the cold, looking at the walls. Some are children. {town_elder.name}
+      will not meet your eyes. {refugee_leader.name} stands at your shoulder and says nothing
+      for a long time. "Those are my people," they say finally. "From my village."
+    choices:
+      - id: argue_to_reopen
+        label: Argue to {town_elder.name} that the gate must open, find another way to feed them
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: gate_reopened
+            value: true
+        exhaustionCost: 2
+        nextNodeId: resolution
+      - id: uphold_the_decision
+        label: Hold the line, the town cannot sustain more, the decision stands
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: -3
+            axis: trust
+          - type: world_fact
+            target: gate_held_closed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: resolution
+
+  resolution:
+    id: resolution
+    text: >-
+      A week later, the situation has settled into something that is not peaceful but is
+      at least stable. {refugee_leader.name} has become an informal voice for their people
+      inside the walls. The demon army has not yet reached Ironhaven. The refugees know
+      things about the enemy that the guard captain has only begun to understand. What you
+      did in the first hours still shapes every conversation you have with the people who
+      arrived that morning. First impressions in a crisis run deep.
+    choices:
+      - id: check_on_refugee_leader
+        label: Find {refugee_leader.name} and see how they are holding up
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: affection
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: refugee_leader_conversation
+      - id: speak_to_town_elder_about_defense
+        label: Speak to {town_elder.name} about integrating the refugee soldiers into the town defense
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: refugee_soldiers_integrated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: elder_and_defense
+      - id: step_back
+        label: Step back, you have done what you could
+        consequences: []
+        exhaustionCost: 0
+        nextNodeId: week_later
+
+  refugee_leader_conversation:
+    id: refugee_leader_conversation
+    text: >-
+      {refugee_leader.name} is sitting by the warehouse door when you find them. They are
+      mending something, a harness strap, with the concentrated quietness of someone keeping
+      their hands busy so their mind does not stray somewhere worse. They look up. "I keep
+      thinking about what I left behind," they say. "Not things. People. There were others
+      still there when we ran." They set the strap down. "I do not know how to stop
+      counting them."
+    choices:
+      - id: sit_and_listen
+        label: Sit down and let them talk for as long as they need
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: affection
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: week_later
+      - id: ask_what_they_need_to_keep_going
+        label: Ask what would help them keep going, practically
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: refugee_leader_supported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: week_later
+      - id: share_own_experience
+        label: Share something of your own about loss, meet them as an equal
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: trust
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: affection
+        exhaustionCost: 0
+        nextNodeId: week_later
+
+  elder_and_defense:
+    id: elder_and_defense
+    text: >-
+      {town_elder.name} is cautious at first. Integrating refugees into the town watch means
+      trusting strangers with weapons during a crisis. You make the argument: they know the
+      demon army. They have seen it. The guard captain, present for this conversation, agrees
+      more quickly than {town_elder.name}. "We take them," the captain says flatly. "We vet
+      them individually and we use what they know." {town_elder.name} yields, reluctantly.
+      It will work or it will not. The next week will tell.
+    choices:
+      - id: take_part_in_vetting
+        label: Volunteer to help with the individual vetting process
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: refugee_soldiers_integrated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: week_later
+      - id: introduce_refugee_leader_to_captain
+        label: Introduce {refugee_leader.name} directly to the guard captain, facilitate the connection
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: trust
+          - type: faction
+            target: town_guard
+            value: 2
+        exhaustionCost: 1
+        nextNodeId: week_later
+
+  week_later:
+    id: week_later
+    text: >-
+      Seven days in. The refugees are part of the town's fabric now, imperfectly, with
+      friction at the edges, but part of it. {refugee_leader.name} has briefed the guard
+      captain twice. Three of the refugee former soldiers are now on the east wall rotation.
+      The town is not the same as it was before the gate opened. That is neither entirely
+      good nor entirely bad. It is what happens when crisis forces two things to become one.
+    choices:
+      - id: reflect_on_the_choice
+        label: Reflect on what your first decision that morning set in motion
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: refugees_sheltered
+            value: true
+        exhaustionCost: 0
+        nextNodeId: friction_point
+      - id: plan_for_what_comes_next
+        label: Look ahead, the demon army is still moving, plan for what comes next
+        consequences:
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+          - type: world_fact
+            target: refugees_sheltered
+            value: true
+        exhaustionCost: 1
+        nextNodeId: defense_integration
+
+  friction_point:
+    id: friction_point
+    text: >-
+      The friction is small things that accumulate. A refugee family cooking unfamiliar
+      food that smells strange to the locals. Children playing games with different rules
+      and fighting about them. {town_elder.name} fielding complaints about noise, about
+      queue order at the well, about a dog. Each complaint is trivial. Together they are
+      a map of where the seams are. {refugee_leader.name} is managing their side of it.
+      You are part of how the other side manages theirs.
+    choices:
+      - id: address_complaints_sympathetically
+        label: Spend time with the complainers, hear them, redirect without dismissing
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 2
+        nextNodeId: before_the_siege
+      - id: address_refugees_directly
+        label: Speak to {refugee_leader.name} about keeping things quieter while tensions are high
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: -1
+            axis: trust
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: before_the_siege
+      - id: let_it_settle_naturally
+        label: Trust that people will adapt, small frictions resolve themselves
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: before_the_siege
+
+  defense_integration:
+    id: defense_integration
+    text: >-
+      The three refugee soldiers on the east wall rotation have changed the dynamic.
+      They know how the demon army moves. One of them, a woman who lost her whole unit,
+      sits down with the town guard captain for two hours and draws diagrams on the back
+      of a grain receipt. The captain comes out of that meeting with a different face.
+      Something in the town's planning has shifted because of who came through the gate.
+    choices:
+      - id: join_the_planning_session
+        label: Ask to sit in on the next planning session, bring what you know too
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: questline
+            target: 'demon_invasion:siege_preparation'
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: before_the_siege
+      - id: tell_refugee_leader_their_people_helped
+        label: Tell {refugee_leader.name} what their soldier's information changed
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: affection
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: before_the_siege
+
+  before_the_siege:
+    id: before_the_siege
+    text: >-
+      Ten days after the refugees arrived, the first scouting report comes in: the demon
+      army is twelve miles east. Moving slower than expected, perhaps gathering more forces,
+      perhaps waiting for something. Ironhaven has those twelve miles and however many days
+      they represent. {refugee_leader.name} finds you that evening. "We knew this was
+      coming," they say. "We just hoped we had longer." They look at the walls. "I want to
+      fight. My people want to fight. Tell me how."
+    choices:
+      - id: take_refugee_leader_to_captain
+        label: Take {refugee_leader.name} to the captain tonight, no time to waste
+        consequences:
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 2
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: refugee_soldiers_integrated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: counsel_patience
+        label: Counsel {refugee_leader.name} to wait, let the captain set the terms
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 1
+            axis: trust
+          - type: faction
+            target: town_guard
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: coordinate_yourself
+        label: Volunteer yourself to coordinate the refugee unit alongside the town guard
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 2
+          - type: world_fact
+            target: refugees_sheltered
+            value: true
+          - type: world_fact
+            target: refugee_soldiers_integrated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: refugee_unit_formed
+
+  refugee_unit_formed:
+    id: refugee_unit_formed
+    text: >-
+      The refugee unit takes shape faster than expected. {refugee_leader.name} leads it.
+      The three former soldiers train the others. By the third day, they have a rough
+      formation that the guard captain describes as "ragged but willing, which is better
+      than half of what I had before." They are assigned to the north approach, away from
+      the strongest expected assault, with a clear mandate: hold and fall back in good
+      order if pressed. Not a sacrifice. A contribution.
+    choices:
+      - id: train_alongside_them
+        label: Spend time training alongside the refugee unit, learn their methods
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: respect
+          - type: world_fact
+            target: refugee_soldiers_integrated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: stay_in_coordination_role
+        label: Stay in the coordination role, the unit does not need another fighter
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: questline
+            target: 'demon_invasion:border_defense'
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+
+  refugee_token_meaning:
+    id: refugee_token_meaning
+    text: >-
+      The carved token {refugee_leader.name} pressed into your hand sits on your windowsill.
+      You asked, days later, what it means. They told you: it is a hearth-mark, given only
+      to people counted as family. Among their people, you cannot refuse a hearth-mark once
+      given. It can only be accepted or dishonored. You accepted it without knowing what it
+      was. Now you know, and the question of whether you are ready to be what it makes you
+      is one you did not get to choose.
+    choices:
+      - id: embrace_the_meaning
+        label: Embrace what the token means, whatever it asks of you
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: trust
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 3
+            axis: affection
+          - type: relationship_tag
+            target: '{refugee_leader.id}'
+            value: hearth_kin
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: hold_it_lightly
+        label: Hold it lightly, the gesture matters but you cannot take on all it implies
+        consequences:
+          - type: relationship
+            target: '{refugee_leader.id}'
+            value: 1
+            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
         exhaustionCost: 0
         nextNodeId: null
