@@ -6,7 +6,7 @@ tags:
   - intrigue
 storyline: town_politics
 chapter: 1
-reentry_recap: null
+reentry_recap: "The meeting broke up without resolution. Factions are hardening and someone noticed how you handled yourself."
 escalation:
   chance_base: 0.2
   advances_to: the_magistrate
@@ -37,7 +37,7 @@ nodes:
   start:
     id: start
     text: >-
-      The bell rings three times the town meeting summons. The hall is packed. {elder_leader.name}
+      The bell rings three times, the town meeting summons. The hall is packed. {elder_leader.name}
       stands at the front with a map and a grim expression. The agenda: the town's defences,
       the failing eastern trade route, and the question of whether to send an envoy to the
       capital for help. {concerned_citizen.name} is already on their feet before anyone is
@@ -58,7 +58,7 @@ nodes:
         exhaustionCost: 2
         nextNodeId: spoke
       - id: listen_and_assess
-        label: Sit quietly and listen you want to understand who stands where
+        label: Sit quietly and listen, you want to understand who stands where
         consequences:
           - type: stat
             target: cunning
@@ -76,14 +76,155 @@ nodes:
             value: true
         exhaustionCost: 2
         nextNodeId: pushed_agenda
+      - id: arrive_late_deliberately
+        label: Arrive late, let the factions show themselves before you weigh in
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+        exhaustionCost: 1
+        nextNodeId: arrived_late
+
+  arrived_late:
+    id: arrived_late
+    text: >-
+      You slip in as {concerned_citizen.name} finishes a long complaint about the east road.
+      From the back, you can see the whole hall. {elder_leader.name} has their faction seated
+      on the left: merchants, two guild masters, a land-holder. On the right: farmers, three
+      craftsmen, the miller. The gap in the middle is where nobody has committed. That is where
+      you stand. You count six people watching the gap, not the speakers. They are waiting for
+      someone to step into it.
+    choices:
+      - id: step_into_gap
+        label: Move to the center of the room and speak
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 2
+        nextNodeId: spoke
+      - id: choose_a_side_deliberately
+        label: Walk to the left and sit with the elder's faction. A statement without words.
+        consequences:
+          - type: faction
+            target: merchants_guild
+            value: 2
+          - type: faction
+            target: village_folk
+            value: -1
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: listened
+      - id: identify_the_recorder
+        label: Spot the person in the back row writing everything down and sit near them
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: meeting_observer_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: found_recorder
+
+  found_recorder:
+    id: found_recorder
+    text: >-
+      You settle beside them. Up close, the writing is not notes: it is verbatim transcript,
+      every word, every speaker's name. This is not a concerned citizen. This is someone
+      with a purpose. They sense you looking and meet your eyes without alarm. "Town record,"
+      they say quietly. Then, after a pause: "Among other things." They go back to writing.
+      You now know there is a document being made of this meeting that will leave this room.
+    choices:
+      - id: ask_who_the_record_is_for
+        label: Ask quietly who the record is for
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: meeting_observer_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: recorder_question
+      - id: watch_what_they_write
+        label: Watch what they choose to write down and what they skip
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: listened
+      - id: speak_to_shape_record
+        label: Speak now, with the awareness that every word will be transcribed
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+          - type: world_fact
+            target: meeting_observer_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: spoke
+
+  recorder_question:
+    id: recorder_question
+    text: >-
+      The recorder tilts their head slightly. "The elder commissioned it. So did the merchant
+      alliance. And one other party that I am not obliged to name." They smile without warmth.
+      "It is a competitive market for minutes." They are telling you that three different
+      interests are paying for records of this meeting. Whatever is discussed here will be
+      reported three ways, to three different powers. Nothing said in this hall today is private.
+    choices:
+      - id: act_accordingly
+        label: Reconsider everything you were going to say. Speak only what you want reported.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 2
+        nextNodeId: pushed_agenda
+      - id: speak_honestly_anyway
+        label: Speak honestly anyway. Let whoever reads the record make of it what they will.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 2
+        nextNodeId: spoke
 
   spoke:
     id: spoke
     text: >-
       The hall goes quiet when you stand. {elder_leader.name} gives you the floor with a
-      slight nod. You make your case clear, short, direct. {concerned_citizen.name} nods
+      slight nod. You make your case: clear, short, direct. {concerned_citizen.name} nods
       vigorously. A merchant in the back crosses their arms. When you sit, the room has
-      shifted slightly. Not everyone agrees. But they heard you.
+      shifted slightly. Not everyone agrees. But they heard you. {elder_leader.name} watches
+      you with new attention as the session continues.
     choices:
       - id: follow_up_privately
         label: Find {elder_leader.name} after and follow up privately
@@ -96,15 +237,116 @@ nodes:
             target: nobility
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: private_elder
+      - id: find_citizen_after
+        label: Find {concerned_citizen.name} after, they were with you
+        consequences:
+          - type: relationship
+            target: '{concerned_citizen.id}'
+            value: 2
+            axis: trust
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: citizen_conversation
       - id: let_it_stand
         label: Let your words stand on their own
         consequences:
           - type: faction
             target: village_folk
             value: 1
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: meeting_public_standing
+
+  private_elder:
+    id: private_elder
+    text: >-
+      {elder_leader.name} meets you in the corridor outside the hall. They speak quietly,
+      efficiently. "Your point on the trade route was well made. I have thought the same
+      thing and said nothing because the merchant alliance would rather have the problem
+      than the solution." They study you. "I am going to need people who can speak plainly
+      in complicated rooms. Are you that kind of person, or was today an exception?"
+    choices:
+      - id: say_you_are_that_person
+        label: Say you are, and mean it
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: elder_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: week_after_meeting
+      - id: ask_what_that_would_mean
+        label: Ask what they are actually proposing before committing
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 1
+            axis: respect
+        exhaustionCost: 1
+        nextNodeId: meeting_week_two
+      - id: deflect_diplomatically
+        label: Be politic about it, say you would need to understand the room better first
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: meeting_week_two
+
+  citizen_conversation:
+    id: citizen_conversation
+    text: >-
+      {concerned_citizen.name} catches your sleeve outside the hall. They are angry in the way
+      of someone who has been angry for a long time and has only recently found someone to direct
+      it toward. "The elder is stalling on the defences because it costs money and the money
+      belongs to the guild. The guild won't spend it unless they see a return." They look at you.
+      "If enough people say what you said in there, loudly enough, the elder has to act. They
+      cannot ignore a consensus." They pause. "Will you keep saying it?"
+    choices:
+      - id: agree_to_keep_speaking
+        label: Agree to keep raising the issue
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: relationship
+            target: '{concerned_citizen.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 1
+        nextNodeId: meeting_faction_map
+      - id: ask_citizen_what_they_know
+        label: Ask what they know specifically about the guild's position
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: guild_tension_observed
 
   listened:
     id: listened
@@ -112,7 +354,9 @@ nodes:
       You learn more in two hours of quiet watching than most people learn in a week.
       {elder_leader.name} is hedging. {concerned_citizen.name} is afraid and covering it
       with anger. The merchants want protection for their routes above all else. And someone
-      in the back row is writing everything down not taking notes. Recording.
+      in the back row is writing everything down, not taking notes. Recording. The hall
+      divides along a fault you can now see clearly: those who want protection, and those
+      who want to pretend they do not need it.
     choices:
       - id: identify_the_recorder
         label: Find out who is recording the meeting and why
@@ -124,9 +368,9 @@ nodes:
             target: meeting_observer_known
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: found_recorder
       - id: approach_elder_after
-        label: Speak to {elder_leader.name} after you have something useful to offer
+        label: Speak to {elder_leader.name} after, you have something useful to offer
         consequences:
           - type: relationship
             target: '{elder_leader.id}'
@@ -136,18 +380,30 @@ nodes:
             target: spoke_at_meeting
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: private_elder
+      - id: use_knowledge_quietly
+        label: Keep what you learned to yourself and use it at the right moment
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: guild_tension_observed
 
   pushed_agenda:
     id: pushed_agenda
     text: >-
-      You wait until the debate gets circular it always does then you speak. Your
-      point is targeted and lands at the right moment. The discussion pivots. People
-      walk away thinking the outcome was inevitable rather than managed. {elder_leader.name}
-      watches you with new attention as the hall empties.
+      You wait until the debate gets circular, it always does, then you speak. Your point is
+      targeted and lands at the right moment. The discussion pivots. People walk away thinking
+      the outcome was inevitable rather than managed. {elder_leader.name} watches you with new
+      attention as the hall empties. {concerned_citizen.name} looks faintly unsettled, as though
+      they felt something shift but cannot identify what.
     choices:
       - id: acknowledge_the_move
-        label: Catch the elder's eye and give a small nod an acknowledgement
+        label: Catch the elder's eye and give a small nod, an acknowledgement
         consequences:
           - type: relationship
             target: '{elder_leader.id}'
@@ -157,12 +413,444 @@ nodes:
             target: political_player_known
             value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: private_elder
       - id: play_innocent
         label: Leave as though nothing of note happened
         consequences:
           - type: stat
             target: cunning
             value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
         exhaustionCost: 0
+        nextNodeId: meeting_dissolves
+      - id: do_it_again_next_time
+        label: Note how it worked. You will do this again at the next meeting.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: meeting_dissolves
+
+  meeting_dissolves:
+    id: meeting_dissolves
+    text: >-
+      The hall empties slowly. People cluster at the doorway, continuing arguments in lower
+      voices. A few glance at you with recognition, assessing whether you are a new factor
+      or a familiar one in different clothes. The east road question was not resolved. The
+      envoy question was tabled. The defence spending argument produced a sub-committee, which
+      is where arguments go to wait. You have a better map of the town's power lines than you
+      did two hours ago.
+    choices:
+      - id: debrief_with_citizen
+        label: Find {concerned_citizen.name} and debrief on who said what
+        consequences:
+          - type: relationship
+            target: '{concerned_citizen.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: citizen_conversation
+      - id: note_the_subcommittee
+        label: Find out who was named to the sub-committee, that is where the real decision will happen
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: meeting_observer_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: subcommittee_learned
+      - id: leave_quickly
+        label: Leave quickly, you need to think before anyone pins you down for a conversation
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: meeting_elder_proposal
+
+  subcommittee_learned:
+    id: subcommittee_learned
+    text: >-
+      The sub-committee on defence spending is three people: a guild-friendly merchant, one of
+      {elder_leader.name}'s allies, and {concerned_citizen.name}. The merchant will block. The
+      elder's ally will stall. {concerned_citizen.name} is the swing vote, and they are already
+      looking nervous about being on it. The real meeting happens before the formal one, and it
+      happens informally, at the tavern or over fences. You now know where to apply pressure.
+    choices:
+      - id: approach_citizen_about_committee
+        label: Talk to {concerned_citizen.name} about the committee before anyone else does
+        consequences:
+          - type: relationship
+            target: '{concerned_citizen.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 1
+        nextNodeId: citizen_conversation
+      - id: approach_elder_about_committee
+        label: Go to {elder_leader.name} with what you know about the committee
+        consequences:
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 1
+            axis: trust
+          - type: faction
+            target: nobility
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: private_elder
+      - id: wait_and_watch
+        label: Watch how the committee dynamic plays out before moving
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: meeting_long_game
+
+  guild_tension_observed:
+    id: guild_tension_observed
+    text: >-
+      On the walk home, you piece together what the meeting revealed about the guild's
+      internal state: the merchant alliance is not unified. Two of the guild masters argued
+      about the east road in ways that suggested a pre-existing dispute, not a new one.
+      The guild has a fracture and neither side is yet strong enough to act on it. That is
+      information worth having. It is also information that would interest the magistrate.
+    choices:
+      - id: file_for_later
+        label: File the observation. Nothing to act on yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: take_to_magistrate
+        label: Bring this to the magistrate, this is exactly the kind of thing they need to know
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: nobility
+            value: 1
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  meeting_aftermath:
+    id: meeting_aftermath
+    text: >-
+      The next morning, Ironhaven goes about its business as though the meeting resolved something.
+      It did not. The defences remain underfunded. The east road is still failing. The capital envoy
+      question sits unanswered. But the factions have shown their positions, and you have shown yours,
+      or chosen not to. What comes next depends on what you do with what you observed.
+    choices:
+      - id: build_on_meeting
+        label: Begin working on the relationships the meeting revealed. This is the moment to move.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: wait_for_next_meeting
+        label: Wait for the next formal meeting. Do not overextend on the momentum of one.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  week_after_meeting:
+    id: week_after_meeting
+    text: >-
+      A week after the meeting, the formal agenda items remain unresolved, but the real
+      work has already begun in the spaces between: in doorway conversations, at the market,
+      in what gets brought to whom first. {elder_leader.name} moves with more purpose. The
+      sub-committee has met once. You are positioned in the town's political landscape now,
+      not neutrally. People who were in that hall are recalibrating where you stand.
+    choices:
+      - id: maintain_relationships
+        label: Invest in the relationships the meeting opened, follow up with each person
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: elder_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: watch_and_wait_week
+        label: Watch and wait. See who moves first now that positions have been declared.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  meeting_faction_map:
+    id: meeting_faction_map
+    text: >-
+      You draw up what you learned from the meeting in your head or on paper: three factions,
+      two of which can be satisfied simultaneously if the third is managed carefully. The
+      merchants want the trade route. The village folk want the defences. The elder's personal
+      concern, which nobody has named, is the capital relationship. Whoever addresses the elder's
+      real concern without making it obvious they see it will have the elder's trust. That is
+      a specific kind of intelligence.
+    choices:
+      - id: use_intelligence_immediately
+        label: Use this intelligence in your next conversation with {elder_leader.name}
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: hold_intelligence
+        label: Hold it. Good intelligence is worth more when the moment is right.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  meeting_public_standing:
+    id: meeting_public_standing
+    text: >-
+      What you did in that hall has become part of how Ironhaven sees you. Three people
+      this week have mentioned your name in conversations you were not part of: once
+      favorably, once as a concern, once neutrally. You are no longer a background presence.
+      Whether that is useful or dangerous depends entirely on what happens next and how you
+      navigate it.
+    choices:
+      - id: embrace_public_standing
+        label: Lean into the visibility. Public trust is a resource.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: reduce_visibility
+        label: Reduce your visibility. You prefer to work without being watched.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  meeting_week_two:
+    id: meeting_week_two
+    text: >-
+      Two weeks after the meeting, the shape of what happened is clearer. {elder_leader.name}
+      has been cautious but consistent, consolidating support quietly. The sub-committee has
+      met twice without producing anything visible. The concerned faction around
+      {concerned_citizen.name} is still active, still talking. The recorder has not been seen
+      again. Whatever they were compiling, it has gone to whoever commissioned it. You have
+      a moment to decide how to engage with what is now in motion.
+    choices:
+      - id: seek_elder_directly
+        label: Seek {elder_leader.name} out directly, you want to know what they need
+        consequences:
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: elder_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: week_after_meeting
+      - id: sound_out_the_citizen
+        label: Sound out {concerned_citizen.name} about what they have heard
+        consequences:
+          - type: relationship
+            target: '{concerned_citizen.id}'
+            value: 1
+            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: meeting_faction_map
+      - id: track_committee_movement
+        label: Find out whether the sub-committee is stalling or building toward something
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: meeting_political_weight
+
+  meeting_political_weight:
+    id: meeting_political_weight
+    text: >-
+      The sub-committee has met three times now. Nothing is public. But people who were at
+      the meeting are being quietly approached, their opinions solicited. Someone is building
+      a picture of where the town actually stands on the defence question, outside of what was
+      said in the hall. You are being approached too. What you say, and how, will be noted.
+    choices:
+      - id: give_honest_assessment
+        label: Give your honest assessment of the situation
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: spoke_at_meeting
+            value: true
+        exhaustionCost: 1
+        nextNodeId: meeting_aftermath
+      - id: give_strategic_assessment
+        label: Frame your answer to serve the outcome you want
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: meeting_aftermath
+      - id: decline_to_be_interviewed
+        label: Say nothing. You are not ready to commit to a position yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: meeting_aftermath
+
+  meeting_long_game:
+    id: meeting_long_game
+    text: >-
+      Whatever happens at the next formal meeting will be shaped by what was done in the
+      weeks before it. The people who spent this time building relationships will arrive
+      with more weight. The people who watched and waited will arrive with more clarity.
+      Both have value, depending on what the room needs. The meeting itself is a formality.
+      The meeting before the meeting is where it matters.
+    choices:
+      - id: invest_now
+        label: Invest now. Relationships built before the next meeting are your capital.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: elder_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: stay_observant
+        label: Stay observant. Know the room before you commit to any part of it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  meeting_elder_proposal:
+    id: meeting_elder_proposal
+    text: >-
+      {elder_leader.name} sends a message three weeks after the meeting, asking to meet
+      privately. When you arrive, they are direct. They want you visible at the next town
+      assembly, and they want to know in advance what you intend to say. This is not an
+      invitation. It is an offer of coordination, with the implication that coordination
+      has benefits and refusal has costs. They are not threatening. They are being clear
+      about the political structure you are now inside.
+    choices:
+      - id: coordinate_with_elder
+        label: Agree to coordinate. This is how things work here.
+        consequences:
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 2
+            axis: trust
+          - type: faction
+            target: nobility
+            value: 1
+          - type: world_fact
+            target: elder_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: negotiate_terms
+        label: Agree to coordinate but name your conditions first
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: 1
+            axis: respect
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: decline_coordination
+        label: Decline. You will speak your own mind when the time comes.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: relationship
+            target: '{elder_leader.id}'
+            value: -1
+            axis: trust
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
         nextNodeId: null

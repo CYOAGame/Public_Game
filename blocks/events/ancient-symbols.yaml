@@ -34,13 +34,15 @@ nodes:
   start:
     id: start
     text: >-
-      The cellar walls are covered floor to ceiling in symbols not scratched but carved, deep
-      and deliberate, by hands that knew what they were doing. Spirals connected to straight lines.
-      Eyes. Figures with too many limbs. And in the center of the far wall, a phrase repeated in
-      three languages, two of which you cannot read. The one you can says: DO NOT OPEN THE WAY.
+      The cellar walls are covered floor to ceiling in symbols, not scratched but carved,
+      deep and deliberate, by hands that knew what they were doing. Spirals connected to
+      straight lines. Eyes. Figures with too many limbs. And in the center of the far wall,
+      a phrase repeated in three languages, two of which you cannot read. The one you can
+      says: DO NOT OPEN THE WAY. You have brought your journal and a stick of charcoal.
+      The question is how deep you are willing to go.
     choices:
       - id: study_carefully
-        label: Study the symbols methodically copy what you can
+        label: Study the symbols methodically, copy what you can
         consequences:
           - type: stat
             target: cunning
@@ -70,8 +72,16 @@ nodes:
             axis: trust
         exhaustionCost: 2
         nextNodeId: brought_neighbor
+      - id: examine_geometry
+        label: Focus on the geometry rather than the text, shapes have their own logic
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: examined_geometry
       - id: seal_it_back
-        label: You have seen enough seal it back and walk away
+        label: You have seen enough, seal it back and walk away
         consequences:
           - type: stat
             target: cunning
@@ -79,14 +89,59 @@ nodes:
         exhaustionCost: 1
         nextNodeId: sealed_back
 
+  examined_geometry:
+    id: examined_geometry
+    text: >-
+      The shapes repeat at different scales: a small spiral that matches a larger one twelve
+      rows above, a cluster of lines that, from the right angle, resolves into a map of
+      something. Underground. Branching. The pattern radiates from the phrase at the center
+      as from a fixed point. Whatever this is, the phrase is the anchor of it. Everything
+      else describes what the phrase is holding in place.
+    choices:
+      - id: sketch_the_map
+        label: Spend time sketching the shapes that look like a map
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: underground_map_sketched
+            value: true
+        exhaustionCost: 3
+        nextNodeId: studied
+      - id: add_neighbor_to_geometry
+        label: Fetch {scholar_neighbor.name}, this is bigger than one set of eyes
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: brought_neighbor
+
   studied:
     id: studied
     text: >-
-      Hours pass. When you finally climb back out, your back aches and your hand is cramped from
-      writing. The patterns have a logic a geometry that repeats at different scales. Whatever
-      was being warded against was not small. Your notes feel like a key you do not yet know the
-      lock for.
+      Hours pass. When you finally climb back out, your back aches and your hand is cramped
+      from writing. The patterns have a logic, a geometry that repeats at different scales.
+      Whatever was being warded against was not small. Your notes feel like a key you do not
+      yet know the lock for. You also noticed something new: near the floor on the east wall,
+      someone added marks in a different hand, much later than the rest. They are in a script
+      you do not recognise at all.
     choices:
+      - id: go_back_for_later_marks
+        label: Return to the cellar and copy the later marks specifically
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: later_marks_copied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: later_marks_found
       - id: show_someone
         label: Show your notes to someone who might understand
         consequences:
@@ -97,25 +152,67 @@ nodes:
             target: symbols_shared
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: shared_notes
       - id: keep_private
-        label: Keep the notes private this knowledge feels dangerous
+        label: Keep the notes private, this knowledge feels dangerous
         consequences:
           - type: stat
             target: cunning
             value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: knowledge_hoarded
+
+  later_marks_found:
+    id: later_marks_found
+    text: >-
+      The later marks are clustered at knee height, as though added by someone who did not
+      want to be seen from the stairs. They run in a short column. At the end of the column
+      is something unmistakable: a date in the old calendar. Sixty years ago. And below it,
+      a single word in the common tongue, scratched rather than carved: "WOKE." You are not
+      alone in having known about this place. Someone else was here before you, and they left
+      a different kind of warning.
+    choices:
+      - id: take_full_rubbings
+        label: Make complete rubbings of everything, the original carvings and the later marks
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: later_marks_copied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shared_notes
+      - id: ask_neighbor_about_sixty_years
+        label: Sixty years ago is within living memory. Ask {scholar_neighbor.name} if they know what happened then.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: brought_neighbor
 
   copied_phrase:
     id: copied_phrase
     text: >-
-      You emerge with the phrase in three languages on a scrap of vellum. The third language, you
-      realize, resembles nothing you have seen curved, almost organic. You find yourself staring
-      at it in the fading light, trying to make it mean something.
+      You emerge with the phrase in three languages on a scrap of vellum. The third language,
+      you realise, resembles nothing you have seen: curved, almost organic, as though the
+      letters grew rather than being written. You find yourself staring at it in the fading
+      light, trying to make it mean something. The script is not unfamiliar in the way of
+      foreign languages. It is unfamiliar in the way of something older than language.
     choices:
       - id: seek_translation
-        label: Ask around for someone who might recognize the third script
+        label: Ask around for someone who might recognise the third script
         consequences:
           - type: stat
             target: charisma
@@ -124,23 +221,37 @@ nodes:
             target: symbols_shared
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: shared_notes
+      - id: go_back_for_more
+        label: Go back to the cellar and copy more, you need the full picture
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: studied
       - id: file_it_away
         label: Tuck it away for now
         consequences:
           - type: stat
             target: cunning
             value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: knowledge_hoarded
 
   brought_neighbor:
     id: brought_neighbor
     text: >-
       {scholar_neighbor.name} stands at the base of the stairs, lantern raised, turning slowly.
-      Their face drains of color. "I have seen this once before," they say quietly. "In a book my
-      father burned." They do not explain. They climb out ahead of you and wait in the lane,
-      breathing too fast.
+      Their face drains of color. "I have seen this once before," they say quietly. "In a book
+      my father burned." They do not explain. They climb out ahead of you and wait in the lane,
+      breathing too fast. You wait with them. The lantern swings between you.
     choices:
       - id: press_them
         label: Press {scholar_neighbor.name} to explain what they know
@@ -156,9 +267,9 @@ nodes:
             target: symbols_studied
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: neighbor_pressed
       - id: give_them_space
-        label: Give them space ask again when they have settled
+        label: Give them space, ask again when they have settled
         consequences:
           - type: relationship
             target: '{scholar_neighbor.id}'
@@ -168,17 +279,574 @@ nodes:
             target: symbols_studied
             value: true
         exhaustionCost: 1
+        nextNodeId: neighbor_space
+      - id: go_back_together
+        label: Ask {scholar_neighbor.name} to come back down with you and point at what they recognise
+        consequences:
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 3
+        nextNodeId: went_back_together
+
+  neighbor_pressed:
+    id: neighbor_pressed
+    text: >-
+      {scholar_neighbor.name} does not answer immediately. When they do, their voice is steady
+      but their hands are not. "The book was a history. Pre-Imperial. It described places like
+      this as binding sites. Where they put things they could not destroy." They look at the
+      sealed door behind you. "My father burned the book because he said knowing about them
+      was enough to draw attention." They meet your eyes. "I think he was right."
+    choices:
+      - id: ask_what_was_bound
+        label: Ask {scholar_neighbor.name} what kind of thing the binding sites held
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: symbols_shared
+            value: true
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: shared_notes
+      - id: thank_and_let_go
+        label: Thank them and say you will not ask more. They have told you enough.
+        consequences:
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 0
+        nextNodeId: knowledge_hoarded
+
+  neighbor_space:
+    id: neighbor_space
+    text: >-
+      You find {scholar_neighbor.name} the next morning at the market, calmer. They pull
+      you aside. "I thought about it. You should know what my father's book said." They
+      describe binding sites, pre-Imperial, places where things were imprisoned rather
+      than destroyed because destruction was impossible. "Whatever is down there," they
+      say, "was put there by people who could not end it. They could only slow it."
+    choices:
+      - id: decide_to_research_further
+        label: Resolve to find out more before anyone else does
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_shared
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shared_notes
+      - id: ask_neighbor_to_help
+        label: Ask {scholar_neighbor.name} to help you research this together
+        consequences:
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: symbols_shared
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shared_notes
+
+  went_back_together:
+    id: went_back_together
+    text: >-
+      {scholar_neighbor.name} moves through the cellar pointing at symbols without touching
+      them, narrating in a low voice. "This cluster is a name. This is a containment glyph.
+      This one I have only seen in one other place, the foundation stone of the old granary,
+      before they rebuilt it." They stop at the center phrase. "The three languages are
+      deliberate. One for each people who agreed to maintain the binding. They made a pact."
+      They look at you. "Someone has been down here recently. The lantern holders have
+      fresh wax."
+    choices:
+      - id: investigate_fresh_wax
+        label: Examine the lantern holders, someone has been maintaining this place
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shared_notes
+      - id: record_neighbors_interpretation
+        label: Write down everything {scholar_neighbor.name} says as fast as you can
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shared_notes
+
+  shared_notes:
+    id: shared_notes
+    text: >-
+      By the time you have shared what you found and compared notes with whoever would listen,
+      a picture is forming. The cellar is not merely old. It is functional, a working
+      containment site, maintained across generations by people who knew what it was for.
+      The phrase is a warning, a lock, and possibly a prayer. Someone in Ironhaven today
+      still knows this. And now, so do you.
+    choices:
+      - id: tell_no_one_else
+        label: Keep what you know between yourself and whoever has already seen it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: symbols_aftermath
+      - id: seek_scholar_contact
+        label: Seek out a proper scholar, someone trained to read these symbols
+        consequences:
+          - type: world_fact
+            target: symbols_shared
+            value: true
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: symbols_aftermath
+      - id: warn_the_town
+        label: Bring what you know to the town meeting or the elder
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: town_response_to_symbols
+
+  knowledge_hoarded:
+    id: knowledge_hoarded
+    text: >-
+      The notes sit in your pack or your drawer. You look at them sometimes. The phrase
+      has lodged in your memory without needing the vellum: DO NOT OPEN THE WAY. You
+      sleep normally. Mostly. But you find yourself checking the ground underfoot when you
+      cross the square, listening for the creak of something vast and old shifting below.
+    choices:
+      - id: act_on_knowledge_eventually
+        label: Decide to act, the knowledge is becoming a weight
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 1
+        nextNodeId: symbol_copying_aftermath
+      - id: keep_sitting_on_it
+        label: Keep sitting on it. Knowing is not the same as being responsible for it.
+        consequences: []
+        exhaustionCost: 0
+        nextNodeId: symbol_weight
+
+  symbol_weight:
+    id: symbol_weight
+    text: >-
+      The knowledge sits in you the way a stone sits in water: it changes the shape of
+      everything around it without being visible on the surface. You find yourself reading
+      surfaces differently, looking at walls and doorframes for traces of the same geometry.
+      You notice two things in town: a worn symbol above the blacksmith's door that matches
+      one from the cellar, and a similar one carved under the lip of the well. They have
+      always been there. You just did not know what to see.
+    choices:
+      - id: investigate_surface_symbols
+        label: Begin systematically looking for the symbols in ordinary town structures
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: surface_symbol_search
+      - id: tell_neighbor_about_surface
+        label: Tell {scholar_neighbor.name} about the symbols above ground
+        consequences:
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: brought_neighbor
+      - id: keep_surface_knowledge
+        label: Keep the surface observations to yourself for now
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: symbols_settled
+
+  surface_symbol_search:
+    id: surface_symbol_search
+    text: >-
+      By the end of two days, you have found eleven symbols in visible places around town:
+      above doors, on corner stones, carved under bridge arches, pressed into the wet clay
+      of old drainage pipes now dry. They form a ring. The cellar is at the center of the
+      ring. Someone built this town around it deliberately, either knowing what it was, or
+      following a tradition so old they no longer knew why. The ring is still intact. Every
+      symbol is still readable.
+    choices:
+      - id: map_the_ring
+        label: Map the ring precisely and work out what it means for the town's layout
+        consequences:
+          - type: stat
+            target: cunning
+            value: 3
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: underground_map_sketched
+            value: true
+        exhaustionCost: 3
+        nextNodeId: ring_understood
+      - id: show_ring_to_scholar_neighbor
+        label: Show {scholar_neighbor.name} the ring before drawing any conclusions
+        consequences:
+          - type: relationship
+            target: '{scholar_neighbor.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: ring_understood
+
+  ring_understood:
+    id: ring_understood
+    text: >-
+      The ring is a containment boundary. The symbols mark the edge of an area of influence,
+      not a ward against entry but a ward against exit. Whatever is in the cellar is not meant
+      to cross the line of these symbols. And the symbols are being maintained: the ones above
+      the blacksmith's door and the well have been retraced recently, the lines sharp where
+      weather should have softened them. Someone in Ironhaven is still doing the work of the
+      old pact. They are doing it in secret, in plain sight, and you have just found them.
+    choices:
+      - id: find_who_maintains_ring
+        label: Begin trying to identify who is maintaining the boundary symbols
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shared_notes
+      - id: do_not_disturb_maintainer
+        label: Leave the maintainer undiscovered. They are doing the work. Let them.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: symbols_aftermath
+
+  symbols_aftermath:
+    id: symbols_aftermath
+    text: >-
+      A week passes. The cellar door on Tanner's Row sits as it always has. The symbols
+      above the blacksmith's door and the well have not changed. If someone is maintaining
+      them, they are doing it at night. You look at the town differently now: every carved
+      lintel, every old foundation stone is a potential piece of the containment system.
+      You cannot stop seeing the pattern. You are not sure you would want to even if you could.
+    choices:
+      - id: continue_mapping_symbols
+        label: Continue mapping every symbol you can find, build the full picture
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: underground_map_sketched
+            value: true
+        exhaustionCost: 2
+        nextNodeId: ring_understood
+      - id: look_for_maintainer_patterns
+        label: Look for patterns in when and how the symbols are touched, identify the maintainer
+        preconditions:
+          - type: world_fact
+            key: cellar_maintained_known
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_keeper_seen
+            value: true
+        exhaustionCost: 3
+        nextNodeId: maintainer_identified
+      - id: accept_what_you_know
+        label: Accept what you know and wait for more to become clear
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: symbols_settled
+
+  maintainer_identified:
+    id: maintainer_identified
+    text: >-
+      Over four nights of watching from different points in the town, you narrow it down.
+      The person retouching the boundary symbols moves before the second bell and after
+      the last tavern noise. They carry a cloth and a small pot. They work quickly, without
+      lingering. You cannot see their face but you know their build, their gait, their pattern.
+      You could follow them. You could confront them. Or you could simply know they exist
+      and let them continue their work.
+    choices:
+      - id: follow_and_confront
+        label: Follow them tonight and speak to them directly
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: cellar_keeper_seen
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shared_notes
+      - id: let_maintainer_continue
+        label: Let them continue undisturbed. The work is being done. That is what matters.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 0
         nextNodeId: null
+      - id: leave_a_note_for_maintainer
+        label: Leave a note near one of the boundary symbols, let them know you know
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  town_response_to_symbols:
+    id: town_response_to_symbols
+    text: >-
+      You bring your findings to the elder. They listen with the careful expression of someone
+      who is deciding how much they already knew. "The symbols on the buildings," they say.
+      "I noticed them when I was young. My father told me they were old good-luck marks." They
+      pause. "He was not entirely wrong. He just simplified." The elder looks at your sketch
+      of the ring. "Nobody in recent memory has known what they were for." They fold their hands.
+      "What do you think we should do about them?"
+    choices:
+      - id: recommend_formal_survey
+        label: Recommend a formal survey and documentation of every visible symbol
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: symbols_shared
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: recommend_secrecy
+        label: Recommend the elder keeps this quiet while you work out what it means
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: recommend_finding_maintainer
+        label: Recommend finding whoever has been maintaining the symbols and talking to them
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: maintainer_identified
+
+  symbol_copying_aftermath:
+    id: symbol_copying_aftermath
+    text: >-
+      Your notes from the cellar are in order but they do not stay quiet. You find yourself
+      rereading them at odd hours, tracing the geometry with your finger on the page. The
+      phrase in the readable language sits at the top of every page: DO NOT OPEN THE WAY.
+      Each time you read it, you think about what opening the way would actually mean. And
+      each time, you are a little less certain you have not already begun.
+    choices:
+      - id: burn_notes
+        label: Burn the notes. The knowing was a mistake. Forget it if you can.
+        consequences:
+          - type: stat
+            target: cunning
+            value: -1
+          - type: world_fact
+            target: symbols_hoarded
+            value: false
+        exhaustionCost: 1
+        nextNodeId: sealed_back
+      - id: copy_notes_and_hide
+        label: Make a copy, hide the original, and carry the copy with you always
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
+        exhaustionCost: 1
+        nextNodeId: symbol_weight
+      - id: seek_understanding_urgently
+        label: Seek understanding urgently. The phrase is not a passive warning.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shared_notes
 
   sealed_back:
     id: sealed_back
     text: >-
-      You drag the door shut and lock it again. Whatever is down there has been quiet for decades.
-      It can stay that way. But the image of the repeated phrase does not leave you. DO NOT OPEN
-      THE WAY. You wonder, walking home, if you already have.
+      You drag the door shut and lock it again. Whatever is down there has been quiet for
+      decades. It can stay that way. But the image of the repeated phrase does not leave
+      you. DO NOT OPEN THE WAY. You wonder, walking home, if you already have.
     choices:
       - id: tell_no_one
         label: Tell no one what you saw
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_hoarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: reconsider_going_back
+        label: Give yourself a day and then go back. Once seen, it cannot be unseen.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 1
+        nextNodeId: studied
+
+  symbols_settled:
+    id: symbols_settled
+    text: >-
+      A month later, the symbols have become part of what you carry rather than part
+      of what you are actively investigating. The scholar has been found, or not. The
+      maintainer has been named, or remains unknown. The town knows what it knows. What
+      you learned from those marks did not arrive as a single revelation. It arrived as
+      a slow shift in how you read certain things, a tendency to notice patterns that
+      others walk past. That is not nothing.
+    choices:
+      - id: commit_to_ongoing_attention
+        label: Commit to paying ongoing attention to what the symbols might connect to
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: document_and_set_aside
+        label: Document what you learned and set it aside. You will return when you have more context.
         consequences:
           - type: stat
             target: cunning

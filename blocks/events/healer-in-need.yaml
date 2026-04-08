@@ -73,8 +73,27 @@ nodes:
             value: true
         exhaustionCost: 2
         nextNodeId: investigated
+      - id: calm_crowd_first
+        label: Try to calm the crowd before either defending or accusing anyone
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: calmed_crowd
+      - id: speak_to_accuser
+        label: Go directly to {accuser.name} and ask them to explain the charge specifically
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: interrogated_accuser
       - id: join_accusation
-        label: Add your voice to the accusation something is odd about her
+        label: Add your voice to the accusation, something is odd about her
         consequences:
           - type: relationship
             target: '{healer.id}'
@@ -93,16 +112,195 @@ nodes:
         exhaustionCost: 1
         nextNodeId: accused
 
+  calmed_crowd:
+    id: calmed_crowd
+    text: >-
+      You step between {accuser.name} and the cottage door. "Nobody is deciding anything in
+      this lane," you say. "Not like this." The crowd shifts. A few people are relieved to
+      have a reason to stop. {accuser.name} sputters. {healer.name} watches from the doorway.
+      "If there is a charge," you continue, "it deserves a proper hearing. Not a mob." You
+      have bought an hour, maybe two. What you do with it matters.
+    choices:
+      - id: use_time_to_investigate
+        label: Use the hour to investigate the accusations properly
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: healer_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: investigated
+      - id: use_time_to_help_healer_flee
+        label: Tell {healer.name} quietly to gather what they need and leave before it starts again
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: trust
+          - type: faction
+            target: village_folk
+            value: -1
+          - type: world_fact
+            target: healer_fled
+            value: true
+        exhaustionCost: 2
+        nextNodeId: healer_escaped
+      - id: propose_formal_hearing
+        label: Propose a formal hearing before the elder, make this a process not a mob act
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: formal_hearing
+
+  interrogated_accuser:
+    id: interrogated_accuser
+    text: >-
+      {accuser.name} lays out the charge with more detail than you expected, which means they
+      have been building it for a while. The three sick children. The herbs. The light at
+      midnight. But when you push on specifics, they stumble. The children's parents are not
+      here. The herbs were described to them second-hand. And the light, they pause, the light
+      was seen by their cousin. Not by them directly. This is a thin charge held together by
+      certainty of feeling rather than fact.
+    choices:
+      - id: push_accuser_harder
+        label: Press {accuser.name} on the gaps, make them account for the lack of direct evidence
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{accuser.id}'
+            value: -1
+            axis: rivalry
+          - type: world_fact
+            target: healer_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: investigated
+      - id: ask_about_personal_grudge
+        label: Ask if there is a personal grievance behind the accusation
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: accuser_motive_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: investigated
+
+  formal_hearing:
+    id: formal_hearing
+    text: >-
+      The elder agrees to convene. The hearing happens in the hall that evening, a dozen
+      people seated, {healer.name} on one side, {accuser.name} on the other. It is not
+      a court, but it has the shape of one. {accuser.name} repeats the charges. {healer.name}
+      answers each one, calmly and precisely. The sick children's parents, when found, say
+      the illness was already breaking when {healer.name} arrived. The herb chest is examined:
+      all named, all documented in {healer.name}'s notes. The midnight light: a candle while
+      reading.
+    choices:
+      - id: speak_at_hearing
+        label: Speak at the hearing in {healer.name}'s favor
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: defended_healer
+            value: true
+        exhaustionCost: 2
+        nextNodeId: hearing_outcome
+      - id: present_accuser_motive
+        label: Present what you learned about {accuser.name}'s real motive, if you know it
+        preconditions:
+          - type: world_fact
+            key: accuser_motive_known
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{accuser.id}'
+            value: -3
+            axis: rivalry
+          - type: world_fact
+            target: defended_healer
+            value: true
+        exhaustionCost: 2
+        nextNodeId: hearing_outcome
+      - id: observe_hearing
+        label: Observe and let the facts speak for themselves
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: healer_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: hearing_outcome
+
+  hearing_outcome:
+    id: hearing_outcome
+    text: >-
+      The elder finds no evidence of wrongdoing. {accuser.name} leaves in silence. {healer.name}
+      stays after everyone else has gone, sitting at the long table with their hands folded.
+      When you approach, they look up. "I have lived here twenty years," they say. "I did not
+      think it would only take one person to undo that." They are not talking about the elder's
+      verdict. They are talking about how close it came.
+    choices:
+      - id: offer_support_after_hearing
+        label: Offer to stand with them publicly for the next few weeks
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 1
+        nextNodeId: healer_aftermath
+      - id: ask_what_healer_thinks_happened
+        label: Ask {healer.name} if they know why {accuser.name} chose now
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{healer.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 1
+        nextNodeId: healer_aftermath
+
   defended:
     id: defended
     text: >-
-      You speak loud enough for the whole crowd to hear. You have seen {healer.name}'s work.
-      You name the people she has pulled back from fever. You ask {accuser.name} to name
-      exactly what they saw. The crowd shifts. Not all of them but enough. {accuser.name}
-      sputters. {healer.name} catches your eye with a look of raw gratitude.
+      You speak loud enough for the whole crowd to hear. You name the people {healer.name}
+      has pulled back from fever. You ask {accuser.name} to name exactly what they saw.
+      The crowd shifts, not all of them but enough. {accuser.name} sputters. {healer.name}
+      catches your eye with a look of raw gratitude. The crowd does not disperse, but the
+      momentum has changed.
     choices:
       - id: keep_pushing
-        label: Keep pushing name the ill children and ask if anyone has actually asked the healer
+        label: Keep pushing, name the ill children and ask if anyone has actually questioned the healer
         consequences:
           - type: stat
             target: charisma
@@ -114,24 +312,100 @@ nodes:
             target: '{accuser.id}'
             value: -2
             axis: rivalry
+          - type: world_fact
+            target: defended_healer
+            value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: hearing_outcome
       - id: let_crowd_decide
-        label: You have said your piece let the crowd make up its own mind
+        label: You have said your piece, let the crowd make up its own mind
         consequences:
           - type: faction
             target: village_folk
             value: 1
+          - type: world_fact
+            target: healer_defended
+            value: true
         exhaustionCost: 1
+        nextNodeId: healer_aftermath
+      - id: draw_healer_inside
+        label: Draw {healer.name} back inside their cottage and wait for the crowd to thin
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 1
+        nextNodeId: healer_private_word
+
+  healer_private_word:
+    id: healer_private_word
+    text: >-
+      Alone with {healer.name}, the composure shows its seams. They are frightened, not of
+      {accuser.name} but of what the accusation revealed: how thin the protection of twenty
+      years of service actually is. "The children's illness," they say quietly. "I do not
+      know what caused it. Not the fever, the fever I understand. But three of them had the
+      same dream the same night. All three. I did not put that in my notes. I did not know
+      what to do with it."
+    choices:
+      - id: ask_about_dream
+        label: Ask {healer.name} to describe the dream
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: healer_defended
+            value: true
+          - type: world_fact
+            target: heard_priest_warning
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: connect_to_shrine
+        label: Connect what they are saying to the shrine below the town, if you know about it
+        preconditions:
+          - type: world_fact
+            key: cellar_opened
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: healer_defended
+            value: true
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: leave_healer_to_rest
+        label: Tell them to rest and say you will check in tomorrow
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 1
+            axis: affection
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 0
         nextNodeId: null
 
   investigated:
     id: investigated
     text: >-
       You spend an afternoon asking quietly. The sick children's parents are not part of the
-      accusation in fact they are baffled. The illness was already breaking when {healer.name}
+      accusation, in fact they are baffled. The illness was already breaking when {healer.name}
       arrived. {accuser.name} has a different grievance entirely: the healer refused to
-      recommend their cousin for something. This is not witchcraft. It is a grudge.
+      recommend their cousin for something. This is not witchcraft. It is a grudge. You also
+      learn that three of the sick children had a shared dream the night before {healer.name}
+      was called. The parents mentioned it only when you asked. All three dreampt of a door
+      underground.
     choices:
       - id: expose_grudge_publicly
         label: Take what you found to the square and expose the real motive
@@ -150,8 +424,11 @@ nodes:
           - type: world_fact
             target: defended_healer
             value: true
+          - type: world_fact
+            target: accuser_motive_known
+            value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: hearing_outcome
       - id: tell_healer_privately
         label: Tell the healer privately and let them handle it
         consequences:
@@ -163,13 +440,57 @@ nodes:
             target: defended_healer
             value: true
         exhaustionCost: 1
+        nextNodeId: healer_private_word
+      - id: note_the_dream
+        label: Set aside the grudge question for now and investigate the shared dream
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: heard_priest_warning
+            value: true
+        exhaustionCost: 2
+        nextNodeId: healer_private_word
+
+  healer_escaped:
+    id: healer_escaped
+    text: >-
+      {healer.name} is gone by morning. Their cottage is dark and empty. The crowd finds
+      nothing to confront and dissipates into disgruntled muttering. {accuser.name} claims
+      this proves guilt. Most people are not sure what it proves. Someone falls ill the
+      following week with nothing serious, and there is no healer to call. The absence
+      is its own argument.
+    choices:
+      - id: send_word_to_healer
+        label: Try to send word to wherever {healer.name} went, they deserve to know the dust settled
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: fill_the_gap
+        label: Do what you can to fill the gap while the town has no healer
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 2
         nextNodeId: null
 
   accused:
     id: accused
     text: >-
       Your voice tips the balance. The crowd surges forward. {healer.name} goes very still.
-      They do not look at you again. Three days later, they are gone from town their cottage
+      They do not look at you again. Three days later, they are gone from town, their cottage
       dark and empty. You hear through others that someone died of fever that week without care.
     choices:
       - id: feel_the_weight
@@ -182,9 +503,379 @@ nodes:
             target: village_folk
             value: -1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: healer_gone_aftermath
       - id: harden_yourself
         label: You made a call. The world is not clean.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: healer_gone_aftermath
+
+  healer_gone_aftermath:
+    id: healer_gone_aftermath
+    text: >-
+      The cottage stays empty for two weeks. Nobody claims it. {accuser.name} does not look
+      triumphant. They look like someone who won something they did not entirely want. The
+      town needs a healer and is starting to feel the absence in small ways: a twisted ankle
+      that does not heal right, a cough that goes on too long, a child with a rash nobody
+      knows how to treat. The gap is real.
+    choices:
+      - id: try_to_find_new_healer
+        label: Make efforts to find a replacement healer for the town
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: healer_replacement_search
+      - id: try_to_contact_old_healer
+        label: Try to send word to {healer.name} wherever they went
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 2
+        nextNodeId: healer_contacted
+      - id: wait_and_see
+        label: Wait and see how the town handles the absence. People adapt.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  healer_replacement_search:
+    id: healer_replacement_search
+    text: >-
+      You ask around in the neighbouring villages. There is a midwife two hours east who
+      knows something of herbs. There is a barber-surgeon at the garrison who might visit
+      on market days. Neither is {healer.name}, who had twenty years of this town's specific
+      ailments memorised. Finding adequate is easy. Finding good takes months. You have
+      started the process. That is something.
+    choices:
+      - id: secure_the_midwife
+        label: Make the offer to the midwife, she is the better fit
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: report_to_elder
+        label: Bring the options to the elder and let the town decide
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+
+  healer_contacted:
+    id: healer_contacted
+    text: >-
+      Word comes back through an indirect route. {healer.name} is two towns east and has
+      found work, but their note is short and careful. They have not forgiven the town.
+      But they have not closed the door either. The final line reads: "If the children with
+      the shared dream fall ill again, tell me. I kept notes on it. It may be important."
+      That detail, the shared dream, connects to things you may have already learned.
+    choices:
+      - id: follow_up_on_shared_dream
+        label: Follow up on the shared dream detail, this is connected to the shrine
+        preconditions:
+          - type: world_fact
+            key: cellar_opened
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: heard_priest_warning
+            value: true
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: keep_the_contact_open
+        label: Send a brief reply thanking them and leaving the door open
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  accuser_reckoning:
+    id: accuser_reckoning
+    text: >-
+      A month after the accusation, {accuser.name} is quieter. The grudge that drove them
+      to the crowd was real, but the outcome was more than they intended. When they need
+      something from a neighbor and find a slight chill in the response, they know why.
+      The town has not forgotten who drove the healer out. They have not forgotten who helped.
+      Social credit moves slowly in Ironhaven, but it moves.
+    choices:
+      - id: let_reckoning_happen_naturally
+        label: Let the social accounting happen on its own. The town is doing it without your help.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: speak_plainly_to_accuser
+        label: Speak plainly to {accuser.name} about what their accusation cost the town
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{accuser.id}'
+            value: -1
+            axis: rivalry
+        exhaustionCost: 1
+        nextNodeId: null
+
+  healer_aftermath:
+    id: healer_aftermath
+    text: >-
+      The accusation leaves marks even after it is resolved. {healer.name} works for
+      another week and then announces they are moving their practice to a different part
+      of town, closer to the edge, where the foot traffic is lighter. They say it is for
+      practical reasons. You know it is not. The distance from the well square and its
+      crowds is the point. They are still here. They are just not entirely the same person
+      they were before the accusation.
+    choices:
+      - id: check_in_regularly
+        label: Check in with {healer.name} regularly. Let them know they are not forgotten.
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shared_dream_implications
+      - id: let_healer_have_distance
+        label: Give {healer.name} the distance they chose. Respect is sometimes quiet.
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 1
+            axis: respect
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 0
+        nextNodeId: shared_dream_implications
+      - id: ask_accuser_what_changes
+        label: Go to {accuser.name} and ask what would have to change for them to feel the accusation was wrong
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{accuser.id}'
+            value: -1
+            axis: rivalry
+        exhaustionCost: 2
+        nextNodeId: accuser_reckoning
+
+  shared_dream_implications:
+    id: shared_dream_implications
+    text: >-
+      You keep returning to what {healer.name} told you: three children, the same dream,
+      the same night, a door underground. {healer.name} said they kept notes. You ask to
+      see them. The notes are precise and unsettling: each child described the same door,
+      the same cold air coming through it, the same sound, not a word exactly but a
+      pressure behind the ears that they interpreted as someone calling. All three had the
+      dream in the same week the mob gathered at the healer's door.
+    choices:
+      - id: connect_dreams_to_cellar
+        label: Connect the children's dreams to what you know about the cellar and shrine
+        preconditions:
+          - type: world_fact
+            key: cellar_opened
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: prophecy_known
+            value: true
+          - type: world_fact
+            target: heard_priest_warning
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: tell_priest_about_dreams
+        label: Tell the priest about the dreams if they are in town
+        preconditions:
+          - type: world_fact
+            key: priest_welcomed
+            value: true
+        consequences:
+          - type: world_fact
+            target: priest_given_evidence
+            value: true
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: keep_dream_notes_private
+        label: Keep {healer.name}'s notes private. You are not sure what to do with them yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: heard_priest_warning
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  accusation_ripple:
+    id: accusation_ripple
+    text: >-
+      The accusation is remembered in Ironhaven longer than it deserves. {accuser.name}'s
+      name is associated with it in the way that names get associated with things, unfairly
+      sticky. {healer.name}'s name gets its own association, the person who was nearly driven
+      out. That is also unfair. Both of them carry a different social weight now than they
+      did before the crowd gathered. You were in that moment. How you behaved in it is part
+      of how people read you.
+    choices:
+      - id: use_reputation_carefully
+        label: Use whatever reputation the moment gave you carefully and deliberately
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: healer_accuser_settlement
+      - id: be_indifferent_to_reputation
+        label: Be indifferent to reputation. You did what seemed right.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: healer_accuser_settlement
+
+  healer_confidence_restored:
+    id: healer_confidence_restored
+    text: >-
+      Two months after the accusation, {healer.name} performs a difficult treatment that
+      had a real chance of failure and succeeds. The word moves through the lanes the way
+      good news does, with speed and generosity. People who were quietly uncertain about
+      the healer after the accusation have a new reason to trust them. The accusation was
+      ugly. This is the correction. It takes two months. That is the pace of a town's
+      memory.
+    choices:
+      - id: mark_the_correction
+        label: Go to {healer.name} and mark the correction with them. Acknowledge the two months.
+        consequences:
+          - type: relationship
+            target: '{healer.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: healer_defended
+            value: true
+        exhaustionCost: 0
+        nextNodeId: healer_restored_position
+      - id: let_it_pass_quietly
+        label: Let it pass quietly. Some corrections are better unacknowledged.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: healer_restored_position
+
+  healer_restored_position:
+    id: healer_restored_position
+    text: >-
+      The healer is working again. Not fully, not with the confidence they had before,
+      but working. The accusation left a mark that will take longer to heal than any
+      wound they have treated. People come to them carefully now, watching for something
+      to confirm their doubts. You have been part of what made continuation possible.
+      That is not nothing, even if nobody will say so clearly.
+    choices:
+      - id: continue_visible_support
+        label: Continue being visibly supportive. It still matters that they see you backing the healer.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: healer_supported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: step_back_now
+        label: Step back. You have done what was needed. The healer can manage from here.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: healer_supported
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  healer_accuser_settlement:
+    id: healer_accuser_settlement
+    text: >-
+      The person who accused the healer is still in town. They have gone quiet but not
+      absent. They trade at the same market, drink at the same tavern, breathe the same
+      air. The town is performing normalcy around a fracture that was never fully
+      addressed. You are one of a small number of people who knows exactly what happened.
+      What you do with that is the question.
+    choices:
+      - id: address_it_when_moment_comes
+        label: Wait for the right moment and address it plainly, if it comes
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: healer_supported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_it_settle_on_its_own
+        label: Let it settle. Forcing a reckoning can do more damage than leaving the fracture.
         consequences:
           - type: stat
             target: cunning

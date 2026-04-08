@@ -6,7 +6,7 @@ tags:
   - mystery
 storyline: sealed_depths
 chapter: 0
-reentry_recap: null
+reentry_recap: "The sealed door on Tanner's Row has not left your mind. You know where it is now. The question is what you do about it."
 escalation:
   chance_base: 0.2
   advances_to: the_sealed_depths
@@ -32,13 +32,13 @@ nodes:
   start:
     id: start
     text: >-
-      You find it at the end of Tanner's Row a heavy door set flush with the ground, iron-banded,
+      You find it at the end of Tanner's Row, a heavy door set flush with the ground, iron-banded,
       sealed with a lock that has not been touched in years. The moss around the edges says it has
       been shut a long time. {local.name} passes on the far side of the lane, pauses, and looks
       deliberately away. They know something about this place.
     choices:
       - id: break_in
-        label: Force the lock you have heard enough to justify it
+        label: Force the lock, you have heard enough to justify it
         consequences:
           - type: stat
             target: strength
@@ -59,8 +59,16 @@ nodes:
             value: true
         exhaustionCost: 1
         nextNodeId: asked_local
+      - id: observe_first
+        label: Watch from a distance and see if anyone else comes near
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: observed_door
       - id: leave_it
-        label: Leave it sealed some doors are closed for good reason
+        label: Leave it sealed, some doors are closed for good reason
         consequences:
           - type: stat
             target: cunning
@@ -68,15 +76,115 @@ nodes:
         exhaustionCost: 0
         nextNodeId: left_it
 
+  observed_door:
+    id: observed_door
+    text: >-
+      You find a spot in the shade of a tanner's awning and watch for half an hour. Nobody
+      approaches the door. Nobody lingers nearby. But twice, people walking down the lane
+      angle their steps to avoid the door's shadow, a small automatic avoidance, as though
+      something in them knows to keep clear without being told. You have seen people avoid
+      plague-marked houses with the same gesture.
+    choices:
+      - id: approach_after_watching
+        label: Approach the door now that you understand the lay of the lane
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: examine_door
+      - id: ask_local_after_watching
+        label: Now approach {local.name}, you noticed how they avoided it too
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: asked_local
+
+  examine_door:
+    id: examine_door
+    text: >-
+      Up close, the ironwork is older than the buildings around it. The lock style is
+      pre-Imperial, the kind that requires a specific key shape no longer made by any smith
+      in Ironhaven. The door frame is carved with a border of small recurring symbols, worn
+      smooth by decades of rain. You recognise one of them: it matches a mark you once saw
+      on a barn charm meant to keep things in rather than keep things out.
+    choices:
+      - id: force_from_examination
+        label: Use what you learned about the lock to force it cleanly
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_opened
+            value: true
+        exhaustionCost: 2
+        nextNodeId: broke_in
+      - id: sketch_symbols
+        label: Sketch the border symbols before deciding anything
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_noted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: sketched_symbols
+      - id: get_local_from_examination
+        label: Find {local.name} and show them the symbols on the frame
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: asked_local
+
+  sketched_symbols:
+    id: sketched_symbols
+    text: >-
+      You fill half a page with the border pattern. The symbols are not decorative, they
+      are functional, spaced too deliberately for ornament. At home, you spread the sketch
+      on your table and study it by lamplight. Three of the marks you cannot identify.
+      The fourth is a word in old Tirean: "below." The fifth is a number. Seven.
+    choices:
+      - id: return_to_force_lock
+        label: Return to the door and break it open, enough caution
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: cellar_opened
+            value: true
+        exhaustionCost: 2
+        nextNodeId: broke_in
+      - id: seek_translation
+        label: Seek out someone who might read the remaining symbols before going further
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_noted
+            value: true
+        exhaustionCost: 1
+        nextNodeId: asked_local
+
   broke_in:
     id: broke_in
     text: >-
-      The lock breaks with a sound like a bone snapping. Cold air rises from below damp stone
-      and something older underneath. The stairs descend into darkness. Your eyes adjust slowly.
-      The walls are covered.
+      The lock breaks with a sound like a bone snapping. Cold air rises from below, damp
+      stone and something older underneath. The stairs descend into darkness. Your eyes
+      adjust slowly. The walls are covered. Whatever you expected, it was not this.
     choices:
       - id: descend_carefully
-        label: Descend with your lantern raised
+        label: Descend with your lantern raised and move slowly
         consequences:
           - type: stat
             target: cunning
@@ -85,27 +193,112 @@ nodes:
             target: cellar_explored
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: descended_carefully
       - id: descend_quickly
-        label: Go quickly in and out before anyone notices
+        label: Go quickly, in and out before anyone notices
         consequences:
           - type: stat
             target: strength
             value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: descended_quickly
+      - id: call_local_first
+        label: Back up and fetch {local.name}, you should not be alone down here
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: cellar_opened
+            value: true
+        exhaustionCost: 1
+        nextNodeId: fetched_local
+
+  descended_carefully:
+    id: descended_carefully
+    text: >-
+      Each step is deliberate. The cellar runs deeper than any storage room has a right to.
+      At the bottom, you raise the lantern and turn. Every wall is covered in carved symbols,
+      floor to ceiling, row upon row. Not scratched, but chiseled with intent. In the center
+      of the far wall, a phrase repeats in three languages. The one you can read says:
+      DO NOT OPEN THE WAY. The cold here is not seasonal. It is something else.
+    choices:
+      - id: study_walls
+        label: Begin studying the walls, you have time
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 3
+        nextNodeId: found_inner_door
+      - id: look_for_another_door
+        label: Scan the walls for anything beyond this first chamber
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+        exhaustionCost: 2
+        nextNodeId: found_inner_door
+      - id: back_up_carefully
+        label: Back out without touching anything, you need to think about this
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: retreated_intact
+
+  descended_quickly:
+    id: descended_quickly
+    text: >-
+      You are down and up in three minutes, lantern sweeping. Walls covered in carvings.
+      Cold air. A phrase on the far wall, repeated. You catch it as you turn: DO NOT OPEN
+      THE WAY. You are back on the street before your eyes fully adjust to daylight.
+      Your heart is going faster than the exertion warrants.
+    choices:
+      - id: go_back_slower
+        label: Catch your breath, then go back down properly this time
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+        exhaustionCost: 2
+        nextNodeId: found_inner_door
+      - id: seal_and_think
+        label: Pull the door shut and sit with what you saw before doing anything else
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: retreated_intact
 
   asked_local:
     id: asked_local
     text: >-
-      {local.name} looks both ways. "Nobody opens that. Not since old Maren's grandfather sealed it.
-      He said the symbols inside were a warning." They lower their voice. "Three years back, a mason
-      tried to repurpose the space. He left town the same week. Wouldn't say why." They press a
-      key into your palm warm, as though they have been carrying it ready. "Do what you need to.
-      But do not tell me about it after."
+      {local.name} looks both ways. "Nobody opens that. Not since old Maren's grandfather
+      sealed it. He said the symbols inside were a warning." They lower their voice.
+      "Three years back, a mason tried to repurpose the space. He left town the same week.
+      Wouldn't say why." They press a key into your palm, warm, as though they have been
+      carrying it ready. "Do what you need to. But do not tell me about it after."
     choices:
       - id: use_key
-        label: Use the key and descend
+        label: Use the key and descend today
         consequences:
           - type: world_fact
             target: cellar_opened
@@ -113,23 +306,251 @@ nodes:
           - type: stat
             target: cunning
             value: 1
+          - type: relationship
+            target: '{local.id}'
+            value: 2
+            axis: trust
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: descended_carefully
+      - id: ask_about_mason
+        label: Ask what the mason said before he left, anything at all
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{local.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: mason_story
       - id: return_key
-        label: Thank them and return the key not today
+        label: Thank them and return the key, not today
         consequences:
           - type: relationship
             target: '{local.id}'
             value: 1
             axis: trust
         exhaustionCost: 0
+        nextNodeId: left_it
+
+  mason_story:
+    id: mason_story
+    text: >-
+      {local.name} thinks for a moment. "He said the room was still in use. He couldn't explain
+      what he meant, the floor was swept clean, the lantern holders had fresh wax. Someone
+      had been down there, not long before. He didn't want to know who." They fold their arms.
+      "He was a steady man. Not given to fancies. He left without even collecting his tools
+      from the workshop."
+    choices:
+      - id: descend_after_mason_story
+        label: Take the key and go down now, fresh wax means someone has been maintaining this
+        consequences:
+          - type: world_fact
+            target: cellar_opened
+            value: true
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: descended_carefully
+      - id: watch_the_door
+        label: Return the key for now and watch the door over the next few days
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: cellar_watched
+            value: true
+        exhaustionCost: 1
+        nextNodeId: watching_door
+
+  watching_door:
+    id: watching_door
+    text: >-
+      You give it four days. On the third night, just before the second bell, you see a
+      figure in a dark cloak go to the door and descend. They are down for less than
+      thirty minutes. When they emerge, they lock the door and walk north without hurrying.
+      You did not see their face. You know their gait: it belongs to someone in Ironhaven.
+      You know it. You just cannot place it yet.
+    choices:
+      - id: follow_the_figure
+        label: Follow at a distance and try to identify them
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_keeper_seen
+            value: true
+        exhaustionCost: 2
+        nextNodeId: found_inner_door
+      - id: go_down_after_them
+        label: Use the key {local.name} gave you and go down immediately while the lantern is still warm
+        consequences:
+          - type: world_fact
+            target: cellar_opened
+            value: true
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: descended_carefully
+
+  fetched_local:
+    id: fetched_local
+    text: >-
+      {local.name} comes, reluctantly. They stand at the top of the stairs and look down
+      but do not descend. "I will wait here," they say. "If you are not back in fifteen
+      minutes I am going home and I never saw you today." They are not joking. You go alone.
+    choices:
+      - id: descend_with_local_watching
+        label: Descend, knowing someone knows where you are
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+          - type: relationship
+            target: '{local.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 2
+        nextNodeId: found_inner_door
+
+  found_inner_door:
+    id: found_inner_door
+    text: >-
+      Behind the carved far wall, your lantern catches a seam: a door disguised as stone,
+      fitted so precisely you would miss it without the right angle of light. A cold draft
+      pushes through the gap. Whatever is on the other side has been waiting. You stand at
+      the threshold of a choice that cannot be unmade.
+    choices:
+      - id: open_inner_door
+        label: Push through, you are already this far
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: cellar_resolution
+      - id: mark_and_leave
+        label: Mark the seam carefully and leave, you need to come back prepared
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: retreated_intact
+
+  retreated_intact:
+    id: retreated_intact
+    text: >-
+      You emerge onto Tanner's Row with the street noise washing over you like something
+      clean. The door sits patient behind you. You know more than you did this morning.
+      The phrase repeats in your head: DO NOT OPEN THE WAY. The honest question is whether
+      someone opened it long ago, and everything since has been the consequence.
+    choices:
+      - id: mark_location_and_think
+        label: Record everything you observed and sit with it tonight
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: tell_someone
+        label: Tell {local.name} what you found without revealing you went deeper than agreed
+        consequences:
+          - type: relationship
+            target: '{local.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: cellar_neighborhood_talk
+
+  cellar_resolution:
+    id: cellar_resolution
+    text: >-
+      The passage beyond the inner door runs straight, then opens into a low chamber
+      directly under the town square. You can hear cart wheels muffled above. At the
+      center: a carved plinth, empty. Whatever stood here was removed, or left. The
+      walls are older than anything in Ironhaven, the stone black with age. You are
+      standing below the town you know, in a room the town does not know it has.
+    choices:
+      - id: record_all_details
+        label: Record everything, every inscription, every measurement
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_explored
+            value: true
+          - type: world_fact
+            target: passage_found
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 3
+        nextNodeId: null
+      - id: take_one_thing
+        label: Take a rubbing of the plinth inscription and leave, do not push further today
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: seal_back_up
+        label: Back out, pull everything shut, and walk away from this
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_explored
+            value: true
+        exhaustionCost: 1
         nextNodeId: null
 
   left_it:
     id: left_it
     text: >-
-      You walk away. The door sits there, flush and patient, as it has for years. But now you know
-      where it is. That is not nothing.
+      You walk away. The door sits there, flush and patient, as it has for years. But now
+      you know where it is, and you have seen the way people avoid its shadow. That is not
+      nothing. Knowledge accumulates whether you want it to or not.
     choices:
       - id: mark_location
         label: Note the location carefully for later
@@ -141,4 +562,233 @@ nodes:
             target: cellar_investigated
             value: true
         exhaustionCost: 0
+        nextNodeId: null
+      - id: forget_it_entirely
+        label: Put it from your mind entirely. Some burdens are not yours to carry.
+        consequences: []
+        exhaustionCost: 0
+        nextNodeId: null
+
+  cellar_neighborhood_talk:
+    id: cellar_neighborhood_talk
+    text: >-
+      You start asking careful questions on Tanner's Row. What you find is a neighborhood that
+      has been actively not discussing the door for years. People change the subject. One woman
+      says her grandmother told her the door was sealed after something happened with a previous
+      family who lived there, but she does not know what. The avoidance is too consistent and
+      too old to be individual discomfort. This is collective, inherited silence.
+    choices:
+      - id: find_oldest_resident
+        label: Find the oldest person on Tanner's Row and ask them directly
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: oldest_resident_account
+      - id: cross_reference_with_records
+        label: Cross-reference what you know with the town records
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: cellar_records_found
+      - id: accept_the_silence
+        label: Accept the silence. It is telling its own story.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  oldest_resident_account:
+    id: oldest_resident_account
+    text: >-
+      The oldest person on the row is eighty-three and does not pretend to misunderstand you.
+      "My father sealed it," they say. "He was the last keeper. There was supposed to be a next
+      one. There was not." They look at their hands. "He told me never to open it. He did not tell
+      me what was down there because he said knowing would make it harder to leave alone." They
+      meet your eyes. "You have been down there, haven't you. I can tell." It is not an accusation.
+      "What did you find?"
+    choices:
+      - id: tell_the_old_resident
+        label: Tell them what you found, they have the context you need
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: cellar_keeper_seen
+            value: true
+        exhaustionCost: 2
+        nextNodeId: keeper_lineage
+      - id: ask_about_next_keeper
+        label: Ask who was supposed to be the next keeper
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: keeper_lineage
+      - id: say_you_found_nothing
+        label: Say you found nothing, you just looked through the door
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  keeper_lineage:
+    id: keeper_lineage
+    text: >-
+      The old resident explains, slowly and with effort. The keeper's role passed from parent to
+      child for four generations. Their father was the last. The next was meant to be their sibling,
+      but the sibling died young. By the time anyone realized the lineage had broken, the knowledge
+      had already begun to fade. "The symbols on the walls hold themselves," the old resident says.
+      "They do not need tending. But the shrine does. Someone needs to attend it. We stopped attending
+      it sixty years ago." They pause. "Is it still intact?"
+    choices:
+      - id: confirm_shrine_intact
+        label: Confirm the shrine is still intact, as far as you know
+        preconditions:
+          - type: world_fact
+            key: passage_found
+            value: true
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: cellar_resolution
+      - id: say_you_did_not_reach_shrine
+        label: Say you did not reach a shrine, you only saw the outer room
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: cellar_resolution
+      - id: offer_to_attend_shrine
+        label: Offer to take on the attendance that was abandoned
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  cellar_records_found:
+    id: cellar_records_found
+    text: >-
+      The records hall has an entry for the cellar under an old property registry: "Site of
+      Primary Containment, maintenance status: current" as of sixty years ago. The status was
+      never updated. There is also a note in the margin, added later in a different hand: "Keeper
+      lineage interrupted. Status unknown." Someone in the town administration knew about this
+      and wrote it down. The note is forty years old. Whether they are still alive or have successors
+      who carry the knowledge is a different question.
+    choices:
+      - id: find_records_clerk_lineage
+        label: Find out who added the margin note and if they left any successors in the administration
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: keeper_lineage
+      - id: report_records_to_elder
+        label: Bring the records entry to the elder. This is official town business.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: cellar_official_response
+
+  cellar_official_response:
+    id: cellar_official_response
+    text: >-
+      The elder reads the records entry twice. Their face does not change, which is its
+      own kind of reaction. "Primary Containment," they repeat, not to you. They set the
+      paper down. "The administration has records of this going back one hundred and forty
+      years. The last active entry was sixty years ago." They look at you. "Who else knows
+      you found this?" The question is a measurement, not a reprimand. They are calculating
+      who needs to know and in what order.
+    choices:
+      - id: say_only_you_know
+        label: Say only you know for now. Let the elder decide how to proceed officially.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: cellar_investigated
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: name_who_else_knows
+        label: Name {local.name} and anyone else who was involved
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: ask_elder_what_they_know
+        label: Ask the elder what they already know about the containment site
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
         nextNodeId: null

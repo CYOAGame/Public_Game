@@ -29,7 +29,7 @@ nodes:
       {scholar.name} arrives at the inn with two mules and a cart loaded entirely with wooden
       chests. They ask no one for directions but find you anyway. "You have been in the cellar,"
       they say, without greeting. "I can tell by the chalk dust and the way you look at walls."
-      They sit across from you uninvited. "Show me what you copied. I will tell you what it means
+      They sit across from you uninvited. "Show me what you copied. I will tell you what it means,
       but you will not enjoy the answer."
     choices:
       - id: show_notes
@@ -52,8 +52,16 @@ nodes:
             value: 1
         exhaustionCost: 1
         nextNodeId: tested_scholar
+      - id: ask_who_sent_them
+        label: Ask who sent them and how they knew to come here
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: asked_who_sent
       - id: refuse
-        label: Refuse you do not know this person
+        label: Refuse, you do not know this person
         consequences:
           - type: stat
             target: cunning
@@ -65,15 +73,124 @@ nodes:
         exhaustionCost: 0
         nextNodeId: refused
 
+  asked_who_sent:
+    id: asked_who_sent
+    text: >-
+      {scholar.name} gives a thin smile. "Nobody sent me. I follow binding sites. I have been
+      cataloguing them for eleven years." They tap the table. "Your town is on my list. It has
+      been on my list since I found a reference in a monastery archive eight years ago. What
+      changed is that someone opened the cellar." They study you. "That was you, wasn't it.
+      Something shifted in the site's signature when it happened. I was in Velrath. I felt it
+      from there." They fold their hands. "Your notes, please. I am not your enemy."
+    choices:
+      - id: show_notes_after_explanation
+        label: Show them your notes, their explanation is credible
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: showed_notes
+      - id: test_them_after_explanation
+        label: Still want to verify them, ask a specific question about what they felt
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: tested_scholar
+      - id: cautious_partial_share
+        label: Share only the sketch of the border symbols, not your deeper notes
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{scholar.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: partial_show
+
+  tested_scholar:
+    id: tested_scholar
+    text: >-
+      You ask about the third script on your copied phrase. {scholar.name} does not hesitate.
+      "Karathi. It says: the form bound here must not walk again." They fold their hands.
+      "Now your notes, if you please. We are wasting time." The accuracy is impossible to
+      fake without genuine knowledge. Whoever this is, they know what they are talking about.
+    choices:
+      - id: convinced_show
+        label: You are convinced, show them everything
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: prophecy_known
+            value: true
+          - type: questline
+            target: 'demon_invasion:lore_uncovered'
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: showed_notes
+      - id: still_cautious
+        label: Show them only partial notes, trust is earned slowly
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: partial_show
+
+  partial_show:
+    id: partial_show
+    text: >-
+      {scholar.name} studies the partial notes with the same intensity they would give a
+      complete set. "You have the border glyphs," they say. "That is the containment frame.
+      The language of the binding itself is deeper in. I need to see the phrase if you have
+      copied it." They push the notes back to you. "I understand caution. I have caused harm
+      with information before. I would rather you trusted me slowly and kept the rest." They
+      wait without pressure.
+    choices:
+      - id: share_more_after_partial
+        label: Give them the full phrase, their patience has earned it
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: showed_notes
+      - id: hold_firm_partial
+        label: Keep holding the line, two meetings before full trust
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: scholar_knowledge_settled
+
   showed_notes:
     id: showed_notes
     text: >-
-      {scholar.name} studies your notes for a long time. When they look up, their expression is
-      carefully controlled. "These are binding wards. Pre-Imperial. The third language is Karathi
-      spoken by the precursor civilization that was destroyed by the first demon incursion, four
-      hundred years ago." They tap the phrase. "This is a seal, not a warning. Something is
-      imprisoned beneath your town. And if the invasion continues" They stop. "The seals weaken
-      when fear and death accumulate. You need to know this."
+      {scholar.name} studies your notes for a long time. When they look up, their expression
+      is carefully controlled. "These are binding wards. Pre-Imperial. The third language is
+      Karathi, spoken by the precursor civilization that was destroyed by the first demon
+      incursion, four hundred years ago." They tap the phrase. "This is a seal, not a warning.
+      Something is imprisoned beneath your town. And if the invasion continues..." They stop.
+      "The seals weaken when fear and death accumulate. You need to know this."
     choices:
       - id: ask_more
         label: Press them for everything they know about the invasion and the seals
@@ -93,6 +210,17 @@ nodes:
             axis: respect
         exhaustionCost: 2
         nextNodeId: learned_more
+      - id: ask_what_is_imprisoned
+        label: Ask specifically what is imprisoned, not how the seals work
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: what_is_imprisoned
       - id: report_to_guard
         label: Say this needs to go to the guard captain immediately
         consequences:
@@ -106,7 +234,7 @@ nodes:
             target: guard_warned_of_seals
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: guard_warned
       - id: stay_quiet
         label: Ask them to keep this between the two of you for now
         consequences:
@@ -118,22 +246,24 @@ nodes:
             value: 1
             axis: trust
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: knowledge_held_close
 
-  tested_scholar:
-    id: tested_scholar
+  what_is_imprisoned:
+    id: what_is_imprisoned
     text: >-
-      You ask about the third script on your copied phrase. {scholar.name} does not hesitate.
-      "Karathi. It says: the form bound here must not walk again." They fold their hands. "Now
-      your notes, if you please. We are wasting time."
+      {scholar.name} is quiet for a moment. "A demon lord. One of the first-generation incursors,
+      the ones that arrived before the Karathi learned to fight them properly. It was not killed
+      because they could not kill it. So they bound it." They look at the table. "It is not dead.
+      It is contained, which is a different thing. It is patient in the way that things without
+      human time are patient. And the invasion, the one moving from the east right now, is not
+      territorial. They are coming for it. To retrieve it, or to trigger its release."
     choices:
-      - id: convinced_show
-        label: You are convinced show them everything
+      - id: press_on_full_lore
+        label: Need the full picture, press them for everything they know
         consequences:
-          - type: relationship
-            target: '{scholar.id}'
-            value: 2
-            axis: trust
+          - type: stat
+            target: cunning
+            value: 1
           - type: world_fact
             target: prophecy_known
             value: true
@@ -142,8 +272,8 @@ nodes:
             value: 1
         exhaustionCost: 2
         nextNodeId: learned_more
-      - id: still_cautious
-        label: Show them only partial notes trust is earned slowly
+      - id: ask_what_you_can_do
+        label: Ask what you specifically can do about this
         consequences:
           - type: stat
             target: cunning
@@ -151,17 +281,17 @@ nodes:
           - type: world_fact
             target: prophecy_known
             value: true
-        exhaustionCost: 1
-        nextNodeId: null
+        exhaustionCost: 2
+        nextNodeId: learned_more
 
   learned_more:
     id: learned_more
     text: >-
       {scholar.name} talks for two hours. You learn about the Karathi civilization, the first
       incursion, the binding rituals used to imprison a demon lord beneath towns built on
-      battlefields. Your town is one of seven such sites. "The invasion," they say finally, "is
-      not conquest. It is retrieval. They are coming for what is buried here." They stand to leave.
-      "Decide what to do with that."
+      battlefields. Your town is one of seven such sites. "The invasion," they say finally,
+      "is not conquest. It is retrieval. They are coming for what is buried here." They stand
+      to leave. "Decide what to do with that."
     choices:
       - id: ask_them_to_stay
         label: Ask {scholar.name} to stay and help
@@ -177,9 +307,484 @@ nodes:
             target: scholar_staying
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: scholar_stays
+      - id: ask_about_other_sites
+        label: Ask about the other six sites, who is protecting them
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: other_sites_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: other_sites_discussed
       - id: let_them_go
-        label: Thank them and let them go you have what you need
+        label: Thank them and let them go, you have what you need
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: scholar_departs
+
+  other_sites_discussed:
+    id: other_sites_discussed
+    text: >-
+      {scholar.name} lists them: two in the north, one at the coast, one in the mountains,
+      two whose locations were lost when the Karathi records burned. "Of the four known sites,
+      yours is the most compromised. The cellar door should not have been openable. The fact
+      that it was means the outer seals have degraded." They look at you with something that
+      is not quite accusation. "When you broke in, the timeline accelerated. I am not blaming
+      you. The degradation was already happening. But opening the door made it faster."
+    choices:
+      - id: ask_how_to_reinforce
+        label: Ask how the seals can be reinforced
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: reinforcement_possible
+            value: true
+        exhaustionCost: 1
+        nextNodeId: scholar_stays
+      - id: sit_with_the_weight
+        label: Sit with the weight of what they just told you. You accelerated this.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: scholar_departs
+
+  scholar_stays:
+    id: scholar_stays
+    text: >-
+      {scholar.name} agrees to stay, at least until they have assessed the site properly.
+      They take a room at the inn and begin asking questions of their own around town, subtle
+      ones. You find yourself with something you did not expect: an expert. And the weight
+      that came with knowing is slightly easier when it is shared with someone who has been
+      carrying a version of it for eleven years.
+    choices:
+      - id: work_with_scholar
+        label: Begin working with {scholar.name} in earnest
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: scholar_working_relationship
+      - id: give_scholar_space
+        label: Let them work independently and compare notes later
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 1
+            axis: respect
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 0
+        nextNodeId: scholar_asks_favor
+
+  guard_warned:
+    id: guard_warned
+    text: >-
+      The guard captain listens, face expressionless, and asks three clipped questions.
+      Then they stand. "I'll post a watch on the cellar door." They do not thank you.
+      You are not sure if you did the right thing. {scholar.name} watched you go and
+      said nothing, their expression unreadable. The information is now in official hands.
+      What that means depends on who the captain reports to.
+    choices:
+      - id: follow_up_with_captain
+        label: Follow up with the captain tomorrow, make sure the watch is real
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: guard_warned_of_seals
+            value: true
+        exhaustionCost: 1
+        nextNodeId: after_guard_warning
+      - id: also_ask_scholar_to_stay
+        label: Go back to {scholar.name} and ask them to stay regardless
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: scholar_staying
+            value: true
+        exhaustionCost: 1
+        nextNodeId: scholar_stays
+
+  knowledge_held_close:
+    id: knowledge_held_close
+    text: >-
+      {scholar.name} nods. "As you wish. I am discreet by habit." They gather their notes.
+      "Find me if you need to go back in. The binding glyphs have a specific sequence for safe
+      passage. Without it, the deeper rooms have a way of..." They pause. "Disorienting
+      visitors." They leave you with that word hanging. You are now the holder of something
+      fragile and enormous, and you chose not to share it. That was a choice with weight.
+    choices:
+      - id: call_them_back
+        label: Call them back, you have changed your mind about the guard
+        consequences:
+          - type: world_fact
+            target: guard_warned_of_seals
+            value: true
+          - type: relationship
+            target: '{scholar.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: guard_warned
+      - id: hold_the_secret
+        label: Hold it. You will decide what to do with it on your own terms.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: prophecy_known
+            value: true
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  scholar_departs:
+    id: scholar_departs
+    text: >-
+      {scholar.name} loads their mules the next morning and gives you a card with an inn
+      name two towns north. "When you need me, which you will, use this." They say it with
+      no drama. They are simply right and they know it. You watch the cart go and feel the
+      information settle into you like a stone into deep water.
+    choices:
+      - id: keep_card_safe
+        label: Keep the card safe. You will use it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: scholar_contact_held
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: decide_not_to_use_it
+        label: Decide not to use it. You will handle this without help.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: scholar_presence_effects
+
+  refused:
+    id: refused
+    text: >-
+      {scholar.name} nods as though they expected this. "Caution is sensible." They slide a
+      small card across the table, a name, an inn in the next town. "When you change your
+      mind, which you will, come find me." They leave without touching their ale.
+    choices:
+      - id: follow_up
+        label: Decide to follow up, tuck the card away carefully
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: scholar_contact_held
+            value: true
+        exhaustionCost: 0
+        nextNodeId: scholar_presence_effects
+      - id: discard_card
+        label: Leave the card on the table. You do not need strangers' warnings.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: scholar_presence_effects
+
+  scholar_presence_effects:
+    id: scholar_presence_effects
+    text: >-
+      Whether {scholar.name} stayed or left, their presence in Ironhaven has had effects.
+      People who saw the cart full of chests are asking questions. The innkeeper mentioned
+      to three people that a scholar asked about the cellar on Tanner's Row. The information
+      is spreading in a form you cannot control now: someone with knowledge came, asked
+      questions, and left or stayed. That means someone in town knows there is something
+      to ask about.
+    choices:
+      - id: get_ahead_of_rumor
+        label: Get ahead of the rumor and tell people what the scholar found before they speculate
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 2
+        nextNodeId: knowledge_spreading
+      - id: let_rumor_spread
+        label: Let the rumor spread. Unsettled people are more willing to prepare.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: heard_priest_warning
+            value: true
+        exhaustionCost: 0
+        nextNodeId: knowledge_spreading
+      - id: deny_scholar_significance
+        label: Tell anyone who asks that the scholar was a collector of old maps, nothing significant
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+
+  knowledge_spreading:
+    id: knowledge_spreading
+    text: >-
+      The knowledge has a life of its own now. You can shape it but not contain it. Within
+      a week, three versions of the story are circulating: that a demon is sealed below the
+      town, that the town was built as a prison, and that the invasion is coming specifically
+      for Ironhaven. Two of those are more or less true. One is an exaggeration of the truth.
+      People are behaving differently in small ways. The priest is being listened to more carefully.
+    choices:
+      - id: coordinate_with_priest
+        label: Coordinate with {scholar.name} or the priest to ensure people have accurate information
+        preconditions:
+          - type: world_fact
+            key: priest_welcomed
+            value: true
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: focus_on_practical_response
+        label: Stop worrying about the narrative and focus on what practically needs doing
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: guard_warned_of_seals
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: protect_the_scholar
+        label: Make sure {scholar.name} is not harassed by people who blame the messenger
+        preconditions:
+          - type: world_fact
+            key: scholar_staying
+            value: true
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  scholar_asks_favor:
+    id: scholar_asks_favor
+    text: >-
+      {scholar.name} comes to you three days into their stay with a specific request. They need
+      access to the records hall to check a date. And they need someone the hall's keeper will
+      trust, since the keeper has already refused to let the scholar in directly. "I understand
+      caution," {scholar.name} says. "But the date matters. The binding was last reinforced on
+      a specific anniversary. If I can find that date, I know how much time we have."
+    choices:
+      - id: vouch_for_scholar
+        label: Vouch for {scholar.name} at the records hall
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: knowledge_spreading
+      - id: get_date_yourself
+        label: Get the date yourself without involving {scholar.name} in the records hall
+        preconditions:
+          - type: trait
+            key: cunning
+            min: 4
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: knowledge_spreading
+      - id: ask_what_date_means
+        label: Ask {scholar.name} to tell you the date's significance before deciding
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: knowledge_spreading
+
+  scholar_working_relationship:
+    id: scholar_working_relationship
+    text: >-
+      Working with {scholar.name} is unlike anything you have done before. They know things
+      that cannot be found in any library in Ironhaven, and they know how to use what they
+      know. Three days in, you have: a timeline of the binding's degradation, a list of
+      the seven sites and which are still stable, and a specific concern about the northeastern
+      wall of the chamber below the square. {scholar.name} wants to go down again. They want
+      you with them.
+    choices:
+      - id: go_down_with_scholar
+        label: Go down into the cellar with {scholar.name}, properly prepared
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{scholar.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: scholar_ally
+            value: true
+          - type: world_fact
+            target: cellar_explored
+            value: true
+        exhaustionCost: 3
+        nextNodeId: null
+      - id: send_scholar_down_alone
+        label: Let {scholar.name} go down alone, you will wait at the top
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: scholar_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: pause_before_descending
+        label: Pause before going further. You want to understand the northeastern concern first.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  after_guard_warning:
+    id: after_guard_warning
+    text: >-
+      The guard captain posts the watch on the cellar door and asks no further questions,
+      which is itself information about how much they already know. {scholar.name} hears
+      about the watch and comes to you that evening. "Good or bad?" they ask. You think
+      about it. "Both," you say. They nod. "Both is honest." The watch keeps people out.
+      It also marks the door as something the guard considers significant. That will draw
+      attention over time.
+    choices:
+      - id: manage_the_attention
+        label: Stay ahead of the attention the watch will draw
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: knowledge_spreading
+      - id: accept_the_exposure
+        label: Accept the exposure. The town needs to know there is something worth guarding.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: symbols_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: knowledge_spreading
+      - id: ask_scholar_to_brief_captain
+        label: Ask {scholar.name} to give the captain a proper briefing, they need to understand what they are guarding
+        consequences:
+          - type: relationship
+            target: '{scholar.id}'
+            value: 1
+            axis: trust
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: guard_warned_of_seals
+            value: true
+        exhaustionCost: 1
+        nextNodeId: scholar_captain_resolution
+
+  scholar_knowledge_settled:
+    id: scholar_knowledge_settled
+    text: >-
+      What you learned from the scholar does not disappear when they do. It sits in you,
+      changing the way you read certain things: the symbols in the cellar, the priest's
+      discomfort, the guard captain's professional caution. The scholar was a window
+      into a layer of Ironhaven that most people here do not know about. Whether you
+      act on what you saw through it is still an open question.
+    choices:
+      - id: pursue_the_thread
+        label: Pursue the thread. The scholar opened a door and you intend to walk through it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: scholar_knowledge_held
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_it_lie_for_now
+        label: Let it lie. You have enough to think about without the scholar's complications.
         consequences:
           - type: stat
             target: cunning
@@ -187,18 +792,37 @@ nodes:
         exhaustionCost: 0
         nextNodeId: null
 
-  refused:
-    id: refused
+  scholar_captain_resolution:
+    id: scholar_captain_resolution
     text: >-
-      {scholar.name} nods as though they expected this. "Caution is sensible." They slide a small
-      card across the table a name, an inn in the next town. "When you change your mind, which
-      you will, come find me." They leave without touching their ale.
+      The guard captain has made their position clear: the scholar is a monitored risk.
+      You are a person who was seen with the scholar. That association is registered,
+      even if nothing was said directly. The captain is not threatening. They are
+      accounting. Whether your connection to the scholar becomes an asset or a liability
+      depends on what happens next and who gets to define it.
     choices:
-      - id: follow_up
-        label: Decide to follow up tuck the card away carefully
+      - id: make_it_an_asset
+        label: Make the association an asset. You know things the captain needs to know.
         consequences:
+          - type: faction
+            target: town_guard
+            value: 1
           - type: stat
             target: cunning
             value: 1
-        exhaustionCost: 0
+          - type: world_fact
+            target: scholar_knowledge_held
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: create_distance
+        label: Create distance from the scholar's reputation, carefully and without visible effort
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: scholar_knowledge_held
+            value: true
+        exhaustionCost: 1
         nextNodeId: null

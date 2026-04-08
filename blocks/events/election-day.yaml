@@ -80,6 +80,17 @@ nodes:
             axis: trust
         exhaustionCost: 2
         nextNodeId: campaigned_b
+      - id: observe_for_leverage
+        label: Spend the day observing, map who is committed and who is persuadable
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: observed_election
       - id: undermine_process
         label: Spread enough doubt about both candidates to keep power fragmented
         preconditions:
@@ -99,6 +110,178 @@ nodes:
         exhaustionCost: 2
         nextNodeId: undermined
 
+  observed_election:
+    id: observed_election
+    text: >-
+      By mid-afternoon you have a complete picture. {candidate_a.name} has the merchants
+      locked, which is roughly forty votes. {candidate_b.name} has the farming families,
+      roughly the same. The swing vote is thirty people who have not committed, and you know
+      twelve of them personally. The question is what you do with that knowledge: use it to
+      help one side, sell it to both, or keep it as leverage regardless of the outcome.
+    choices:
+      - id: swing_vote_for_a
+        label: Work the undecided voters toward {candidate_a.name}
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: merchants_guild
+            value: 2
+          - type: relationship
+            target: '{candidate_a.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: election_influenced
+            value: true
+        exhaustionCost: 2
+        nextNodeId: swung_vote_a
+      - id: swing_vote_for_b
+        label: Work the undecided voters toward {candidate_b.name}
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: relationship
+            target: '{candidate_b.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: election_influenced
+            value: true
+        exhaustionCost: 2
+        nextNodeId: swung_vote_b
+      - id: offer_knowledge_to_winner
+        label: Wait for the vote and offer your map of the undecideds to whoever won, after the fact
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: late_offer
+
+  late_offer:
+    id: late_offer
+    text: >-
+      You wait until dusk. The hands go up. It is close, within eight votes either way,
+      but a winner emerges. You find them afterward in the torchlight, congratulate them
+      with genuine warmth, and mention that you spent the day watching the undecided voters
+      and know exactly who moved and why. You offer to share that analysis. Their eyes sharpen.
+      "That would have been useful this morning," they say. "Yes," you agree pleasantly.
+      "It still is."
+    choices:
+      - id: share_freely
+        label: Share the analysis freely as a gift of goodwill
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: election_reflections
+      - id: name_a_price
+        label: "Name a price: a favour to be called in later"
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_favour_owed
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: election_reflections
+
+  swung_vote_a:
+    id: swung_vote_a
+    text: >-
+      You spend three hours in careful conversation, not persuading but asking questions
+      that lead people to the same conclusion on their own. By the time they get to the
+      square, they think the decision was theirs. {candidate_a.name} wins by nineteen votes.
+      Comfortable. The merchant faction is satisfied. The farming faction is not. You have
+      made a clear choice and everyone will eventually know it.
+    choices:
+      - id: announce_support_a
+        label: Announce your support publicly, let people know where you stand
+        consequences:
+          - type: faction
+            target: merchants_guild
+            value: 2
+          - type: faction
+            target: village_folk
+            value: -2
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 1
+        nextNodeId: campaigned_a
+      - id: stay_quiet_about_swing
+        label: Say nothing about what you did, let {candidate_a.name} think it happened naturally
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: post_election_fallout
+
+  swung_vote_b:
+    id: swung_vote_b
+    text: >-
+      The same careful work, different direction. {candidate_b.name} wins by twelve votes.
+      The merchant faction goes home in tight-lipped quiet. You have sided with the farming
+      families and they will remember it. {candidate_b.name} gives a short speech about roots
+      and patience. You are somewhere in the crowd, having made something happen without anyone
+      seeing you make it.
+    choices:
+      - id: announce_support_b
+        label: Step forward and be seen as a supporter
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: faction
+            target: merchants_guild
+            value: -1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: campaigned_b
+      - id: stay_invisible_after_b
+        label: Stay invisible, your leverage is better kept than spent
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: post_election_fallout
+
   campaigned_a:
     id: campaigned_a
     text: >-
@@ -117,8 +300,11 @@ nodes:
             target: '{candidate_a.id}'
             value: 1
             axis: respect
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: post_election_fallout
       - id: ask_for_consideration
         label: Ask {candidate_a.name} to remember you when decisions are made
         consequences:
@@ -128,8 +314,25 @@ nodes:
           - type: world_fact
             target: political_favour_owed
             value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: post_election_fallout
+      - id: ask_specific_favour
+        label: Ask for something specific now while the gratitude is fresh
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_favour_owed
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: election_reflections
 
   campaigned_b:
     id: campaigned_b
@@ -137,7 +340,7 @@ nodes:
       {candidate_b.name} wins by a comfortable margin and gives a short speech about roots
       and patience. Afterward they find you in the crowd. "The new elder remembers their
       friends," they say quietly. The merchants on the other side of the square are already
-      planning their response. The town has picked a direction, for now.
+      planning their response. The town has picked a direction, for now. You helped pick it.
     choices:
       - id: accept_gratitude
         label: Accept the gratitude and go home satisfied
@@ -149,8 +352,11 @@ nodes:
             target: '{candidate_b.id}'
             value: 1
             axis: trust
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: post_election_fallout
       - id: ask_what_comes_next
         label: Ask the new elder what their first priority will be
         consequences:
@@ -160,15 +366,35 @@ nodes:
           - type: world_fact
             target: political_favour_owed
             value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: post_election_fallout
+      - id: warn_about_merchant_response
+        label: Warn {candidate_b.name} that the merchants will not accept this quietly
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{candidate_b.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 1
+        nextNodeId: election_reflections
 
   undermined:
     id: undermined
     text: >-
-      Whispers do their work. By dusk, neither candidate has a firm majority and the vote
-      is declared inconclusive. A council of three will govern temporarily. Chaos, some call
-      it. Others see an opening. You see both. Nobody knows you had anything to do with it.
+      Whispers do their work. By dusk, neither candidate has a firm majority and the vote is
+      declared inconclusive. A council of three will govern temporarily. Chaos, some call it.
+      Others see an opening. You see both. Nobody knows you had anything to do with it. The
+      merchant faction blames the farmers. The farmers blame outside agitators. Both are
+      looking in the wrong direction.
     choices:
       - id: position_yourself_for_council
         label: Position yourself to advise the temporary council
@@ -179,10 +405,495 @@ nodes:
           - type: faction
             target: nobility
             value: 2
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: council_opportunity
       - id: stay_invisible
         label: Stay invisible. Fragmented power serves you better than consolidated power.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: election_reflections
+      - id: watch_for_consequences
+        label: Observe how the factions react. Understand the damage before using it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: election_disrupted
+            value: true
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: faction_reaction_map
+
+  council_opportunity:
+    id: council_opportunity
+    text: >-
+      The temporary council is three people who do not agree on anything and know it. They
+      are already looking for a fourth voice to break the deadlock. You present yourself not
+      as a candidate but as a facilitator, someone who can translate between the factions.
+      Two of the three accept the framing immediately. The third looks at you for a long
+      moment and then nods. "We will see," they say. That is enough for now.
+    choices:
+      - id: accept_facilitator_role
+        label: Accept the role. Facilitator today, something more tomorrow.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: nobility
+            value: 2
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 1
+        nextNodeId: election_council_dynamics
+      - id: push_for_formal_seat
+        label: Push for a formal seat on the council rather than an informal advisory role
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: nobility
+            value: 3
+          - type: faction
+            target: village_folk
+            value: -1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 2
+        nextNodeId: post_election_fallout
+
+  post_election_fallout:
+    id: post_election_fallout
+    text: >-
+      Whatever happened at the vote, the morning after has its own texture. Winners move
+      quickly: they set meetings, issue messages, claim momentum. Losers move quietly: they
+      count what they still hold and plan for the next cycle. You have a position in this
+      landscape now. Neutral ground is harder to claim than it was yesterday. The town
+      expects you to have shown your hand.
+    choices:
+      - id: consolidate_position
+        label: Use the morning to consolidate whatever position the vote gave you
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 2
+        nextNodeId: winner_meeting
+      - id: speak_to_loser
+        label: Go speak to whichever candidate lost. Losing candidates remember who came.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: loser_conversation
+      - id: step_back_after_election
+        label: Step back. Let the dust settle before making any new moves.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: election_month_on
+
+  winner_meeting:
+    id: winner_meeting
+    text: >-
+      The winner's first day is chaos organised to look decisive. They are meeting everyone
+      who helped them and everyone who opposed them, in that order. When they get to you,
+      they are sharper than they were last night, more careful. Victory has made them aware
+      of what they owe and to whom. "I need to know what you want from the next six months,"
+      they say. "I prefer to know early."
+    choices:
+      - id: name_what_you_want
+        label: Name something specific. Early requests are the ones that get honoured.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_favour_owed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: winner_second_week
+      - id: say_you_want_nothing_yet
+        label: Say you want nothing yet. Store the credit.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: winner_second_week
+      - id: ask_winner_first_priority
+        label: Ask what their first priority is, understand the direction before naming your own needs
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: elder_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: winner_second_week
+
+  loser_conversation:
+    id: loser_conversation
+    text: >-
+      The losing candidate is at the tavern, alone, with a beer they are not drinking.
+      They look up when you come in. The courtesy costs you nothing, and they know it.
+      That is the point. "I lost by thirty votes," they say. "Someone moved the undecideds
+      in the last two hours." They are looking at you steadily. "I do not suppose you know
+      anything about that." The question is whether you honour them with honesty or protect
+      what you did with ambiguity.
+    choices:
+      - id: admit_you_helped_the_winner
+        label: Admit it. You made a choice and you will own it to their face.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: relationship
+            target: '{candidate_b.id}'
+            value: 1
+            axis: respect
+        exhaustionCost: 1
+        nextNodeId: election_loser_future
+      - id: deny_involvement_to_loser
+        label: Deny it. You attended the vote, nothing more.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: election_loser_future
+      - id: neither_confirm_nor_deny
+        label: Say only that elections are decided by the voters. Which is technically true.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: null
+
+  election_reflections:
+    id: election_reflections
+    text: >-
+      A week out, the election has receded into history and the town is already absorbed in
+      what comes after. The new or continuing leader is making appointments. The losing faction
+      is quietly reorganizing. The daily business of Ironhaven continues regardless. You have
+      demonstrated something to several people this week: what you are willing to do, and for
+      whom, and at what cost. That information will circulate.
+    choices:
+      - id: be_satisfied
+        label: Be satisfied. You played it the way you wanted to play it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 0
+        nextNodeId: election_lessons
+      - id: plan_for_next_cycle
+        label: Begin thinking about what you will do differently at the next opportunity
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: election_lessons
+
+  faction_reaction_map:
+    id: faction_reaction_map
+    text: >-
+      The disrupted vote has produced a map of faction responses you could not have obtained
+      any other way. The merchants are immediately organized, calling meetings. The farmers
+      are slower, angry and directionless at first, then coalescing around the two most
+      respected elders. The temporary council is already being managed by one member who
+      is doing the work of three. You understand the town's political anatomy more clearly
+      after this than you would have from any clean election.
+    choices:
+      - id: approach_organized_faction
+        label: Approach the organized merchants while the disruption gives you an opening
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: merchants_guild
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: election_reflections
+      - id: support_farmer_coalescence
+        label: Help the farmers find direction. Their slow organization is a window.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 2
+        nextNodeId: election_reflections
+      - id: watch_the_council_worker
+        label: Identify the council member doing all the real work and learn what they want
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: council_insider
+
+  council_insider:
+    id: council_insider
+    text: >-
+      The working member of the temporary council is not the most senior one, not the most
+      impressive one. They are the one who answers letters the same day, who knows which
+      clerk controls which document, who remembers every promise the factions made before
+      the vote. They do not have power. They have something more durable: they understand
+      how it actually moves. When you approach them at the end of a long day, they look at
+      you with the expression of someone who has been waiting for someone to notice.
+    choices:
+      - id: offer_to_help_council_worker
+        label: Offer your help. Two people who understand how power actually moves can do more.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: nobility
+            value: 2
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: observe_council_worker_more
+        label: Keep watching rather than approaching. This is someone worth understanding before engaging.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: election_reflections
+      - id: ask_council_worker_what_they_need
+        label: Ask them plainly what they need most right now from someone outside the council
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+          - type: world_fact
+            target: political_favour_owed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  winner_second_week:
+    id: winner_second_week
+    text: >-
+      Two weeks into the new leadership's term, the winner has already made two appointments
+      that reveal their priorities. One surprised people. One did not. You have enough context
+      to read both decisions and understand what they are building. Whether you were part of
+      their victory or not, you are now part of the town that will live with it. The question
+      is whether to engage with what they are building or hold your position and watch.
+    choices:
+      - id: engage_with_new_direction
+        label: Engage with the new leadership's direction. You can shape it from inside.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: guild_conflict_resolved
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: hold_position_and_watch
+        label: Hold your position. You learn more by watching than by moving.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  election_month_on:
+    id: election_month_on
+    text: >-
+      A month after election day, the new council is settling in. The winner is
+      learning what they won, which turns out to include problems the previous
+      council had been quietly managing. Two factions that publicly supported the
+      winner are already applying pressure in different directions. You have a better
+      view of this than most people, because of where you stood on election day.
+    choices:
+      - id: share_what_you_see
+        label: Share your reading of the situation with whoever is best placed to act on it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: watch_it_develop
+        label: Watch it develop. This is the part where you learn who the winner actually is.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  election_loser_future:
+    id: election_loser_future
+    text: >-
+      The person who lost is still in Ironhaven. They are not humiliated. They are
+      recalibrating. The election gave them information: who showed up, who stayed
+      home, where the real support was thin. They are not done with politics. They
+      are studying the results with the particular attention of someone who plans to
+      learn from them. Whether they become a long-term rival, an unexpected ally, or
+      simply someone who moves to the background depends on what happens in the next
+      few months.
+    choices:
+      - id: stay_in_contact_with_loser
+        label: Stay in contact. The loser knows things the winner does not yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: follow_the_winner_only
+        label: Follow the winner. That is where the resources and decisions are now.
+        consequences:
+          - type: faction
+            target: nobility
+            value: 1
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  election_council_dynamics:
+    id: election_council_dynamics
+    text: >-
+      You attend a public council session three weeks after the election. The new
+      dynamic is visible immediately: the winner leads but has not yet established
+      dominance, the returning members are testing the limits of the new arrangement,
+      and the citizens who voted are already expecting something. The winner's first
+      significant decision is going to tell everyone more about them than all the
+      campaign promises did.
+    choices:
+      - id: position_for_first_decision
+        label: Position yourself to be relevant to the winner's first significant decision
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: watch_first_decision_unfold
+        label: Watch the first decision from outside. You want to understand the new structure first.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  election_lessons:
+    id: election_lessons
+    text: >-
+      What the election revealed about Ironhaven stays with you. The split was narrower
+      than the factions admitted. The people who stayed home were more numerous than the
+      people who voted, and nobody is talking about why. The recorder was present and
+      three parties commissioned records. The outcome was not inevitable. It was shaped
+      by specific decisions by specific people, including you, on that specific day.
+      The next election will be different, in part because of what happened in this one.
+    choices:
+      - id: apply_the_lessons
+        label: Apply the lessons now. The next cycle begins before the current one ends.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_the_lessons_settle
+        label: Let the lessons settle. You need distance before you can use what you learned.
         consequences:
           - type: stat
             target: cunning

@@ -39,7 +39,7 @@ nodes:
     id: start
     text: >-
       A crowd has gathered at the north gate. {exile.name} stands in the road with a single
-      pack, {guard_captain.name} behind them. The reading is brief and formal conduct
+      pack. {guard_captain.name} is behind them. The reading is brief and formal: conduct
       unbecoming, threat to the town's peace, banishment effective immediately. {exile.name}
       does not beg. They look once at the crowd, finding faces, remembering who was silent.
       Their eyes find yours. You know what came before this moment.
@@ -73,6 +73,35 @@ nodes:
             value: true
         exhaustionCost: 2
         nextNodeId: protested
+      - id: speak_to_crowd
+        label: Turn to the crowd and ask if anyone else objects
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -1
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: crowd_addressed
+      - id: slip_to_exile
+        label: Move through the crowd to stand beside {exile.name} before they go through the gate
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: spoke_to_exile
       - id: help_them_escape
         label: Slip to the back of the crowd and arrange a way out before the gate closes
         preconditions:
@@ -99,13 +128,163 @@ nodes:
         exhaustionCost: 2
         nextNodeId: helped_escape
 
+  crowd_addressed:
+    id: crowd_addressed
+    text: >-
+      "Does anyone here object?" You say it loud enough that people stop fidgeting. A long
+      moment of silence. Then the miller's wife raises her hand. Then an old farmer near the
+      back. Three more. Not a majority. But enough that {guard_captain.name} shifts their
+      weight. "The sentence is final," the captain says, but their voice has lost a little
+      of its certainty. {exile.name} watches you with an expression you cannot read, relief
+      and grief in equal measure.
+    choices:
+      - id: press_captain_after_crowd
+        label: "Address {guard_captain.name} directly: who issued the complaint"
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -2
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: complaint_investigated
+      - id: speak_to_exile_after_crowd
+        label: Let the crowd's objection stand and go to {exile.name}
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: spoke_to_exile
+      - id: accept_result_after_crowd
+        label: You tried. The sentence stands. Accept it.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: exile_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: witnessed
+
+  complaint_investigated:
+    id: complaint_investigated
+    text: >-
+      {guard_captain.name} looks at you with the expression of someone who does not enjoy
+      this either but will not show it. "The complaint was filed through proper channels,"
+      they say. "I am not at liberty to name the source." But their eyes move, just once,
+      to the far side of the crowd. You follow the direction: a merchant you know, standing
+      slightly apart, watching the proceedings with an expression that is too controlled. Not
+      neutral. Managed.
+    choices:
+      - id: confront_the_merchant
+        label: Walk directly toward the merchant and let them see that you saw
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: protested
+      - id: file_the_knowledge
+        label: Note the merchant's face and say nothing now. This is leverage for later.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: witnessed
+      - id: tell_exile_what_you_saw
+        label: Go to {exile.name} and tell them who you think filed the complaint
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: spoke_to_exile
+
+  spoke_to_exile:
+    id: spoke_to_exile
+    text: >-
+      {exile.name} looks at you with steadiness they have earned through the last hour. They
+      are not asking for help, not now. But they do not turn away. "I will be at the river
+      crossing by nightfall," they say quietly. "I have people two days east." They look at
+      the gate. "I am not coming back. I know what that means." A pause. "I did not think
+      you would come and stand beside me." Another pause. "I am glad you did."
+    choices:
+      - id: offer_supplies
+        label: Press what money or food you can spare into their hands
+        consequences:
+          - type: stat
+            target: strength
+            value: -1
+          - type: relationship
+            target: '{exile.id}'
+            value: 3
+            axis: affection
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 1
+        nextNodeId: exile_departs
+      - id: give_information
+        label: Tell them what you know about who filed the complaint if you know it
+        preconditions:
+          - type: world_fact
+            key: exile_complaint_investigated
+            value: true
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 0
+        nextNodeId: exile_departs
+      - id: say_goodbye_only
+        label: Say goodbye. That is all you have to give today.
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: exile_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: exile_departs
+
   witnessed:
     id: witnessed
     text: >-
-      {exile.name} walks through the gate. {guard_captain.name} watches until they are
-      gone, then turns back to the square. The crowd disperses. People do not meet each
-      other's eyes. You stood and watched the town do something it will not examine closely
-      afterward. That is its own kind of record.
+      {exile.name} walks through the gate. {guard_captain.name} watches until they are gone,
+      then turns back to the square. The crowd disperses. People do not meet each other's eyes.
+      You stood and watched the town do something it will not examine closely afterward. That
+      is its own kind of record. You will carry what you saw here differently depending on
+      whether you believe it was just.
     choices:
       - id: follow_to_gate
         label: Walk to the gate and watch until they are out of sight
@@ -114,24 +293,42 @@ nodes:
             target: '{exile.id}'
             value: 1
             axis: trust
+          - type: world_fact
+            target: exile_witnessed
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: aftermath
+      - id: seek_captain_after
+        label: Find {guard_captain.name} after the crowd clears and ask about the complaint
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: captains_interest
       - id: walk_away_first
         label: Walk away before they are through the gate
         consequences:
           - type: stat
             target: cunning
             value: 1
+          - type: world_fact
+            target: exile_witnessed
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: aftermath
 
   protested:
     id: protested
     text: >-
-      {guard_captain.name} tells you the decision is final. You make your case anyway
-      loudly enough for the crowd to hear. {exile.name} does not look at you again, but
-      their hands unclench slightly. It is not enough to stop anything. But it was said,
-      and the crowd heard it, and {guard_captain.name} will remember your face.
+      {guard_captain.name} tells you the decision is final. You make your case anyway, loudly
+      enough for the crowd to hear. {exile.name} does not look at you again, but their hands
+      unclench slightly. It is not enough to stop anything. But it was said, and the crowd
+      heard it, and {guard_captain.name} will remember your face. You have put your name on
+      the wrong side of this sentence, in the guard's ledger.
     choices:
       - id: push_further
         label: Demand to know who brought the original complaint
@@ -146,27 +343,39 @@ nodes:
             target: exile_complaint_investigated
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: complaint_investigated
+      - id: speak_to_exile_after_protest
+        label: Stop protesting and go stand with {exile.name} instead
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: spoke_to_exile
       - id: accept_defeat
-        label: Stop when the captain steps toward you it is over
+        label: Stop when the captain steps toward you. It is over.
         consequences:
           - type: faction
             target: village_folk
             value: 1
+          - type: world_fact
+            target: exile_protested
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: aftermath
 
   helped_escape:
     id: helped_escape
     text: >-
-      You pass word through a boy you trust, who passes it to {exile.name}'s cousin.
-      The route through the abandoned tannery and under the south wall is not comfortable
-      but it works. {exile.name} is gone before the gate closes but not through it.
-      {guard_captain.name} counts heads afterward and comes up one short. They will
-      look at you eventually.
+      You pass word through a boy you trust, who passes it to {exile.name}'s cousin. The
+      route through the abandoned tannery and under the south wall is not comfortable, but it
+      works. {exile.name} is gone before the gate closes, but not through it. {guard_captain.name}
+      counts heads afterward and comes up one short. They will look at you eventually. You have
+      done something real and dangerous and you know it.
     choices:
       - id: have_an_alibi
-        label: Make sure you were seen elsewhere someone can vouch for you
+        label: Make sure you were seen elsewhere, someone can vouch for you
         preconditions:
           - type: trait
             key: cunning
@@ -178,10 +387,13 @@ nodes:
           - type: faction
             target: town_guard
             value: -1
+          - type: world_fact
+            target: exile_helped_escape
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: escape_aftermath
       - id: do_not_hide
-        label: Do not hide it if they ask, you will not lie
+        label: Do not hide it. If they ask, you will not lie.
         consequences:
           - type: stat
             target: charisma
@@ -189,5 +401,520 @@ nodes:
           - type: faction
             target: town_guard
             value: -3
+          - type: world_fact
+            target: exile_helped_escape
+            value: true
+        exhaustionCost: 1
+        nextNodeId: escape_aftermath
+      - id: disappear_briefly
+        label: Lay low for two days until the immediate search loses momentum
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: exile_helped_escape
+            value: true
+        exhaustionCost: 2
+        nextNodeId: escape_aftermath
+
+  escape_aftermath:
+    id: escape_aftermath
+    text: >-
+      The search lasts two days. No one finds {exile.name}. {guard_captain.name} comes to
+      your door on the second morning, not with accusation but with a question: "Do you
+      know anything about how they left?" They are not certain. But they are not uncertain
+      either. What you say here closes one door and opens another.
+    choices:
+      - id: deny_involvement
+        label: Deny it. You saw them go through the north gate like everyone else.
+        preconditions:
+          - type: trait
+            key: cunning
+            min: 4
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -1
+        exhaustionCost: 1
+        nextNodeId: aftermath
+      - id: admit_involvement
+        label: Admit it and accept whatever comes next
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: town_guard
+            value: -3
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: world_fact
+            target: exile_helped_escape
+            value: true
+        exhaustionCost: 1
+        nextNodeId: aftermath
+      - id: redirect_captain
+        label: Tell the captain who you think filed the complaint against {exile.name} if you know
+        preconditions:
+          - type: world_fact
+            key: exile_complaint_investigated
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: aftermath
+
+  exile_departs:
+    id: exile_departs
+    text: >-
+      {exile.name} walks through the gate and does not look back. You watch until the road
+      bends and takes them out of sight. Whatever you gave them, it was not enough to undo
+      what happened here. But it was something. The gate closes. The town goes back to its
+      business. You carry the weight of the moment in your chest, not heavy enough to stop
+      you, just present enough to remind you that you were here.
+    choices:
+      - id: investigate_complaint
+        label: Begin investigating who filed the complaint now that the immediate moment has passed
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: aftermath
+      - id: let_it_settle
+        label: Let it settle. You will know what to do with it when you do.
+        consequences: []
+        exhaustionCost: 0
+        nextNodeId: aftermath
+
+  aftermath:
+    id: aftermath
+    text: >-
+      A week passes. The gate where {exile.name} walked through has its usual traffic now.
+      {guard_captain.name} is professional and distant with you. The town has absorbed the
+      banishment the way it absorbs most things: imperfectly, and without quite looking at
+      the seam. What you learned about who filed the complaint, or chose not to learn, sits
+      with you. The town is the same. You are not entirely.
+    choices:
+      - id: act_on_what_you_know
+        label: Act on what you learned. Someone needs to be held to account.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: accountability_attempt
+      - id: carry_it_quietly
+        label: Carry it quietly. Some accounts are settled in their own time.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: exile_long_shadow
+      - id: send_word_to_exile
+        label: Send word to wherever {exile.name} landed, tell them the town has not forgotten
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 1
+        nextNodeId: exile_long_shadow
+
+  accountability_attempt:
+    id: accountability_attempt
+    text: >-
+      You bring what you know to the elder and lay it out plainly: the complaint was filed
+      in bad faith, motivated by private interest, and the sentence was executed without
+      proper investigation. The elder listens with the careful expression of someone weighing
+      cost. "Even if that is true," they say finally, "the sentence has been served. Reopening
+      it creates more disruption than it resolves." They do not dismiss you. They decline you.
+      That is a different thing, and its own kind of answer about how this town works.
+    choices:
+      - id: push_for_formal_review
+        label: Push for a formal review regardless. The process matters even when outcomes are fixed.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: faction
+            target: town_guard
+            value: -1
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: formal_review
+      - id: accept_elder_answer
+        label: Accept the elder's answer. You said what needed to be said.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 0
+        nextNodeId: exile_long_shadow
+      - id: go_around_elder
+        label: Go around the elder. There are other authorities.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: faction
+            target: town_guard
+            value: -2
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+        exhaustionCost: 2
+        nextNodeId: formal_review
+
+  formal_review:
+    id: formal_review
+    text: >-
+      A review is not a reinstatement. The town's formal process moves slowly and produces
+      a qualified finding: that the original complaint lacked sufficient corroborating evidence
+      and was filed without proper process, but that the sentence cannot be reversed once
+      served. The name of the complaint filer is recorded. Their reputation in the town shifts.
+      {exile.name} is not brought back. But the record is corrected. In a town like Ironhaven,
+      that matters.
+    choices:
+      - id: inform_the_exile
+        label: Send word to {exile.name} about the finding. They deserve to know.
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 1
+        nextNodeId: exile_informed
+      - id: let_record_stand_alone
+        label: Let the record stand without sending word. Some closures do not need acknowledgement.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: exile_week_three
+
+  exile_long_shadow:
+    id: exile_long_shadow
+    text: >-
+      The banishment leaves a shape in your daily life: a gap where {exile.name} used to be,
+      in conversations and in the town's small fabric. You notice when someone who might have
+      asked {exile.name} for something asks someone else instead. You notice when a task that
+      {exile.name} would have done simply goes undone. The loss is not dramatic. It is ordinary,
+      and ordinary losses have a way of adding up.
+    choices:
+      - id: fill_some_gaps
+        label: Fill some of what {exile.name} left behind. Not because you have to, but because someone should.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: exile_shadow_on_town
+      - id: let_gaps_be_felt
+        label: Let the gaps be felt. Sometimes a town needs to miss what it drove away.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: village_folk
+            value: -1
+        exhaustionCost: 0
+        nextNodeId: exile_shadow_on_town
+      - id: work_to_bring_exile_back
+        label: Begin the quiet work of making {exile.name}'s return possible
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: exile_aided
+            value: true
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: return_possibility
+
+  return_possibility:
+    id: return_possibility
+    text: >-
+      Making a return possible is not the same as making it happen. You need several things:
+      the complaint filer publicly discredited, at least two council members willing to revisit,
+      and {exile.name}'s own willingness. The first is achievable. The second is slow. The third
+      you cannot know without asking. You send word. The reply takes two weeks and says only:
+      "Tell me when the second thing is done. Then I will decide." They are not coming back on
+      hope. They are coming back on evidence. That is fair.
+    choices:
+      - id: commit_to_the_work
+        label: Commit to it fully. This becomes your project.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: relationship
+            target: '{exile.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: do_what_you_can
+        label: Do what you can without making it your whole focus
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: exile_aided
+            value: true
         exhaustionCost: 1
         nextNodeId: null
+
+  captains_interest:
+    id: captains_interest
+    text: >-
+      {guard_captain.name} comes to you two weeks after the exile. Not officially. At the
+      market, they happen to be near you at the same time, and they say, without turning to
+      face you: "The complaint was filed by someone I do not respect, using a process I do
+      not think was properly used. I could not say so at the gate." They do not wait for
+      your response. They walk on. You have been given something: the captain's private
+      opinion, carefully delivered without any official implication.
+    choices:
+      - id: use_captains_disclosure
+        label: Use the captain's disclosure to build the case for a formal review
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: exile_complaint_investigated
+            value: true
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: formal_review
+      - id: acknowledge_and_move_on
+        label: Acknowledge it internally and move on. The captain did what they could do.
+        consequences:
+          - type: relationship
+            target: '{guard_captain.id}'
+            value: 2
+            axis: respect
+        exhaustionCost: 0
+        nextNodeId: exile_guard_follow_up
+
+  exile_informed:
+    id: exile_informed
+    text: >-
+      You find a way to get word to {exile.name} about the formal review, the complaints
+      filed and what the record actually contains. Their reply is careful and careful is
+      not the same as grateful. They have been burned by hope before. What they want is
+      not your sympathy but your honesty about what the process can actually produce and
+      on what timeline. You owe them that much.
+    choices:
+      - id: give_honest_assessment_of_odds
+        label: Give them an honest assessment, including what is unlikely to change
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 2
+            axis: trust
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: return_possibility
+      - id: frame_it_positively
+        label: Frame the situation as hopeful, you want them to have something to hold onto
+        consequences:
+          - type: relationship
+            target: '{exile.id}'
+            value: 1
+            axis: trust
+          - type: relationship
+            target: '{exile.id}'
+            value: 1
+            axis: affection
+        exhaustionCost: 1
+        nextNodeId: return_possibility
+
+  exile_shadow_on_town:
+    id: exile_shadow_on_town
+    text: >-
+      {exile.name}'s departure has left a gap in Ironhaven that nobody has named openly.
+      Some of what they did is now undone. Some of the relationships they maintained have
+      become frictions. The town absorbs their absence the way it absorbs anything:
+      quietly, with small adjustments, without acknowledging what was lost. You feel it,
+      even if you cannot point to exactly where.
+    choices:
+      - id: fill_what_you_can
+        label: Step into some of what was left behind. Not their role, but where you can help.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 1
+        nextNodeId: exile_long_shadow
+      - id: let_the_gap_stay_visible
+        label: Let the gap be visible. The town should feel what it chose.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: exile_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: exile_long_shadow
+
+  exile_political_cost:
+    id: exile_political_cost
+    text: >-
+      Word has gotten back that you were not silent at the gate, or that you asked
+      questions afterward, or that you were seen speaking to {guard_captain.name}.
+      Someone in the council is unhappy. Not officially. Officially nothing has been
+      said. But the temperature in certain rooms has dropped. You are being evaluated
+      for how far you will push this, and whether you are worth the friction.
+    choices:
+      - id: push_further
+        label: Push further. Let them see you are not deterred by social cooling.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 2
+          - type: faction
+            target: nobility
+            value: -1
+          - type: world_fact
+            target: exile_protested
+            value: true
+        exhaustionCost: 2
+        nextNodeId: accountability_attempt
+      - id: ease_off_strategically
+        label: Ease off for now. You can return to this when the temperature normalises.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: exile_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: exile_long_shadow
+
+  exile_week_three:
+    id: exile_week_three
+    text: >-
+      Three weeks on. The gate is the same gate. The north road is the same road.
+      {exile.name} is gone and the town has moved on with the particular ruthlessness
+      of communities that have to keep functioning. What you hold onto from this,
+      and what you do next, says something about what you think justice means in a
+      place like Ironhaven. You have not resolved that question yet.
+    choices:
+      - id: commit_to_memory
+        label: Commit what happened to memory as a lesson in how this town works
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: exile_witnessed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: decide_this_matters
+        label: Decide this matters to you specifically. You will not let it close.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: exile_protested
+            value: true
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 1
+        nextNodeId: return_possibility
+
+  exile_guard_follow_up:
+    id: exile_guard_follow_up
+    text: >-
+      {guard_captain.name} stops you at the market a second time. This time they turn to
+      face you. "The formal review is being discussed. Quietly. Someone submitted a request."
+      They do not say who. They do not have to. "If you were planning to be visible about
+      this, now is when it would matter. If you were not, now is when you decide." They
+      hold your gaze for a moment and then walk on. They have given you a window.
+    choices:
+      - id: become_visible
+        label: Become visible. Step into the window the captain is opening.
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: exile_protested
+            value: true
+          - type: relationship
+            target: '{guard_captain.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 2
+        nextNodeId: formal_review
+      - id: stay_quiet_but_present
+        label: Stay quiet but stay present. Let the process move and be ready to support it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: exile_aided
+            value: true
+        exhaustionCost: 0
+        nextNodeId: exile_long_shadow

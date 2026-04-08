@@ -34,10 +34,10 @@ nodes:
     id: start
     text: >-
       Two days after the meeting, a sealed note arrives at your door. The seal is the
-      magistrate's an unfamiliar hand pressed it. The note is brief: "If you have
-      further thoughts on the town's direction, I would welcome them. Come at your
-      convenience. {magistrate.name}." You know {magistrate.name} by reputation:
-      careful, powerful, and not in the habit of wasting their attention on anyone.
+      magistrate's, an unfamiliar hand pressed it. The note is brief: "If you have further
+      thoughts on the town's direction, I would welcome them. Come at your convenience.
+      {magistrate.name}." You know {magistrate.name} by reputation: careful, powerful, and
+      not in the habit of wasting their attention on anyone.
     choices:
       - id: accept_invitation
         label: Go to the magistrate's office the same day
@@ -55,15 +55,26 @@ nodes:
         exhaustionCost: 1
         nextNodeId: went
       - id: delay_and_prepare
-        label: Wait two days you want to think before you speak
+        label: Wait two days, you want to think before you speak
         consequences:
           - type: stat
             target: cunning
             value: 2
         exhaustionCost: 1
         nextNodeId: prepared
+      - id: ask_around_first
+        label: Ask around about the magistrate before going, what do people say
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: magistrate_researched
+            value: true
+        exhaustionCost: 1
+        nextNodeId: researched_magistrate
       - id: ignore_the_note
-        label: Leave the note unanswered powerful people's interest is a trap
+        label: Leave the note unanswered, powerful people's interest is a trap
         consequences:
           - type: stat
             target: cunning
@@ -75,17 +86,55 @@ nodes:
         exhaustionCost: 0
         nextNodeId: ignored
 
+  researched_magistrate:
+    id: researched_magistrate
+    text: >-
+      What you learn is consistent across everyone you ask, which is itself a kind of data.
+      {magistrate.name} has held the position for eleven years. They are not from a noble
+      family. They came up through the guild system, then the trade council, then got the
+      appointment by being the least objectionable option to three competing factions. Nobody
+      hates them. Nobody fully trusts them. The miller puts it plainest: "They are the kind
+      of person who knows where everything is buried. Not because they dug the holes. Because
+      they watched."
+    choices:
+      - id: go_after_research
+        label: Go in knowing what you know
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: magistrate_researched
+            value: true
+        exhaustionCost: 1
+        nextNodeId: went
+      - id: prepare_after_research
+        label: Wait and prepare a specific approach based on what you learned
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: magistrate_researched
+            value: true
+        exhaustionCost: 1
+        nextNodeId: prepared
+
   went:
     id: went
     text: >-
-      {magistrate.name}'s office is spare and deliberate everything placed to tell you
+      {magistrate.name}'s office is spare and deliberate, everything placed to tell you
       something about who you are dealing with. They offer wine. They ask three questions
-      about the town that are actually one question: where do your loyalties sit? You
-      answer as honestly as you dare. They listen in the manner of someone who already
-      knows and wants to see if you do.
+      about the town that are actually one question: where do your loyalties sit? You answer
+      as honestly as you dare. They listen in the manner of someone who already knows and
+      wants to see if you do.
     choices:
       - id: speak_plainly
-        label: Speak plainly you are not one for games
+        label: Speak plainly, you are not one for games
         consequences:
           - type: stat
             target: charisma
@@ -97,8 +146,11 @@ nodes:
           - type: world_fact
             target: magistrate_relationship_open
             value: true
+          - type: world_fact
+            target: testified_truthfully
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: magistrate_responds_openly
       - id: play_the_game
         label: Give them what they want to hear while revealing nothing vital
         preconditions:
@@ -117,15 +169,212 @@ nodes:
             target: magistrate_relationship_guarded
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: magistrate_responds_guardedly
+      - id: turn_question_back
+        label: Answer their question with a question of your own about the town
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 1
+            axis: respect
+        exhaustionCost: 2
+        nextNodeId: magistrate_surprised
+
+  magistrate_surprised:
+    id: magistrate_surprised
+    text: >-
+      {magistrate.name} pauses. Not an uncomfortable pause, a recalibrating one. "That is a
+      good question," they say. "And I will answer it." They describe the town's political
+      state with a clarity that suggests they think about it often: three factions, two of
+      which can be satisfied simultaneously but not all three. The guild, the village, and
+      a third interest they refer to only as "external pressure." They stop before naming it.
+      "Your turn," they say.
+    choices:
+      - id: speak_after_surprise
+        label: Answer honestly, they have shown you something real
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: magistrate_relationship_open
+            value: true
+          - type: world_fact
+            target: testified_truthfully
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_responds_openly
+      - id: ask_about_external_pressure
+        label: Ask about the third interest before answering
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_responds_guardedly
+
+  magistrate_responds_openly:
+    id: magistrate_responds_openly
+    text: >-
+      {magistrate.name} listens to your honest account and nods slowly when you finish.
+      "Good," they say. "You have identified the same problem I have, from a different angle.
+      That is useful." They refill your wine. "The town has a decision to make in the next
+      two months about the capital envoy. If we send one, we invite oversight. If we do not,
+      we handle the threat alone." They look at you. "I would like someone I can consult who
+      is not already owned by one of the factions."
+    choices:
+      - id: accept_consulting_role
+        label: Accept, that is a role you can fill honestly
+        consequences:
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: magistrate_relationship_open
+            value: true
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_offer
+      - id: ask_what_they_want_from_you
+        label: Ask what specifically they would want you to do
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: magistrate_offer
+      - id: decline_consulting
+        label: Decline, you prefer to operate independently
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: -1
+            axis: trust
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: magistrate_true_purpose
+
+  magistrate_offer:
+    id: magistrate_offer
+    text: >-
+      "I want ears," {magistrate.name} says. "Not spies. There is a difference. I want someone
+      who hears what people actually think and tells me without translating it for their own
+      advantage." They slide a small token across the desk, a flat disc of polished iron stamped
+      with the magistrate's mark. "If you need to speak to me and the note route feels exposed,
+      show this at the gate. You will be seen immediately." They stand, meeting over. "Think about
+      the envoy question. Your instinct is probably worth more than you know."
+    choices:
+      - id: take_the_token
+        label: Take the token
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+          - type: faction
+            target: nobility
+            value: 2
+        exhaustionCost: 0
+        nextNodeId: magistrate_specific_ask
+      - id: leave_token_on_desk
+        label: Leave the token on the desk, you will use the note route if you need it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 1
+            axis: respect
+        exhaustionCost: 0
+        nextNodeId: envoy_question
+
+  magistrate_responds_guardedly:
+    id: magistrate_responds_guardedly
+    text: >-
+      {magistrate.name} absorbs your careful answers without expression. "You are protecting
+      something," they say. "Not dishonestly. Cautiously. That is fine." They set down their
+      wine. "I am going to tell you something I would not tell someone I did not assess carefully.
+      The external pressure on this town is not just the invasion. There is an interest in the
+      capital that would benefit from Ironhaven's failure. Not its conquest. Its failure under
+      external pressure." They watch you. "I need to know if you already know that, or if
+      this is new information."
+    choices:
+      - id: confirm_you_knew
+        label: Confirm you suspected as much
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: magistrate_relationship_open
+            value: true
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_responds_openly
+      - id: admit_its_new
+        label: Admit this is new. Ask what it means for the town.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_relationship_open
+            value: true
+          - type: world_fact
+            target: testified_truthfully
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_responds_openly
+      - id: stay_neutral
+        label: Give nothing. You do not know if this is a test.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 1
+        nextNodeId: power_read
 
   prepared:
     id: prepared
     text: >-
-      When you arrive, {magistrate.name} notes the delay with a half-smile. "Cautious,"
-      they say. "Good." They ask fewer questions than you expected they already have
-      answers to most of them. What they want is your read on the craftsmen's guild.
-      They want it honestly and they are paying attention.
+      When you arrive, {magistrate.name} notes the delay with a half-smile. "Cautious," they
+      say. "Good." They ask fewer questions than you expected, they already have answers to most
+      of them. What they want is your read on the craftsmen's guild: its loyalties, its current
+      grievances, and whether it is in play. They want it honestly and they are paying attention.
     choices:
       - id: give_honest_read
         label: Give them an honest assessment of the guild's state
@@ -140,10 +389,25 @@ nodes:
           - type: world_fact
             target: magistrate_relationship_open
             value: true
+          - type: world_fact
+            target: testified_truthfully
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: magistrate_responds_openly
+      - id: give_partial_read
+        label: Give a partial read, honest about what you know but not about what you guess
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: magistrate_responds_guardedly
       - id: deflect_the_question
-        label: Give a vague answer the guild is nobody's friend to antagonise
+        label: Give a vague answer, the guild is nobody's friend to antagonise
         consequences:
           - type: stat
             target: cunning
@@ -152,15 +416,20 @@ nodes:
             target: '{magistrate.id}'
             value: -1
             axis: trust
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: power_read
 
   ignored:
     id: ignored
     text: >-
-      A week passes. Nothing happens. Then {magistrate.name} appears at your workshop
-      in person, unannounced. "You did not come," they say. Not a question. Not quite
-      an accusation. "I wondered what that meant." They are still deciding. So are you.
+      A week passes. Nothing happens. Then {magistrate.name} appears at your workshop in person,
+      unannounced. "You did not come," they say. Not a question. Not quite an accusation. "I
+      wondered what that meant." They stand in your doorway in a way that makes the choice to
+      ignore them feel like a statement you now have to stand behind. They are still deciding.
+      So are you.
     choices:
       - id: explain_yourself
         label: Explain you needed time, not avoidance
@@ -173,7 +442,19 @@ nodes:
             target: magistrate_relationship_guarded
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: went
+      - id: own_the_choice
+        label: Own it. You chose not to come and you are not apologising.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{magistrate.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: magistrate_responds_guardedly
       - id: let_them_wonder
         label: Say little. Let them make of it what they will.
         consequences:
@@ -184,5 +465,464 @@ nodes:
             target: '{magistrate.id}'
             value: -1
             axis: trust
+        exhaustionCost: 0
+        nextNodeId: power_read
+
+  power_read:
+    id: power_read
+    text: >-
+      Whether you answered the magistrate directly or left them guessing, you come away from
+      the encounter with a clearer sense of what they are. Not corrupt, not innocent: a person
+      who has held a complicated position for over a decade by being genuinely difficult to
+      categorize. They serve the town and serve themselves and do not pretend those are always
+      different things. That kind of honesty, in its own way, is trustworthy.
+    choices:
+      - id: decide_to_engage
+        label: Decide to engage with the magistrate properly, this is someone worth knowing
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_relationship_open
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_offer
+      - id: maintain_distance
+        label: Maintain distance. Useful contacts do not need to be close ones.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: magistrate_week_later
+
+  envoy_question:
+    id: envoy_question
+    text: >-
+      A few days after your conversation, the envoy question comes to a head. The elder calls
+      an emergency session. {magistrate.name} sends you a note: "I would welcome your read on
+      which way the hall is leaning before I walk in." It is a test and an offer simultaneously.
+      If you give them useful intelligence, you become part of their network. If you refuse, they
+      will know your limit.
+    choices:
+      - id: give_intelligence
+        label: Send an honest assessment back. You are in this now.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+          - type: world_fact
+            target: testified_truthfully
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: send_partial_intelligence
+        label: Send something useful but not complete. Show willingness, not dependence.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: decline_the_note
+        label: Decline. One favour does not obligate a second.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: null
+
+  magistrate_true_purpose:
+    id: magistrate_true_purpose
+    text: >-
+      Reading between the lines of everything {magistrate.name} has said, a picture forms.
+      They are not trying to collect allies. They are trying to find a successor: someone who
+      understands how the town works at the level below the formal structures, who can continue
+      the quiet work of keeping the three factions from each other's throats. The job is thankless
+      and exhausting and probably the most important role in Ironhaven. They have been doing it
+      alone for eleven years.
+    choices:
+      - id: acknowledge_the_role
+        label: The next time you meet {magistrate.name}, acknowledge what you now understand they are doing
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 3
+            axis: respect
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_public_actions
+      - id: decide_not_to_be_successor
+        label: Decide that is not a role you want, whatever the magistrate intends
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: magistrate_week_later
+
+  magistrate_week_later:
+    id: magistrate_week_later
+    text: >-
+      A week passes. You have an assessment of {magistrate.name} now: not corrupt, not
+      idealistic, something harder to categorize. They are a person doing a difficult job
+      well while also serving themselves, and they are honest about the second part in ways
+      that most officials are not. That makes them less comfortable to work with and more
+      trustworthy at the same time. You understand the difference.
+    choices:
+      - id: reach_out_to_magistrate
+        label: Reach out to {magistrate.name} with something you have learned about the town
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_network_built
+      - id: keep_distance_for_now
+        label: Keep distance for now. You know where the door is.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: magistrate_network_built
+
+  magistrate_public_actions:
+    id: magistrate_public_actions
+    text: >-
+      You start paying attention to {magistrate.name}'s public actions with new eyes.
+      Things you dismissed as routine begin to look deliberate: a decision that disadvantaged
+      the guild by a small amount, covered by a larger concession. A patrol route change
+      that put guards near a building you now know is significant. They have been playing
+      this game for eleven years. Once you see the moves, you cannot unsee them.
+    choices:
+      - id: match_their_level
+        label: Begin operating at their level, making your own deliberate small moves
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: magistrate_capital_question
+      - id: bring_observations_to_magistrate
+        label: Bring your observations to {magistrate.name} directly, show you see what they are doing
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: respect
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: magistrate_capital_question
+
+  magistrate_specific_ask:
+    id: magistrate_specific_ask
+    text: >-
+      {magistrate.name} makes a specific ask: they want you to attend a gathering at the
+      merchant house in three days, not as their representative, but as yourself, and tell
+      them afterward what the mood was. The gathering is nominally social. The decisions
+      that get made at these gatherings are not. You are being asked to be a useful presence
+      in a room without being seen as the magistrate's presence.
+    choices:
+      - id: accept_the_ask
+        label: Accept. This is exactly the kind of work you agreed to.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: testified_truthfully
+            value: true
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: negotiate_terms
+        label: Accept with conditions, you want something in return for this specific ask
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_favour_owed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: decline_specific_ask
+        label: Decline this particular ask. You agreed to information, not infiltration.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: -1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: magistrate_week_later
+
+  magistrate_envoy_meeting:
+    id: magistrate_envoy_meeting
+    text: >-
+      The envoy from the capital arrives three weeks after your first meeting with
+      {magistrate.name}. They are younger than you expected, formal in the capital manner,
+      asking questions that are actually assessments. {magistrate.name} requested your presence
+      at the dinner that followed, not as a representative of anything, simply as an Ironhaven
+      resident who had thoughts about the town's direction. The envoy asks you directly: "Do
+      you believe the magistrate has Ironhaven's interests at heart?"
+    choices:
+      - id: endorse_magistrate_to_envoy
+        label: Endorse {magistrate.name} to the envoy honestly and with specific reasons
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 3
+            axis: trust
+          - type: faction
+            target: nobility
+            value: 2
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: give_balanced_assessment
+        label: Give a balanced assessment without either endorsing or undermining
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: redirect_to_town
+        label: Tell the envoy to ask the town, not you
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  magistrate_long_game:
+    id: magistrate_long_game
+    text: >-
+      After several weeks of interactions with {magistrate.name}, a pattern is clear.
+      They are not building a network of spies. They are building a succession plan.
+      Every person they have invited into their confidence has a specific quality: one
+      understands trade, one understands the guard, one understands the village elders.
+      You understand something else. You are not sure what they think it is. The question
+      is whether you want to find out, and what you will owe them if you do.
+    choices:
+      - id: ask_magistrate_directly
+        label: Ask {magistrate.name} directly what quality they think you bring
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: respect
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: observe_from_the_network
+        label: Stay within the network and observe the others. Understand what they represent.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: step_back_from_magistrate
+        label: Step back. The long game is too long. You are not interested in a succession plan.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  magistrate_threshold:
+    id: magistrate_threshold
+    text: >-
+      {magistrate.name} presents you with something you did not expect: a small formal role.
+      Not official, not titled, but real. A seat at a monthly advisory meeting that includes
+      three guild representatives and the elder. It is the inner edge of the town's actual
+      decision-making. You would know things that most of Ironhaven does not know. You would
+      owe {magistrate.name} for the seat. That last part is the point.
+    choices:
+      - id: accept_the_seat
+        label: Accept. You have been working toward this kind of access.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: faction
+            target: nobility
+            value: 2
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+          - type: world_fact
+            target: testified_truthfully
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: negotiate_the_terms
+        label: Negotiate the terms before accepting. Access has a price but the price should be fair.
+        preconditions:
+          - type: trait
+            key: cunning
+            min: 4
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+          - type: world_fact
+            target: political_player_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: decline_formal_role
+        label: Decline. You want access on your own terms, not bought access.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{magistrate.id}'
+            value: -1
+            axis: trust
+          - type: world_fact
+            target: magistrate_relationship_guarded
+            value: true
+        exhaustionCost: 0
+        nextNodeId: magistrate_long_game
+
+  magistrate_network_built:
+    id: magistrate_network_built
+    text: >-
+      The magistrate has a network in Ironhaven and you have become part of it,
+      knowingly or not. The way information flows to them, through whom, at what
+      speed, says something about what they value and who they trust. You are
+      positioned somewhere in that structure, not at the center, but not at
+      the edge either. What you do with that position is the question you are
+      being asked, even though nobody will put it that way directly.
+    choices:
+      - id: use_position_actively
+        label: Use your position actively. You are inside the network and should move within it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: understand_before_acting
+        label: Take time to understand the full shape of the network before committing to any role in it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  magistrate_capital_question:
+    id: magistrate_capital_question
+    text: >-
+      The magistrate has asked, indirectly, about your connections to the capital.
+      Or the lack of them. Or whether you are the kind of person who could develop
+      them. The question was phrased as a general observation about Ironhaven's
+      isolation, but you heard the real question underneath it. The capital matters
+      to whatever the magistrate is building here, and they want to know if you
+      are an asset in that direction.
+    choices:
+      - id: say_you_can_help_with_capital
+        label: Say you can help with that, without specifying how yet
+        consequences:
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: magistrate_ally
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: be_honest_about_capital_connections
+        label: Be honest about what you have and what you do not have
+        consequences:
+          - type: relationship
+            target: '{magistrate.id}'
+            value: 1
+            axis: respect
+          - type: stat
+            target: charisma
+            value: 1
         exhaustionCost: 0
         nextNodeId: null

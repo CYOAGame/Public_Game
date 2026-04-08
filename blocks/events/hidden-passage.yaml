@@ -33,12 +33,12 @@ nodes:
     id: start
     text: >-
       You return to the cellar alone, deeper this time. Behind the far wall of symbols, your
-      lantern catches something a seam. A door, disguised as stone, fitted so precisely you
+      lantern catches something: a seam. A door, disguised as stone, fitted so precisely you
       nearly missed it. A cold draft pushes through the gap. Something is on the other side.
-      {companion.name} was with you last time; you could fetch them, or go alone.
+      {companion.name} was with you last time. You could fetch them, or go alone.
     choices:
       - id: go_alone
-        label: Go alone this is your discovery
+        label: Go alone, this is your discovery
         consequences:
           - type: stat
             target: strength
@@ -52,7 +52,7 @@ nodes:
         exhaustionCost: 3
         nextNodeId: went_alone
       - id: fetch_companion
-        label: Fetch {companion.name} you should not be alone down here
+        label: Fetch {companion.name}, you should not be alone down here
         consequences:
           - type: relationship
             target: '{companion.id}'
@@ -63,8 +63,63 @@ nodes:
             value: true
         exhaustionCost: 2
         nextNodeId: brought_companion
+      - id: examine_seam_first
+        label: Study the seam before opening it, look for anything that suggests a trap or mechanism
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: examined_seam
       - id: seal_passage
-        label: Wedge it shut whatever is down there should stay there
+        label: Wedge it shut, whatever is down there should stay there
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_sealed
+            value: true
+        exhaustionCost: 2
+        nextNodeId: sealed_passage
+
+  examined_seam:
+    id: examined_seam
+    text: >-
+      The seam is worked from the other side: no latch you can see, no visible mechanism.
+      The door opens inward, pulled rather than pushed. Along the top of the frame, barely
+      visible, is a second row of the same small symbols you saw on the street-level door.
+      One of them is different from the others, a symbol you now recognise from your notes:
+      the binding glyph. This door was not meant to be opened from this side.
+    choices:
+      - id: open_anyway_alone
+        label: Open it anyway, knowing what you are doing
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 3
+        nextNodeId: went_alone
+      - id: get_companion_after_examination
+        label: Get {companion.name}, this is not a thing to do alone with what you now know
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: brought_companion
+      - id: seal_after_examination
+        label: Seal it back. The symbols are clear enough.
         consequences:
           - type: stat
             target: cunning
@@ -79,10 +134,10 @@ nodes:
     id: went_alone
     text: >-
       The passage runs straight for thirty paces, then opens. You are standing in a low
-      chamber beneath the town square you can hear the muffled sound of carts above. The
+      chamber beneath the town square. You can hear the muffled sound of carts above. The
       walls here are older still, the stone black with age. A single carved plinth stands in
-      the center, empty. Whatever stood on it was removed, or escaped. You are alone with
-      the silence and what it implies.
+      the center, empty. Whatever stood on it was removed, or left. You are alone with the
+      silence and what it implies.
     choices:
       - id: search_chamber
         label: Search the chamber for evidence of what was here
@@ -94,7 +149,26 @@ nodes:
             target: chamber_searched
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: chamber_hub
+      - id: examine_plinth
+        label: Study the plinth itself, something was here and recently
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: chamber_searched
+            value: true
+        exhaustionCost: 2
+        nextNodeId: plinth_examined
+      - id: listen_at_walls
+        label: Stand still and listen. The chamber has an acoustic quality worth noting.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: listened_at_walls
       - id: retreat_and_report
         label: Retreat and report what you found to someone you trust
         consequences:
@@ -105,12 +179,12 @@ nodes:
             target: passage_reported
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: reported_passage
 
   brought_companion:
     id: brought_companion
     text: >-
-      {companion.name} follows you without asking too many questions they trust you enough
+      {companion.name} follows you without asking too many questions. They trust you enough
       for that. When you reach the chamber, you hear them draw a sharp breath. "This is under
       the square," they say. "Right under it." The empty plinth casts a long shadow.
       {companion.name} looks at you. "What do we do?"
@@ -129,7 +203,7 @@ nodes:
             target: chamber_searched
             value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: chamber_hub
       - id: send_companion_back
         label: Send {companion.name} back to keep watch above
         consequences:
@@ -141,14 +215,229 @@ nodes:
             value: 1
             axis: respect
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: plinth_examined
+      - id: companion_examines_passage
+        label: Ask {companion.name} to measure and sketch the passage while you study the chamber
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{companion.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: chamber_searched
+            value: true
+        exhaustionCost: 2
+        nextNodeId: chamber_hub
+
+  listened_at_walls:
+    id: listened_at_walls
+    text: >-
+      The chamber carries sound in unusual ways: your breathing reflects back from different
+      angles, as if there are spaces in the stone you cannot see. At the base of the north
+      wall, you can feel a vibration, too low and too steady to be random. It is rhythmic.
+      Like breathing, but slower. You put your hand flat against the stone and hold it there
+      for a long moment.
+    choices:
+      - id: knock_on_north_wall
+        label: Knock on the north wall and listen for what comes back
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: chamber_searched
+            value: true
+          - type: world_fact
+            target: passage_beyond_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: chamber_hub
+      - id: back_away_from_vibration
+        label: Back away from the wall. Some things announce themselves for a reason.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: reported_passage
+
+  plinth_examined:
+    id: plinth_examined
+    text: >-
+      The plinth is carved from the same black stone as the walls, not assembled but grown
+      from the floor as though it was always part of it. The top surface has a clean circular
+      depression, the right diameter for a disc or a bowl. Around the depression: the same
+      binding glyphs as the doors above, but here they are inlaid in a metal that does not
+      match any alloy you know, dark and slightly warm to the touch. Something rested here
+      for a very long time. The depression is worn smooth by that weight.
+    choices:
+      - id: take_rubbing_of_plinth
+        label: Make a rubbing of the metal inlays
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: chamber_searched
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: chamber_hub
+      - id: note_dimensions
+        label: Measure and note the dimensions precisely
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: chamber_searched
+            value: true
+        exhaustionCost: 1
+        nextNodeId: chamber_hub
+
+  chamber_hub:
+    id: chamber_hub
+    text: >-
+      The chamber has given you what it will for now. You have a sense of the place: old,
+      deliberate, and not incidentally built. Whoever made this knew what they were doing
+      and why. The passage back to the cellar is behind you. The north wall hums faintly.
+      There may be more beyond it. There is definitely danger in finding out.
+    choices:
+      - id: investigate_north_wall
+        label: Push on the north wall and see if there is another door
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: passage_beyond_known
+            value: true
+          - type: world_fact
+            target: shrine_found
+            value: true
+        exhaustionCost: 3
+        nextNodeId: deeper_passage
+      - id: return_and_report_from_hub
+        label: You have enough. Get out and report what you found.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: reported_passage
+      - id: sit_and_record
+        label: Sit in the chamber and record everything before leaving
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: chamber_searched
+            value: true
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: companion_after_chamber
+
+  deeper_passage:
+    id: deeper_passage
+    text: >-
+      The north wall gives under pressure at a specific point: the binding glyph. The door
+      swings open and the smell that comes through is different, not damp stone but something
+      mineral and faintly warm, like forge air trapped for a century. Fifty paces on, you
+      step through a low arch into a shrine. Intact. The carvings seem to move at the edge
+      of your vision. An altar stone holds a single artifact: a disc of dark metal, warm
+      to the touch, inscribed in Karathi. This place is not abandoned.
+    choices:
+      - id: enter_shrine
+        label: Step fully into the shrine and take stock
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+          - type: world_fact
+            target: shrine_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: companion_after_chamber
+      - id: hold_at_threshold
+        label: Hold at the threshold. You have found it. That is enough for today.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+          - type: world_fact
+            target: shrine_found
+            value: true
+        exhaustionCost: 1
+        nextNodeId: companion_after_chamber
+
+  reported_passage:
+    id: reported_passage
+    text: >-
+      You come up out of the cellar with information and the question of what to do with it.
+      The chamber is real. The plinth is real. The warmth in the stone is real. {companion.name}
+      is nearby, or can be found. The guard captain is across the square. The elder is at the
+      hall. What you say next, and to whom, will shape how Ironhaven responds to what is below
+      it.
+    choices:
+      - id: tell_companion_all
+        label: Tell {companion.name} everything
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 0
+        nextNodeId: passage_formal_decision
+      - id: tell_authority
+        label: Go directly to the guard captain or the elder with a full account
+        consequences:
+          - type: faction
+            target: town_guard
+            value: 2
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_wider_meaning
+      - id: tell_no_one_yet
+        label: Tell no one yet. You need to think about what you have walked into.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 0
+        nextNodeId: passage_wider_meaning
 
   sealed_passage:
     id: sealed_passage
     text: >-
       You jam a broken beam across the gap and heap old stone against it. Your hands shake
       slightly as you climb back out into the street. You do not know if you have been
-      cautious or cowardly. Maybe both.
+      cautious or cowardly. Maybe both. The symbols on the seam frame are still fresh in
+      your mind. That word: binding.
     choices:
       - id: leave_marker
         label: Leave a discreet marker so you can find it again
@@ -156,10 +445,397 @@ nodes:
           - type: stat
             target: cunning
             value: 1
+          - type: world_fact
+            target: passage_sealed
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: passage_reconsider
+      - id: tell_someone_what_you_sealed
+        label: Tell {companion.name} you found something and sealed it, without saying what
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: passage_sealed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_reconsider
       - id: walk_away
         label: Walk away and do not look back
         consequences: []
         exhaustionCost: 0
+        nextNodeId: null
+
+  passage_reconsider:
+    id: passage_reconsider
+    text: >-
+      That night you lie awake turning over the question of whether sealing was the right
+      call. The binding glyph on the frame suggested the passage was not meant to be opened
+      from this side. But if it was sealed by design, then something on the other side is
+      meant to stay in. And if something is meant to stay in, it follows that it is still
+      there. Whatever it is has been below Ironhaven for longer than the town has existed.
+    choices:
+      - id: go_back_next_day
+        label: Go back the next morning and open it properly, with preparation
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: chamber_hub
+      - id: seek_advice_before_opening
+        label: Find someone who understands what binding glyphs mean before touching it again
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_formal_decision
+      - id: leave_it_sealed_firmly
+        label: Leave it sealed. Some decisions benefit from being made once and held to.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_sealed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  passage_wider_meaning:
+    id: passage_wider_meaning
+    text: >-
+      Whether you opened it or sealed it, the passage changes what you know about Ironhaven.
+      The town was built on a site that was already significant. The chamber below the square
+      was here before the square. The passage was part of something deliberate, built by people
+      who knew what they were building and why. That knowledge means the ordinary surfaces of
+      this town are never quite ordinary again. You will look at the ground differently from now on.
+    choices:
+      - id: share_the_revelation
+        label: Share this realisation with {companion.name}
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_formal_decision
+      - id: hold_the_revelation
+        label: Hold it. The town does not need to know what it is built on.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: passage_formal_decision
+
+  companion_after_chamber:
+    id: companion_after_chamber
+    text: >-
+      {companion.name} is different after the chamber. They do not speak about it directly
+      but they have been thinking. You can tell by the way they pause sometimes on the
+      square, looking at the paving stones. "It is right under there," they said once,
+      almost to themselves. They did not finish the sentence. You did not ask them to.
+      Shared knowledge of something underground creates its own kind of closeness.
+    choices:
+      - id: acknowledge_what_changed
+        label: Acknowledge with {companion.name} that something has changed between you
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: affection
+          - type: relationship_tag
+            target: '{companion.id}'
+            value: knows_about_passage
+        exhaustionCost: 1
+        nextNodeId: passage_wider_meaning
+      - id: let_it_be_unspoken
+        label: Let it remain unspoken. Some understandings do not need words.
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: passage_wider_meaning
+
+  passage_formal_decision:
+    id: passage_formal_decision
+    text: >-
+      At some point the passage below Ironhaven requires a formal decision: tell or not tell,
+      seal or leave accessible, bring authorities or handle privately. You have been in a
+      holding pattern since you first found the seam. The holding pattern cannot last indefinitely.
+      The shrine is untended. The chamber exists. Other people are starting to ask questions
+      you are not sure you want to answer yet.
+    choices:
+      - id: decide_to_report_formally
+        label: Decide to report the passage formally. The town should know what is under it.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: faction
+            target: town_guard
+            value: 1
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 2
+        nextNodeId: passage_official_response
+      - id: decide_to_keep_privately
+        label: Decide to keep it private for now. Not everything benefits from official attention.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 0
+        nextNodeId: passage_private_weight
+      - id: decide_to_tend_shrine
+        label: Decide to begin tending the shrine yourself. Let the formal decision wait.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 2
+        nextNodeId: passage_private_weight
+
+  passage_official_response:
+    id: passage_official_response
+    text: >-
+      The guard captain and the elder both come down to look. They bring a third person, an
+      old woman you have not met, who examines the plinth and the north wall without being
+      asked, as though she already knows what to look for. She says nothing the entire time.
+      When you climb back out, the elder sends the captain away and speaks to you quietly.
+      "We have known about the cellar for a hundred years," they say. "We did not know about
+      the passage." They look at the old woman. "She does."
+    choices:
+      - id: ask_who_old_woman_is
+        label: Ask who the old woman is and what she knows
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_shared_knowledge
+      - id: let_elder_handle_it
+        label: You have done your part. Let the elder and the old woman handle it.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 0
+        nextNodeId: passage_town_response
+      - id: offer_to_continue_involvement
+        label: Offer to remain involved. You know this passage better than anyone now.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_long_settling
+
+  passage_private_weight:
+    id: passage_private_weight
+    text: >-
+      Keeping the passage private costs something. Not in any immediate way. But you walk
+      past the cellar door on Tanner's Row three times in the next week, each time aware
+      that what is below it is yours to carry alone. {companion.name} can see that something
+      is in your head. They do not push. They wait. The waiting is its own kind of asking.
+    choices:
+      - id: confide_in_companion
+        label: Confide in {companion.name}. The private weight is too heavy for one person.
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: passage_shared_knowledge
+      - id: carry_it_alone
+        label: Carry it alone. Some knowledge is protective only if it stays contained.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_found
+            value: true
+        exhaustionCost: 0
+        nextNodeId: passage_long_settling
+      - id: decide_to_tend_it
+        label: The weight means you need to do something. Go back and tend the shrine.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 2
+        nextNodeId: passage_tended
+
+  passage_tended:
+    id: passage_tended
+    text: >-
+      Tending the passage is a quiet practice. You clear the entrance twice, then three
+      times, and a rhythm develops: the hour before dusk, when nobody is watching the
+      lane. The offering feels less strange by the fourth time. You are not sure what
+      you are honoring, but you are honoring something that was honored before you and
+      will need honoring after. That continuity is its own kind of meaning.
+    choices:
+      - id: establish_regular_practice
+        label: Establish a regular practice. Make this part of your life in Ironhaven.
+        consequences:
+          - type: world_fact
+            target: passage_tended
+            value: true
+          - type: world_fact
+            target: passage_honored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: keep_it_informal
+        label: Keep it informal. You tend it when you can, without obligation.
+        consequences:
+          - type: world_fact
+            target: passage_honored
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  passage_shared_knowledge:
+    id: passage_shared_knowledge
+    text: >-
+      What you know about the passage has a weight now. One other person knows,
+      or two, or the elder knows and has chosen silence, or nobody knows and the
+      knowledge sits only with you. However it landed, you are carrying something
+      about Ironhaven that not everyone carries. That is a kind of responsibility
+      and a kind of advantage and you have not yet fully decided which it is.
+    choices:
+      - id: build_on_what_you_know
+        label: Build on what you know. Use it to understand Ironhaven more deeply.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: hold_it_as_a_resource
+        label: Hold it as a resource. Information is worth more when it is scarce.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_sealed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  passage_town_response:
+    id: passage_town_response
+    text: >-
+      The town's response to news of the passage, if news reached it, was more
+      muted than you expected. Or it was not muted at all, and the elder called
+      a meeting. Or it was dismissed. The town of Ironhaven has a particular
+      relationship with its past: it prefers to walk over things rather than
+      dig them up. The passage is something to walk over, in their accounting.
+      You are less certain about that.
+    choices:
+      - id: push_for_more_investigation
+        label: Push for more investigation. The town should know what is underneath it.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: accept_the_towns_pace
+        label: Accept the town's pace. You cannot force a community to reckon with what it is not ready for.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  passage_long_settling:
+    id: passage_long_settling
+    text: >-
+      Months later, the passage is still there, whether sealed or tended or simply
+      known. What changed is not the passage but your understanding of Ironhaven.
+      The town was built over things. Most towns are. The question the passage posed
+      was never really about the passage. It was about what you do when you find what
+      a place was before it became what it is.
+    choices:
+      - id: carry_it_as_part_of_the_place
+        label: Carry this as part of your understanding of Ironhaven, not as a burden
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: passage_honored
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: act_on_what_you_learned
+        label: Act on what the passage revealed about the town's history
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: passage_reported
+            value: true
+        exhaustionCost: 1
         nextNodeId: null

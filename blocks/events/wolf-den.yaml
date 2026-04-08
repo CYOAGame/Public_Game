@@ -27,13 +27,13 @@ nodes:
     id: start
     text: >-
       The tracks lead you to a slope in the Ashwood, a rocky hollow half-hidden by fallen
-      timber. You find the den at dusk and the den is not empty. A grey she-wolf lies
-      inside, three cubs pressed against her flank. She does not move toward you. She
-      watches you with yellow eyes, perfectly still. {hunter.name} is behind you, bow
-      raised. "Say the word," they say quietly.
+      timber. You find the den at dusk and the den is not empty. A grey she-wolf lies inside,
+      three cubs pressed against her flank. She does not move toward you. She watches you with
+      yellow eyes, perfectly still. {hunter.name} is behind you, bow raised. "Say the word,"
+      they say quietly.
     choices:
       - id: kill_them
-        label: Give the word wolves near town are a threat, cubs or not
+        label: Give the word, wolves near town are a threat, cubs or not
         consequences:
           - type: stat
             target: strength
@@ -61,8 +61,16 @@ nodes:
             value: true
         exhaustionCost: 1
         nextNodeId: backed_away
+      - id: observe_before_deciding
+        label: Hold position and observe before doing anything
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: observed_den
       - id: find_another_way
-        label: Back off and think there may be a way to move them without killing
+        label: Back off and think, there may be a way to move them without killing
         consequences:
           - type: stat
             target: cunning
@@ -73,13 +81,222 @@ nodes:
         exhaustionCost: 2
         nextNodeId: found_another_way
 
+  observed_den:
+    id: observed_den
+    text: >-
+      The she-wolf does not attack. She could: the hollow is her advantage, she knows every
+      angle. Instead she watches, and the watching has a quality you recognise from the clearing,
+      the same deliberate attention, not animal threat but assessment. The cubs are small, too
+      young to run. They press against her and watch you with eyes still blue with newness.
+      {hunter.name} holds the bow steady but does not draw.
+    choices:
+      - id: speak_to_hunter_quietly
+        label: "Whisper to {hunter.name}: these wolves are not what we came for"
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{hunter.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: wolves_spared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: found_another_way
+      - id: look_for_fourth_wolf
+        label: Look around the hollow for the large wolf you tracked before
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: wolf_den_suspected
+            value: true
+        exhaustionCost: 2
+        nextNodeId: fourth_wolf_sought
+      - id: make_decision_from_observation
+        label: You have seen enough. Lower the bow and leave.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: wolves_spared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: backed_away
+
+  fourth_wolf_sought:
+    id: fourth_wolf_sought
+    text: >-
+      The large prints you tracked from the clearing come to the den and continue. The fourth
+      wolf is not here. It was here recently, the prints are fresh, but it is not in the hollow.
+      {hunter.name} notices you searching and lowers the bow an inch. "You see it?" they ask.
+      "The big one's missing." You both realise at the same moment: the mother and the cubs
+      were left. Whatever the large wolf is, it left them behind for a reason. It is somewhere
+      else. It is doing something else.
+    choices:
+      - id: spare_family_and_track_fourth
+        label: Leave the family, track the fourth wolf. That is the one that matters.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: wolves_spared
+            value: true
+          - type: world_fact
+            target: fourth_wolf_tracked
+            value: true
+        exhaustionCost: 3
+        nextNodeId: tracking_fourth
+      - id: spare_all_and_report
+        label: Spare them all and get back to town, this is bigger than a wolf hunt
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: wolves_spared
+            value: true
+          - type: world_fact
+            target: fourth_wolf_tracked
+            value: true
+        exhaustionCost: 1
+        nextNodeId: reported_den
+      - id: kill_family_track_fourth
+        label: Eliminate the immediate threat and then track the fourth
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: wolves_killed
+            value: true
+          - type: world_fact
+            target: fourth_wolf_tracked
+            value: true
+        exhaustionCost: 3
+        nextNodeId: tracking_fourth
+
+  tracking_fourth:
+    id: tracking_fourth
+    text: >-
+      The large prints lead northeast, toward the part of the Ashwood that {hunter.name}
+      said they were never comfortable in. The tracks are not running. They are deliberate,
+      unhurried. You follow for an hour and then the prints stop at the edge of a clearing
+      you have seen before: the flat stone, the perfect ring of trees. The stone is warm.
+      The fourth wolf is not here. But the stone's warmth is stronger than before, and around
+      its base, you find a single long grey hair, caught in the stone's grain, as though the
+      wolf pressed against it the way a cat presses against a heated surface.
+    choices:
+      - id: examine_stone_closely
+        label: Examine the stone closely with what you know now about the binding sites
+        preconditions:
+          - type: world_fact
+            key: cellar_opened
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ashwood_stone_examined
+            value: true
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+          - type: world_fact
+            target: fourth_wolf_tracked
+            value: true
+        exhaustionCost: 2
+        nextNodeId: den_revelation
+      - id: wait_at_stone_for_fourth
+        label: Wait at the stone, the fourth wolf came here for a reason and may return
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: made_contact_with_wolves
+            value: true
+          - type: world_fact
+            target: fourth_wolf_tracked
+            value: true
+        exhaustionCost: 3
+        nextNodeId: den_revelation
+      - id: report_clearing_to_town
+        label: You have found what you came for. Bring this back to {hunter.name} and Ironhaven.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+          - type: world_fact
+            target: fourth_wolf_tracked
+            value: true
+        exhaustionCost: 1
+        nextNodeId: reported_den
+
+  den_revelation:
+    id: den_revelation
+    text: >-
+      Whether you wait at the stone or examine it, the conclusion is the same: the large wolf
+      has been tending this place. Coming here regularly. Pressing against the stone. The wolves
+      were not driven out of the Ashwood by fear alone. They were called toward the town because
+      something below the town is pulling at things that can sense it. The binding under the
+      cellar is like a fire, and the wolves have been drawn to its warmth for months. The fourth
+      wolf is its keeper. Whether that is its own instinct or something the binding shaped, you
+      cannot say.
+    choices:
+      - id: report_revelation_to_scholar
+        label: This goes to {hunter.name} and anyone who knows about the binding
+        preconditions:
+          - type: world_fact
+            key: symbols_studied
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 1
+        nextNodeId: reported_den
+      - id: hold_the_revelation
+        label: Hold this to yourself for now. The implications are too large to speak aloud yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ashwood_secret_kept
+            value: true
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 0
+        nextNodeId: reported_den
+
   killed:
     id: killed
     text: >-
-      {hunter.name} makes it quick. You drag the animals clear of the den and mark the
-      hollow. On the walk back, neither of you says much. The cubs were small.
-      The threat to the flocks is gone. {hunter.name} says: "You made the right call."
-      They mean it. You are not entirely sure.
+      {hunter.name} makes it quick. You drag the animals clear of the den and mark the hollow.
+      On the walk back, neither of you says much. The cubs were small. The threat to the flocks
+      is gone. {hunter.name} says: "You made the right call." They mean it. You are not entirely
+      sure. That night you find yourself thinking about the clearing and the warm stone, and
+      what used to tend it.
     choices:
       - id: accept_the_necessity
         label: Accept it. Hard things sometimes need doing.
@@ -88,7 +305,7 @@ nodes:
             target: strength
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: killing_aftermath
       - id: feel_the_cost
         label: Say nothing. Walk home alone.
         consequences:
@@ -96,15 +313,45 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: killing_aftermath
+
+  killing_aftermath:
+    id: killing_aftermath
+    text: >-
+      Three days later, {hunter.name} comes to find you. They have been in the Ashwood.
+      "The clearing," they say. "The stone. It is cold now. It was warm last week. I could
+      have sworn." They look uncomfortable. "I think the wolves were doing something up there.
+      I do not know what. But something was. And we stopped it." They are not asking for
+      absolution. They are asking if you noticed the same thing.
+    choices:
+      - id: confirm_hunters_observation
+        label: Confirm it. The stone was connected to the wolves somehow. Unclear how.
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: ashwood_stone_examined
+            value: true
+        exhaustionCost: 1
+        nextNodeId: reported_den
+      - id: say_nothing_to_hunter
+        label: Say nothing. What is done is done.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: reported_den
 
   backed_away:
     id: backed_away
     text: >-
       {hunter.name} lowers the bow with barely concealed frustration. "Those cubs will be
       full-sized in six months," they say. "And back at the sheep pens." You back out of
-      the hollow without looking away from the she-wolf's eyes. She does not follow.
-      For now.
+      the hollow without looking away from the she-wolf's eyes. She does not follow. For now.
+      At the edge of the wood, you look back once. The den is still visible in the last light.
     choices:
       - id: post_a_warning
         label: Post a warning at the south gate about the den's location
@@ -116,7 +363,16 @@ nodes:
             target: charisma
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: reported_den
+      - id: plan_relocation
+        label: Tell {hunter.name} you have an idea for moving them without killing
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 1
+            axis: respect
+        exhaustionCost: 1
+        nextNodeId: found_another_way
       - id: trust_your_choice
         label: Trust your instinct. You did not want blood on your hands today.
         consequences:
@@ -124,16 +380,32 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: reported_den
 
   found_another_way:
     id: found_another_way
     text: >-
       You and {hunter.name} spend the next day returning with the carcass of a deer killed
       elsewhere, leaving a trail further into the deep Ashwood, away from the farmsteads.
-      It takes two attempts, but the she-wolf follows the food. By the third day the den
-      is empty. The sheep are safe. The wolves are alive and far from town.
+      It takes two attempts. On the third day the den is empty and the family has moved north,
+      deeper into the Ashwood and toward the clearing with the stone. The sheep are safe.
+      The wolves are alive. And you have, in effect, brought them closer to whatever drew
+      them toward town in the first place.
     choices:
+      - id: follow_up_on_relocation
+        label: Go back to the clearing and see if the family found it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+          - type: world_fact
+            target: made_contact_with_wolves
+            value: true
+        exhaustionCost: 2
+        nextNodeId: den_revelation
       - id: tell_the_shepherds
         label: Tell the shepherds what you did so they can watch for return
         consequences:
@@ -144,13 +416,441 @@ nodes:
             target: charisma
             value: 1
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: reported_den
       - id: keep_it_between_you
-        label: Keep it between you and {hunter.name} no point explaining
+        label: Keep it between you and {hunter.name}, no point explaining
         consequences:
           - type: relationship
             target: '{hunter.id}'
             value: 2
             axis: respect
+        exhaustionCost: 0
+        nextNodeId: reported_den
+
+  reported_den:
+    id: reported_den
+    text: >-
+      Back in Ironhaven, you give what account seems right. The sheep are safer than they
+      were this morning. Whether the wolves are gone, relocated, or merely moved is a question
+      for the next few weeks. {shepherd.name} is grateful. {hunter.name} is professional about
+      it. The Ashwood is still out there, and you know more about what is in it than you did
+      before. That knowledge is either an advantage or a weight, depending on what comes next.
+    choices:
+      - id: report_the_clearing
+        label: Tell {hunter.name} about the clearing and the stone, they need to know
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+        exhaustionCost: 0
+        nextNodeId: hunter_response
+      - id: keep_clearing_to_self
+        label: Keep the clearing to yourself, report only what the town needs to know
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ashwood_secret_kept
+            value: true
+        exhaustionCost: 0
+        nextNodeId: wolf_aftermath
+      - id: ask_shepherd_to_watch_for_wolves
+        label: Ask {shepherd.name} to send word if they see the wolves again
+        consequences:
+          - type: relationship
+            target: '{shepherd.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: wolves_tracked
+            value: true
+        exhaustionCost: 0
+        nextNodeId: wolf_aftermath
+
+  hunter_response:
+    id: hunter_response
+    text: >-
+      {hunter.name} listens to everything you say about the clearing and the stone without
+      interrupting. When you finish, they are quiet for a long moment. "I have been in the
+      Ashwood twenty years," they say finally. "I always thought the north part felt wrong
+      because of something I could not name. Now you have named it." They look at their
+      bow, then at you. "I am not sure whether knowing makes it better or worse." They
+      think for another moment. "What do we do about it?"
+    choices:
+      - id: suggest_investigating_together
+        label: Suggest you go back to the clearing together, properly prepared
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: wolf_aftermath
+      - id: suggest_leaving_it
+        label: Suggest leaving the clearing alone. The wolves are not the problem.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: ashwood_secret_kept
+            value: true
+        exhaustionCost: 0
+        nextNodeId: wolf_aftermath
+      - id: ask_hunter_what_they_know
+        label: Ask {hunter.name} what they know about the north Ashwood that they have never said before
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: hunter_old_knowledge
+
+  hunter_old_knowledge:
+    id: hunter_old_knowledge
+    text: >-
+      {hunter.name} describes three incidents over twenty years: a deer he tracked to the
+      north clearing and found dead without a mark on it. A camp he made there once that he
+      left at midnight without being able to explain why. A wolf he had drawn a perfect bead
+      on that turned and looked at him from forty paces with eyes that held something he could
+      not name, and he had lowered the bow. He tells you these things in the flat voice of
+      someone who filed them under inexplicable and moved on. "I did not think they were
+      related," he says. "Now I do."
+    choices:
+      - id: tie_hunter_knowledge_to_binding
+        label: Tell {hunter.name} what you know about the binding below the town, if you know it
+        preconditions:
+          - type: world_fact
+            key: cellar_opened
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{hunter.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: wolf_pattern_understood
+      - id: leave_connection_unspoken
+        label: Leave the connection unspoken. Let {hunter.name} arrive at it themselves.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: wolf_aftermath
+
+  wolf_aftermath:
+    id: wolf_aftermath
+    text: >-
+      A week after the den, the flocks are safe. The Ashwood is quiet in its ordinary way,
+      not the charged quiet you noticed near the clearing. Life in Ironhaven returns to its
+      rhythms. But the wolves are still out there, the fourth wolf is still out there, and
+      the stone in the clearing still hums with something below it. None of that has been
+      resolved. It has been set aside.
+    choices:
+      - id: plan_to_return_to_clearing
+        label: Make a firm decision to return to the clearing with proper preparation
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 1
+        nextNodeId: clearing_preparation
+      - id: let_sleeping_wolves_lie
+        label: Let it rest. The town is safe enough for now.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: den_week_later
+
+  clearing_preparation:
+    id: clearing_preparation
+    text: >-
+      Preparing for the clearing requires thinking through what you actually expect to find.
+      The stone is warm. The wolf tends it. Something below the town may be connected to it.
+      You do not know what you are walking into. {hunter.name} can come with you, or you can
+      go alone. You have three days before the next market when the roads are busy enough to
+      cover your movement.
+    choices:
+      - id: bring_hunter_to_clearing
+        label: Bring {hunter.name}. Two sets of eyes at the clearing is better than one.
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 3
+        nextNodeId: den_revelation
+      - id: go_alone_to_clearing
+        label: Go alone. What you find there may be something {hunter.name} should not see yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: den_revelation
+      - id: ask_scholar_about_clearing
+        label: Ask the scholar about the clearing before going, if you know them
+        preconditions:
+          - type: world_fact
+            key: symbols_studied
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: den_revelation
+
+  den_week_later:
+    id: den_week_later
+    text: >-
+      A week after leaving the den, the Ashwood returns to its ordinary silence. The flocks
+      have settled. {hunter.name} makes one more trip to check the north part of the wood
+      and comes back with nothing urgent to report. "The stone is still there," they say.
+      "Still warm." Neither of you says what that means. Some things need more time before
+      they can be named.
+    choices:
+      - id: go_to_clearing_after_week
+        label: Go to the clearing now. Enough time has passed and the question will not answer itself.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 2
+        nextNodeId: clearing_preparation
+      - id: talk_to_hunter_after_week
+        label: Have a proper conversation with {hunter.name} about what you both know
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: hunter_old_knowledge
+      - id: leave_it_for_now
+        label: Leave it for now. The town is safe and the mystery can wait.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: den_month_on
+
+  wolf_pattern_understood:
+    id: wolf_pattern_understood
+    text: >-
+      Putting together everything you have learned, a pattern emerges: the wolves have been
+      tending the forest end of something that has a town end too. The binding, the stone,
+      the fourth wolf, the she-wolf and cubs near town. It is a system. Someone or something
+      designed it that way, or it grew that way over decades. Either way, the wolves are not
+      the problem. They may be the only thing that has been maintaining whatever is left of
+      the original design.
+    choices:
+      - id: share_full_pattern
+        label: Share the full pattern with {hunter.name} and whoever else needs to know
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: ashwood_truth_shared
+            value: true
+        exhaustionCost: 1
+        nextNodeId: den_hunter_bond
+      - id: hold_pattern_close
+        label: Hold the pattern close. This is too large to spread without a plan for what comes next.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: ashwood_secret_kept
+            value: true
+        exhaustionCost: 0
+        nextNodeId: den_territorial_question
+      - id: write_it_down
+        label: Write the pattern down carefully. Records matter if you are not here to explain it.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: wolf_clearing_found
+            value: true
+        exhaustionCost: 1
+        nextNodeId: den_territorial_question
+
+  den_binding_applied:
+    id: den_binding_applied
+    text: >-
+      The binding is in place. Whatever it does, it does quietly: the wolves have not
+      come closer in the weeks since. Whether that is the binding or the season, you
+      cannot say for certain, but the hunter believes it, and a hunter who believes
+      something is a different kind of resource than one who is uncertain. The Ashwood
+      feels different when you enter it now. Or you notice different things in it.
+      The distinction might not matter.
+    choices:
+      - id: check_on_binding_regularly
+        label: Check on the binding regularly. You want to know if it holds or changes.
+        consequences:
+          - type: world_fact
+            target: wolf_territory_understood
+            value: true
+          - type: world_fact
+            target: wolf_binding_placed
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: trust_the_hunter_to_monitor
+        label: Trust {hunter.name} to monitor it. You have done your part.
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: wolf_binding_placed
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  den_month_on:
+    id: den_month_on
+    text: >-
+      A month after the den discovery. The hunter has been quieter than usual about it,
+      which could mean nothing. At the market, you overhear someone saying the wolf
+      that spooked the shepherd was never from the Ashwood, it came down from the
+      northern hills. That account does not match what you found. Someone's story
+      has drifted, or someone needs it to. You know what you saw.
+    choices:
+      - id: correct_the_account
+        label: Correct the account. Ironhaven should have accurate information about its own land.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: wolf_territory_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_the_account_drift
+        label: Let the story drift. It keeps people out of the Ashwood without them having to be warned.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  den_hunter_bond:
+    id: den_hunter_bond
+    text: >-
+      What you did with the hunter in the Ashwood sits between you differently now.
+      They are not someone you hired or helped. They are someone who knows what you
+      know, who was in the same wood at the same hour, who made the same calculation
+      about the den and the binding and the wolves. That is a particular kind of trust,
+      built in a particular kind of place. It does not need naming to be useful.
+    choices:
+      - id: build_on_the_trust
+        label: Build on what was established. The hunter is more useful as an ally than as a contact.
+        consequences:
+          - type: relationship
+            target: '{hunter.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: wolf_territory_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: keep_it_professional
+        label: Keep it professional. Shared experience is not the same as shared goals.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  den_territorial_question:
+    id: den_territorial_question
+    text: >-
+      The question the den raised was not really about wolves. It was about whose
+      territory the Ashwood is. The wolves have prior claim by any reasonable accounting.
+      Ironhaven's claim is newer, louder, and backed by fence-posts and market days.
+      What you found in the Ashwood adds a third claim: something older than either.
+      You are the only one who has stood in all three of those overlapping territories.
+      What you do with that is not a simple question.
+    choices:
+      - id: advocate_for_careful_boundary
+        label: Advocate for a careful boundary. Humans should know where they are not welcome.
+        consequences:
+          - type: faction
+            target: village_folk
+            value: 1
+          - type: world_fact
+            target: wolf_territory_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_the_territory_sort_itself
+        label: Let the territory sort itself. These things have been working out for longer than the town.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
         exhaustionCost: 0
         nextNodeId: null

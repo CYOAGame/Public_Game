@@ -55,7 +55,7 @@ nodes:
         exhaustionCost: 1
         nextNodeId: sought_help
       - id: embrace_it
-        label: Embrace whatever it is the benefits are real
+        label: Embrace whatever it is, the benefits are real
         consequences:
           - type: stat
             target: strength
@@ -65,6 +65,14 @@ nodes:
             value: true
         exhaustionCost: 0
         nextNodeId: embraced
+      - id: ask_what_she_sees
+        label: Ask {wise_woman.name} to describe exactly what she sees on you
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: described_marking
       - id: hide_it
         label: Thank her and deny anything strange is happening
         consequences:
@@ -77,6 +85,54 @@ nodes:
         exhaustionCost: 0
         nextNodeId: hidden
 
+  described_marking:
+    id: described_marking
+    text: >-
+      {wise_woman.name} studies you without touching. "It sits behind your eyes. A watchfulness
+      that is not yours but has borrowed your sight." She tilts her head. "It does not feel
+      hostile. It feels attentive, the way a dog watches a door when it hears something outside.
+      Something is using you to look." She pauses. "The question is what it is looking for, and
+      whether you want to know."
+    choices:
+      - id: want_to_know
+        label: Yes. You want to know.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: marking_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: sought_help
+      - id: not_sure_you_want_to_know
+        label: Ask {wise_woman.name} if knowing makes it better or worse
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 1
+        nextNodeId: sought_help
+      - id: decide_to_embrace_after_description
+        label: The description is not frightening. Lean into it.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: marking_embraced
+            value: true
+        exhaustionCost: 0
+        nextNodeId: embraced
+
   sought_help:
     id: sought_help
     text: >-
@@ -84,10 +140,11 @@ nodes:
       from the shrine? Did you leave an offering? Were you alone? Her expression grows
       thoughtful rather than alarmed. "It is old power," she says finally. "Not evil. But
       it has a price. Things that come easily start to cost you elsewhere. Be careful what
-      you use it for."
+      you use it for." She pauses. "And it is not permanent. If you do not feed it attention,
+      it will fade. Three months, maybe four."
     choices:
       - id: use_it_sparingly
-        label: Heed the warning use whatever gift this is sparingly
+        label: Heed the warning, use whatever gift this is sparingly
         consequences:
           - type: stat
             target: cunning
@@ -96,7 +153,7 @@ nodes:
             target: marking_understood
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: marking_understood_hub
       - id: ask_how_to_remove_it
         label: Ask how to remove the marking entirely
         consequences:
@@ -108,14 +165,262 @@ nodes:
             target: marking_removal_sought
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: removal_path
+      - id: ask_what_its_looking_for
+        label: Ask what she thinks the presence is looking for through you
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_understood
+            value: true
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: presence_explained
+
+  presence_explained:
+    id: presence_explained
+    text: >-
+      {wise_woman.name} considers this carefully. "Old bindings have guardians. Not people,
+      something older than people. If the binding under this town is real, and I think you
+      know it is, then what is watching through you may be the binding itself. Testing whether
+      you are worth using." She looks at you without sentiment. "The answer, apparently, is
+      yes. The question is whether you want that responsibility."
+    choices:
+      - id: accept_responsibility
+        label: Accept it. If the binding is real and needs a guardian, that might as well be you.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: marking_embraced
+            value: true
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_understood_hub
+      - id: refuse_responsibility
+        label: Refuse. You did not sign up for this and you want the marking removed.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_removal_sought
+            value: true
+        exhaustionCost: 1
+        nextNodeId: removal_path
+      - id: ask_for_time
+        label: Ask {wise_woman.name} for time to think before deciding anything
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 0
+        nextNodeId: marking_shared_burden
+
+  marking_understood_hub:
+    id: marking_understood_hub
+    text: >-
+      You understand the marking now, at least what {wise_woman.name} understands of it.
+      The benefits are real. The costs are subtle. And the presence watching through you has
+      a purpose that may or may not align with your own. You have several directions you
+      could go from here.
+    choices:
+      - id: use_marking_actively
+        label: Begin using the marking deliberately, lean into the sharpness it gives
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: marking_embraced
+            value: true
+        exhaustionCost: 2
+        nextNodeId: active_use
+      - id: tend_the_shrine_in_return
+        label: Go to the shrine and tend it, if the binding is watching through you, show it you understand
+        preconditions:
+          - type: world_fact
+            key: passage_found
+            value: true
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 2
+        nextNodeId: keeper_first_weeks
+      - id: tell_priest_about_marking
+        label: Tell {wise_woman.name} you want to talk to the wandering priest about this
+        preconditions:
+          - type: world_fact
+            key: heard_priest_warning
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: priest_knows_about_cellar
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_and_priest
+
+  removal_path:
+    id: removal_path
+    text: >-
+      {wise_woman.name} describes three things that might break the marking: returning the
+      artifact if you took one, performing a specific rite at the shrine, or simply leaving
+      Ironhaven for long enough that the connection weakens through distance. "The third is
+      the simplest," she says. "But you would have to stay away for months. And whatever is
+      watching through you would have to find someone else." Her expression makes clear she
+      thinks that would not be an improvement.
+    choices:
+      - id: return_artifact_path
+        label: Return the artifact to the shrine
+        preconditions:
+          - type: world_fact
+            key: artifact_taken
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_removal_sought
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 3
+        nextNodeId: marking_lifted
+      - id: perform_shrine_rite
+        label: Ask {wise_woman.name} to teach you the rite and go to the shrine
+        preconditions:
+          - type: world_fact
+            key: passage_found
+            value: true
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: marking_removal_sought
+            value: true
+        exhaustionCost: 3
+        nextNodeId: marking_lifted
+      - id: decide_not_to_remove
+        label: Think about leaving Ironhaven and decide against it. You will keep the marking.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: marking_embraced
+            value: true
+        exhaustionCost: 0
+        nextNodeId: marking_understood_hub
+
+  marking_lifted:
+    id: marking_lifted
+    text: >-
+      Whatever the rite was, or whatever the return of the artifact accomplished, the next
+      morning is different. The quality of attention you have been carrying is gone. Your
+      tools are tools again. The bread goes stale normally. You feel, obscurely, like you
+      have passed something on to someone you never met. {wise_woman.name} comes by that
+      afternoon and asks how you feel. "Lighter," you say. She nods. "Good. Or at least
+      different. I am not sure those are the same thing."
+    choices:
+      - id: thank_wise_woman
+        label: Thank {wise_woman.name} properly
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: marking_removal_sought
+            value: true
+        exhaustionCost: 0
+        nextNodeId: life_without_marking
+      - id: ask_if_marking_is_gone_for_good
+        label: Ask if it could come back
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: life_without_marking
+
+  active_use:
+    id: active_use
+    text: >-
+      You lean into the marking deliberately, and the results are real. You move through
+      your work faster. You notice things you would have missed. People seem easier to read.
+      Two weeks in, {wise_woman.name} finds you at the market and looks at you for a long
+      moment without speaking. "The cost is starting," she says finally. "You are sleeping
+      less. You have not noticed because you do not feel tired. But you are burning through
+      something that does not replenish easily." She is not wrong. You realise you cannot
+      remember the last time you were bored.
+    choices:
+      - id: heed_warning_and_pull_back
+        label: Heed the warning and deliberately stop leaning on it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_understood_hub
+      - id: keep_going_anyway
+        label: Keep going. The work matters more than the cost right now.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: stat
+            target: cunning
+            value: -1
+          - type: world_fact
+            target: marking_embraced
+            value: true
+        exhaustionCost: 0
+        nextNodeId: marking_physical_cost
 
   embraced:
     id: embraced
     text: >-
       You lean into it. Your work goes better. Your body aches less. People seem to listen
       to you more readily. {wise_woman.name} watches you from across the market a few days
-      later. She does not approach. But her expression is not disapproving it is cautious.
+      later. She does not approach. But her expression is not disapproving, it is cautious.
       Like someone watching a fire that has not yet decided what to burn.
     choices:
       - id: check_in_with_her
@@ -129,7 +434,7 @@ nodes:
             target: marking_investigated
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: sought_help
       - id: enjoy_the_gift
         label: Trust yourself. This is a good thing.
         consequences:
@@ -137,14 +442,15 @@ nodes:
             target: strength
             value: 1
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: active_use
 
   hidden:
     id: hidden
     text: >-
       {wise_woman.name} watches you walk away. "As you like," she calls after you. "But
       it knows you have it. And things that are ignored have a way of announcing themselves."
-      That night, the dreams are louder.
+      That night, the dreams are louder. You dream of the shrine. Of someone calling your
+      name from beneath the floor of the square.
     choices:
       - id: go_back_and_talk
         label: Go back to her the next morning and tell the truth
@@ -157,9 +463,428 @@ nodes:
             target: marking_investigated
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: sought_help
+      - id: go_back_to_shrine
+        label: Go back to the shrine yourself, without {wise_woman.name}, and face it directly
+        preconditions:
+          - type: world_fact
+            key: passage_found
+            value: true
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 3
+        nextNodeId: marking_understood_hub
       - id: endure_it
         label: Endure it alone. Whatever this is, you will manage.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: marking_persists
+
+  marking_persists:
+    id: marking_persists
+    text: >-
+      The marking does not fade on its own. You had hoped it might, given time. Instead it
+      settles, becomes familiar, the way a healing scar becomes part of your skin. The
+      benefits are real but manageable. The dreams have a rhythm now: three nights out of
+      seven, the roots, the stone, something watching from below. On the other nights you
+      sleep normally. You have learned to exist with it rather than fighting it or embracing
+      it. That is its own kind of equilibrium.
+    choices:
+      - id: live_with_equilibrium
+        label: Accept the equilibrium. This is manageable.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 0
+        nextNodeId: marking_long_term
+      - id: consult_wise_woman_after_persists
+        label: The persistence is unexpected. Go to {wise_woman.name} and ask why it is not fading.
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 1
+            axis: trust
+          - type: world_fact
+            target: marking_investigated
+            value: true
+        exhaustionCost: 1
+        nextNodeId: sought_help
+      - id: push_against_it
+        label: Actively resist the dreams. You refuse to be a vessel for something else's purpose.
+        consequences:
+          - type: stat
+            target: strength
+            value: 2
+          - type: stat
+            target: cunning
+            value: -1
+        exhaustionCost: 2
+        nextNodeId: marking_physical_cost
+
+  marking_long_term:
+    id: marking_long_term
+    text: >-
+      Three months in, the marking has become part of your daily texture. You notice things
+      others do not: a crack in the square paving that runs along the same line as the
+      underground passage. The way sound changes near the sealed cellar door. A pressure in
+      the air before certain dreams. Whether this is the marking working through you or simply
+      heightened attention from everything you now know, you cannot separate. Perhaps they
+      are the same thing.
+    choices:
+      - id: use_sensitivity_actively
+        label: Begin using this heightened sensitivity deliberately, as a tool
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: marking_embraced
+            value: true
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_and_community
+      - id: document_what_you_notice
+        label: Keep a careful record of what you observe in case it becomes useful later
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_and_community
+      - id: share_with_wise_woman
+        label: Share your observations with {wise_woman.name}, let her interpret them
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_and_community
+
+  marking_shared_burden:
+    id: marking_shared_burden
+    text: >-
+      {wise_woman.name} suggests the marking may have been waiting for someone specific.
+      "Old powers do not mark at random," she says. "They look for certain qualities. Attention.
+      A willingness to look at what others turn from." She looks at you directly. "The binding
+      below this town has been without a guardian for two generations. The last keeper died
+      without passing it on. The marking chose you because you were the first person to look
+      at the cellar and not flinch." She pauses. "What you do with that information is yours
+      to decide."
+    choices:
+      - id: accept_keeper_role
+        label: Accept it. If the binding needs tending, you will tend it.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: marking_embraced
+            value: true
+        exhaustionCost: 1
+        nextNodeId: keeper_first_weeks
+      - id: ask_for_time_with_keeper
+        label: Ask {wise_woman.name} if she knows anything about how the previous keeper managed it
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: keeper_first_weeks
+      - id: reject_keeper_role
+        label: Reject it. You did not consent to this and you are not the chosen anything.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: marking_removal_sought
+            value: true
+        exhaustionCost: 1
+        nextNodeId: removal_path
+
+  keeper_first_weeks:
+    id: keeper_first_weeks
+    text: >-
+      The first weeks of tending feel strange. You visit the shrine when you can, attend to
+      it the way you would a garden: clearing, checking, leaving things as you found them but
+      with attention added. {wise_woman.name} tells you that is probably enough. "The previous
+      keeper did not do anything dramatic," she says. "They just paid attention. The binding
+      does the work. It needs someone to notice when the work is slipping." You are learning
+      what slipping looks like. It is subtle. You will keep learning.
+    choices:
+      - id: commit_to_keeper_practice
+        label: Establish a regular practice. Weekly visits, careful attention, records kept.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: ask_wise_woman_to_help
+        label: Ask {wise_woman.name} to teach you more about what to look for when tending
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 1
+        nextNodeId: wise_woman_teaches
+      - id: manage_it_alone
+        label: Manage it alone. The marking is yours and so is the responsibility.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  wise_woman_teaches:
+    id: wise_woman_teaches
+    text: >-
+      {wise_woman.name} agrees to teach, but her teaching is not instruction. It is
+      observation. She comes to the shrine with you once, says almost nothing, and on the
+      walk back tells you three things to watch for: a change in the quality of silence
+      near the door, a smell of iron that comes and goes, and a particular kind of dream
+      that is not a dream but a communication. "You will know the difference," she says,
+      "because you will remember it perfectly in the morning. Most dreams fade. These do not."
+    choices:
+      - id: trust_wise_womans_guidance
+        label: Trust her guidance. You will learn to read the signs she described.
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: ask_what_those_signs_mean
+        label: Ask what those signs mean when you notice them. What is she actually warning about?
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  life_without_marking:
+    id: life_without_marking
+    text: >-
+      A month after the marking fades, the dreams stop entirely and your tools behave like
+      tools again. The absence is its own texture: you notice when things you had grown
+      accustomed to are simply gone. You do not miss the marking exactly. You miss the
+      clarity. Everything you were noticing before, you were noticing for a reason. Without
+      that reason, the world is no less strange, just less ordered. {wise_woman.name} checks
+      in once and says you look well. You mostly believe her.
+    choices:
+      - id: stay_curious_about_what_was_happening
+        label: Stay curious. The marking is gone but the binding is not.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: close_the_chapter
+        label: Close this chapter. You made a choice and you live with it.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  marking_physical_cost:
+    id: marking_physical_cost
+    text: >-
+      The cost {wise_woman.name} warned about comes in stages. First the shortened sleep,
+      not unpleasant at first. Then a quality of hyperawareness that makes ordinary
+      conversation feel slow. Then, after three weeks of pushing it, a morning where you
+      cannot remember what you did the afternoon before. Not the marking doing it. Your
+      body refusing the pace. You sit down and understand, for the first time, that this
+      has limits.
+    choices:
+      - id: rest_and_recalibrate
+        label: Rest and recalibrate. You heard the warning before and ignored it. Hear it now.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 0
+        nextNodeId: marking_understood_hub
+      - id: seek_wise_woman_about_cost
+        label: Go to {wise_woman.name} and tell her honestly how far you pushed it
+        consequences:
+          - type: relationship
+            target: '{wise_woman.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: sought_help
+
+  marking_and_priest:
+    id: marking_and_priest
+    text: >-
+      The priest listens to everything you tell them about the marking with the focus of
+      someone hearing a confirmation of something they already suspected. "The binding is
+      looking for a guardian," they say. "I have seen this pattern before. The marking is
+      not a curse. It is an audition." They fold their hands. "Whether you accept the role
+      is yours to decide. But you should know: if you do not, it will find someone else.
+      It will keep trying until the town falls or someone tends it."
+    choices:
+      - id: accept_after_priest
+        label: Accept the keeper role after hearing the priest's account
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: marking_embraced
+            value: true
+          - type: world_fact
+            target: priest_knows_about_cellar
+            value: true
+        exhaustionCost: 1
+        nextNodeId: keeper_first_weeks
+      - id: ask_priest_about_other_auditions
+        label: Ask the priest what happened in towns where no one accepted the audition
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: marking_long_consequences
+      - id: refuse_even_after_priest
+        label: Refuse. This responsibility belongs to whoever built the binding, not you.
+        consequences:
+          - type: stat
+            target: strength
+            value: 1
+          - type: world_fact
+            target: marking_removal_sought
+            value: true
+        exhaustionCost: 0
+        nextNodeId: removal_path
+
+  marking_and_community:
+    id: marking_and_community
+    text: >-
+      People do not know about the marking, or most of them do not. But you notice
+      that you are reading situations differently now: smaller signals, undercurrents
+      that seemed like noise before. Whether this is the marking or simply experience
+      is not clear. The wise woman would say the distinction does not matter. The
+      priest would say the distinction matters enormously. You are not sure either is
+      entirely wrong.
+    choices:
+      - id: test_the_sensitivity_deliberately
+        label: Test it deliberately. Find a situation that would show whether the sensitivity is real.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: accept_the_ambiguity
+        label: Accept the ambiguity. Some things do not need to be proven to be used.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+
+  marking_long_consequences:
+    id: marking_long_consequences
+    text: >-
+      Six months since the marking. The wise woman has moved on, or the priest has
+      made their peace with Ironhaven, or neither. The marking is part of you now
+      in ways that are mostly quiet. It flares occasionally: at the threshold of
+      the sealed cellar, in the shrine below the town, in certain conversations
+      where the air goes thick with what people are not saying. You have learned
+      to read those moments. That is not nothing.
+    choices:
+      - id: document_the_pattern
+        label: Document the pattern of when it flares. This is data worth keeping.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: marking_understood
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: let_it_be_what_it_is
+        label: Let it be what it is, without naming or cataloguing.
         consequences:
           - type: stat
             target: strength

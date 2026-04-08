@@ -27,15 +27,24 @@ nodes:
   start:
     id: start
     text: >-
-      Beyond the chamber with the empty plinth, the passage continues. It was not visible before
-      the angle of the lantern had to be just right. You follow it another fifty paces and step
-      through a low arch into a shrine. Intact. Alive, in a way that has nothing to do with
-      candlelight the carvings seem to move at the edge of your vision. An altar stone holds a
-      single artifact: a disc of dark metal, inscribed in Karathi, warm to the touch though the
-      air down here is freezing. {companion.name} stands beside you, saying nothing.
+      Beyond the chamber with the empty plinth, the passage continues. It was not visible
+      before, the angle of the lantern had to be just right. You follow it another fifty
+      paces and step through a low arch into a shrine. Intact. Alive, in a way that has
+      nothing to do with candlelight: the carvings seem to move at the edge of your vision.
+      An altar stone holds a single artifact, a disc of dark metal inscribed in Karathi,
+      warm to the touch though the air down here is freezing. {companion.name} stands
+      beside you, saying nothing.
     choices:
+      - id: approach_altar
+        label: Approach the altar stone slowly and examine the disc
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: altar_examined
       - id: pray_at_altar
-        label: Kneel and pray whatever this place is, show it respect
+        label: Kneel and pray, whatever this place is, show it respect
         consequences:
           - type: stat
             target: charisma
@@ -48,8 +57,16 @@ nodes:
             value: true
         exhaustionCost: 2
         nextNodeId: prayed
+      - id: study_shrine_walls
+        label: Study the walls of the shrine before touching anything
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+        exhaustionCost: 2
+        nextNodeId: walls_studied
       - id: take_artifact
-        label: Take the disc it may be the key to something larger
+        label: Take the disc, it may be the key to something larger
         consequences:
           - type: stat
             target: cunning
@@ -60,7 +77,7 @@ nodes:
         exhaustionCost: 2
         nextNodeId: took_artifact
       - id: destroy_shrine
-        label: Destroy the shrine this is demon-touched ground
+        label: Destroy the shrine, this is demon-touched ground
         consequences:
           - type: stat
             target: strength
@@ -74,7 +91,7 @@ nodes:
         exhaustionCost: 4
         nextNodeId: destroyed
       - id: observe_only
-        label: Touch nothing observe and leave
+        label: Touch nothing, observe and leave
         consequences:
           - type: stat
             target: cunning
@@ -82,13 +99,137 @@ nodes:
         exhaustionCost: 1
         nextNodeId: observed
 
+  altar_examined:
+    id: altar_examined
+    text: >-
+      The disc is roughly the size of your palm, dark as charcoal but denser, the surface
+      covered in Karathi inscriptions so fine they seem more grown than carved. Where your
+      fingers come close to it, you feel warmth, then a vibration too low to hear. Around
+      the base of the altar stone, the floor is worn in a perfect ring: generations of feet
+      standing in the same place, turning to face the same direction. The disc has been tended.
+      Not forgotten. Tended. Someone was here regularly until recently.
+    choices:
+      - id: pray_after_examination
+        label: Kneel at the altar out of respect for whatever those feet were doing here
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: prayed
+      - id: take_after_examination
+        label: Take the disc, understanding now what you are doing
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: artifact_taken
+            value: true
+        exhaustionCost: 2
+        nextNodeId: took_artifact
+      - id: record_after_examination
+        label: Record the inscriptions as precisely as you can without touching it
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+        exhaustionCost: 2
+        nextNodeId: walls_studied
+
+  walls_studied:
+    id: walls_studied
+    text: >-
+      The walls tell a story in images: a great battle, a binding, a procession of robed
+      figures who maintained the site across centuries. And at the end of the narrative, a
+      gap, the final panels are blank, the carving stopped mid-story. Someone intended to
+      finish the record and did not. Or could not. The last completed image shows a figure
+      alone at the altar, looking back over their shoulder at the arch you entered through.
+      Their expression, in stone, is fear.
+    choices:
+      - id: sit_with_the_story
+        label: Sit with the story. Try to understand what the figures were afraid of.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shrine_hub
+      - id: record_story_walls
+        label: Copy the narrative panels in order, this is a complete account of the binding
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: symbols_studied
+            value: true
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 3
+        nextNodeId: shrine_hub
+
+  shrine_hub:
+    id: shrine_hub
+    text: >-
+      You have a sense of the shrine now: its purpose, its age, its recent abandonment.
+      Something changed here, maybe one generation ago, maybe two. The maintenance stopped.
+      The last keeper died without passing the knowledge on, or left, or was prevented.
+      The altar disc still hums. The binding still holds. But it is untended, and untended
+      things have a way of drifting. {companion.name} is still beside you, watching you think.
+    choices:
+      - id: pray_from_hub
+        label: Pray at the altar. Take up the role the last keeper abandoned.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 2
+        nextNodeId: prayed
+      - id: take_disc_from_hub
+        label: Take the disc. It cannot sit here unguarded.
+        consequences:
+          - type: world_fact
+            target: artifact_taken
+            value: true
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 2
+        nextNodeId: took_artifact
+      - id: leave_intact_from_hub
+        label: Leave everything as it is. You will come back with more knowledge.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: observed
+
   prayed:
     id: prayed
     text: >-
-      Something shifts in the quality of the silence. Not threatening attentive. As if the
+      Something shifts in the quality of the silence. Not threatening, attentive. As if the
       shrine has noticed you. When you rise, your hands are trembling slightly, and {companion.name}
       puts a steadying hand on your shoulder. "Did you feel that?" they whisper. Whatever it was,
-      it felt like an answer.
+      it felt like an answer. Not in words. In weight, the way a burden acknowledged becomes
+      slightly easier to carry.
     choices:
       - id: stay_longer
         label: Stay longer and listen to whatever is speaking
@@ -102,25 +243,78 @@ nodes:
           - type: world_fact
             target: prophecy_known
             value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
         exhaustionCost: 3
-        nextNodeId: null
+        nextNodeId: heard_something
       - id: leave_respectfully
-        label: Leave respectfully you have what you came for
+        label: Leave respectfully, you have what you came for
         consequences:
           - type: relationship
             target: '{companion.id}'
             value: 1
             axis: affection
+          - type: world_fact
+            target: shrine_honored
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: departed_shrine
+      - id: return_tomorrow
+        label: Make a deliberate choice to come back and tend this place
+        consequences:
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: departed_shrine
+
+  heard_something:
+    id: heard_something
+    text: >-
+      You do not hear words. You feel direction: not toward the disc, not toward the walls,
+      but upward. Toward the surface. Toward the town. Whatever is bound here is not trying
+      to get out, it is trying to tell you that something above is already wrong. The shrine
+      is not a danger. The shrine is a sentinel. When you stand, the warmth in the disc has
+      increased slightly. You are not imagining it.
+    choices:
+      - id: report_to_scholar
+        label: This needs the scholar, find {scholar.name} and describe what happened
+        consequences:
+          - type: world_fact
+            target: prophecy_known
+            value: true
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: departed_shrine
+      - id: act_on_direction
+        label: Trust it. Whatever it is pointing at above, go look.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: departed_shrine
 
   took_artifact:
     id: took_artifact
     text: >-
-      The disc is heavier than it looks. The moment it leaves the altar stone, a sound low,
-      sustained, felt more than heard moves through the passage. {companion.name} grabs your
+      The disc is heavier than it looks. The moment it leaves the altar stone, a sound, low,
+      sustained, felt more than heard, moves through the passage. {companion.name} grabs your
       arm. "We need to go. Now." You both run. Behind you, the sound fades. But you are holding
-      something you cannot name, and you feel it pulse faintly against your palm all the way home.
+      something you cannot name, and you feel it pulse faintly against your palm all the way
+      home. That night, you do not dream of anything comfortable.
     choices:
       - id: keep_artifact_secret
         label: Keep the artifact secret and study it yourself
@@ -132,7 +326,7 @@ nodes:
             target: artifact_hidden
             value: true
         exhaustionCost: 1
-        nextNodeId: null
+        nextNodeId: artifact_aftermath
       - id: show_scholar
         label: Show it to someone with the knowledge to understand it
         consequences:
@@ -143,15 +337,60 @@ nodes:
             target: 'demon_invasion:lore_uncovered'
             value: 1
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: artifact_aftermath
+      - id: return_artifact
+        label: Go back and return it. Whatever that sound was, you do not want to find out what comes next.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 3
+        nextNodeId: departed_shrine
+
+  artifact_aftermath:
+    id: artifact_aftermath
+    text: >-
+      The disc sits in your workshop or your pack, pulsing faintly at irregular intervals.
+      The warmth has not left it. {companion.name} checks in with you the next morning, their
+      expression careful. "Are you alright?" they ask. "You look like you did not sleep." You
+      did sleep. You just do not feel like you rested. Something has shifted in the quality
+      of your days. The disc knows it is somewhere new. So does whatever is still at the shrine.
+    choices:
+      - id: commit_to_studying_disc
+        label: Commit to understanding it before doing anything else
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: artifact_examined
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shrine_long_shadow
+      - id: ask_companion_opinion
+        label: Ask {companion.name} what they think you should do with it
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: artifact_examined
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shrine_long_shadow
 
   destroyed:
     id: destroyed
     text: >-
-      You bring your hammer down on the altar stone. The disc shatters with a sound like a scream
-      heard underwater. The carvings go dark. {companion.name} backs toward the passage. Something
-      cold and purposeful moves through the air not wind. Then nothing. The shrine is rubble.
-      You do not feel victorious.
+      You bring your hammer down on the altar stone. The disc shatters with a sound like a
+      scream heard underwater. The carvings go dark. {companion.name} backs toward the passage.
+      Something cold and purposeful moves through the air, not wind. Then nothing. The shrine
+      is rubble. You do not feel victorious. You feel like you have closed a door that was meant
+      to stay open.
     choices:
       - id: bury_rubble
         label: Make sure it is thoroughly buried before you leave
@@ -162,24 +401,63 @@ nodes:
           - type: exhaustion
             target: self
             value: 2
+          - type: world_fact
+            target: shrine_destroyed
+            value: true
         exhaustionCost: 3
-        nextNodeId: null
-      - id: leave_it
+        nextNodeId: destruction_aftermath
+      - id: leave_rubble
         label: Leave the rubble and get out
         consequences:
           - type: stat
             target: cunning
             value: 1
+          - type: world_fact
+            target: shrine_destroyed
+            value: true
         exhaustionCost: 0
-        nextNodeId: null
+        nextNodeId: destruction_aftermath
+
+  destruction_aftermath:
+    id: destruction_aftermath
+    text: >-
+      That night, the dreams start. Not nightmares exactly. More like a signal without a
+      receiver, something trying to reach a station that no longer exists. {companion.name}
+      asks if you are well. You say yes. Three days later, you notice a crack in the wall
+      of your workshop that was not there before, running from floor to ceiling, following
+      a line that, when you step back, points directly toward the cellar on Tanner's Row.
+    choices:
+      - id: report_crack_to_scholar
+        label: Tell {scholar.name} about the crack and what you did
+        consequences:
+          - type: world_fact
+            target: shrine_destroyed
+            value: true
+          - type: questline
+            target: 'demon_invasion:seals_broken'
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: shrine_after_crack
+      - id: investigate_crack_yourself
+        label: Investigate the crack yourself before involving anyone else
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: shrine_destroyed
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shrine_after_crack
 
   observed:
     id: observed
     text: >-
-      You study the shrine for a long time without touching anything. The disc on the altar stone.
+      You study the shrine for a long time without touching anything. The disc on the altar.
       The Karathi inscriptions on the walls. The worn depressions in the floor where generations
-      of knees have pressed. Someone maintained this place for a very long time. Someone stopped
-      not long ago. {companion.name} waits by the arch, giving you space.
+      of knees have pressed. Someone maintained this place for a very long time. Someone stopped,
+      not long ago. {companion.name} waits by the arch, giving you space. You feel the wrongness
+      of the absence, whatever kept this place attended, the chain broke.
     choices:
       - id: record_observations
         label: Record everything you observe carefully
@@ -190,8 +468,22 @@ nodes:
           - type: world_fact
             target: symbols_studied
             value: true
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
         exhaustionCost: 2
-        nextNodeId: null
+        nextNodeId: departed_shrine
+      - id: make_offering
+        label: Leave something of your own at the altar, a gesture of acknowledgement
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: departed_shrine
       - id: leave_quietly
         label: Leave quietly and think on it
         consequences:
@@ -199,4 +491,380 @@ nodes:
             target: cunning
             value: 1
         exhaustionCost: 0
+        nextNodeId: departed_shrine
+
+  departed_shrine:
+    id: departed_shrine
+    text: >-
+      You and {companion.name} come back up through the passage and into the cellar. You lock
+      the street door behind you and stand for a moment on Tanner's Row. The town goes about
+      its business, oblivious. Below it, the shrine hums or waits or warns, depending on what
+      you believe about what you just experienced. You carry the knowledge with you now wherever
+      you go.
+    choices:
+      - id: tell_companion_all
+        label: Tell {companion.name} everything you felt and noticed while you were down there
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: shrine_long_shadow
+      - id: share_selectively
+        label: Share the facts with {companion.name} but not what you felt
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 1
+            axis: trust
+        exhaustionCost: 0
+        nextNodeId: shrine_morning_after
+      - id: carry_it_alone
+        label: Carry it alone for now. Some things need to settle before they can be shared.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: shrine_morning_after
+
+  shrine_long_shadow:
+    id: shrine_long_shadow
+    text: >-
+      The shrine sits in your mind the way physical places rarely do. You wake thinking of
+      the worn depressions in the floor. The warmth of the disc. The silence that felt
+      attended. It is not haunting, exactly. It is more like memory of a responsibility
+      you did not ask for. Over the following days you find yourself noting things in town
+      that seem related: which buildings are oldest, where the foundations are deepest,
+      who among the elders looks at the square's paving with a particular expression.
+    choices:
+      - id: investigate_connections
+        label: Investigate the connections you are starting to see
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shrine_keeper_trail
+      - id: let_the_shadow_settle
+        label: Let the shadow settle. Not everything needs to be acted on immediately.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  shrine_keeper_trail:
+    id: shrine_keeper_trail
+    text: >-
+      You find the trail in the oldest part of the records hall: a ledger entry from sixty
+      years ago listing a "Keeper's fee" paid annually from the town fund, with no further
+      description. The payments stopped forty years ago. The entry before the last one is
+      annotated: "No successor named." Someone who maintained the shrine died without passing
+      it on. The town forgot what it was paying for within a generation. The shrine went
+      untended. And now you have been there.
+    choices:
+      - id: take_on_keeper_role
+        label: Take on the keeper role deliberately. Someone has to do it.
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 2
+        nextNodeId: shrine_keeper_decision
+      - id: find_who_should_be_keeper
+        label: Find out if there is anyone in town who has hereditary connection to the old keeper
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: cellar_maintained_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: report_ledger_to_scholar
+        label: Bring the ledger entry to anyone who would understand what it means
+        preconditions:
+          - type: world_fact
+            key: symbols_studied
+            value: true
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+
+  shrine_temptation:
+    id: shrine_temptation
+    text: >-
+      The second time you return, the shrine feels different. Not changed, but you feel
+      differently inside it. The disc on the altar radiates its warmth and something in you
+      responds to it, a pull toward the altar that is not hunger exactly. It is the feeling
+      of being near something that could give you something, if you only knew how to ask.
+      {companion.name} notices you standing still for a long time. "Are you alright?" they ask.
+      You are. But the pull is real.
+    choices:
+      - id: resist_temptation
+        label: Step back deliberately. You do not take what you do not understand.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shrine_long_shadow
+      - id: ask_companion_what_they_feel
+        label: Ask {companion.name} if they feel it too
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shrine_long_shadow
+      - id: reach_toward_disc
+        label: Reach toward the disc without taking it, let the feeling guide your hand
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+          - type: world_fact
+            target: prophecy_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: heard_something
+
+  shrine_morning_after:
+    id: shrine_morning_after
+    text: >-
+      Whatever happened in the shrine, the morning after has a quality of both weight and
+      clarity. You went somewhere most people in this town have never been and may not believe
+      exists. You carry knowledge that changes what Ironhaven means to you. It is the same
+      town. But you know what it is built on now, and that knowledge is not returnable.
+    choices:
+      - id: return_to_tend_it
+        label: Commit to returning regularly. The shrine needs what it has always needed.
+        consequences:
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+          - type: stat
+            target: charisma
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: tell_someone_everything
+        label: Tell someone everything, the complete truth, because carrying this alone is too much
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shrine_companion_impact
+
+  shrine_companion_impact:
+    id: shrine_companion_impact
+    text: >-
+      {companion.name} handles what you share better than you expected. They are not dismissive
+      and not alarmed. They ask three practical questions: How often do you need to go back?
+      What would happen if nobody went back? Can you teach them what to do in case something
+      happens to you? Their practicality is a relief. You have been sitting with something vast
+      and they have immediately begun treating it as a problem to be managed.
+    choices:
+      - id: welcome_companions_help
+        label: Welcome {companion.name}'s practical approach and begin planning together
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 3
+            axis: trust
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: be_glad_of_companion
+        label: Be grateful for {companion.name} without immediately planning, some things need to settle
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: affection
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 0
+        nextNodeId: null
+      - id: teach_companion_basics
+        label: Teach {companion.name} the basics of what you understand so far
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+
+  shrine_second_visit:
+    id: shrine_second_visit
+    text: >-
+      The second time you visit the shrine it is easier to descend and harder to leave.
+      The disc on the altar is unmistakably warmer than it was. You have been attuned to it,
+      or it to you. {companion.name} waits at the arch while you approach the altar. The worn
+      depressions in the floor where generations of keepers stood feel, this time, like an
+      invitation rather than a record. You understand what it would mean to step into them.
+    choices:
+      - id: step_into_worn_depressions
+        label: Step into the worn spots and take the keeper's position deliberately
+        consequences:
+          - type: stat
+            target: charisma
+            value: 2
+          - type: world_fact
+            target: shrine_keeper_role
+            value: true
+          - type: world_fact
+            target: shrine_honored
+            value: true
+          - type: world_fact
+            target: marking_embraced
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: hold_back_from_depressions
+        label: Hold back. You are not ready to commit to the position yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+          - type: world_fact
+            target: shrine_honored
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shrine_temptation
+      - id: bring_companion_to_altar
+        label: Bring {companion.name} to the altar this time, let them see it fully
+        consequences:
+          - type: relationship
+            target: '{companion.id}'
+            value: 2
+            axis: trust
+          - type: world_fact
+            target: shrine_lore_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: shrine_long_shadow
+
+  shrine_keeper_decision:
+    id: shrine_keeper_decision
+    text: >-
+      The ledger named a keeper. You have had time to think about what that means
+      and what it would cost. The shrine does not demand. But it has a weight that
+      does not diminish with distance. Whether you take on the keeper role formally,
+      pass it to someone better suited, or simply acknowledge that someone must do
+      it, the decision is yours to make or refuse.
+    choices:
+      - id: accept_keeper_role_formally
+        label: Accept the role. The shrine needs a keeper and you are here.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: shrine_keeper_known
+            value: true
+        exhaustionCost: 2
+        nextNodeId: null
+      - id: delegate_to_someone_suited
+        label: Find someone better suited and pass on what you know
+        consequences:
+          - type: stat
+            target: charisma
+            value: 1
+          - type: world_fact
+            target: shrine_keeper_known
+            value: true
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: keep_watch_without_committing
+        label: Keep watch without committing. You are not ready to name it a role yet.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 1
+        exhaustionCost: 0
+        nextNodeId: null
+
+  shrine_after_crack:
+    id: shrine_after_crack
+    text: >-
+      The crack in the disc is not widening. You checked. But it changed the nature
+      of the place: what had been sealed is now ambiguous. The scholar would want to
+      know. The priest would want to close it. You may want neither of those things.
+      Whatever the disc was protecting or containing, it is now less contained than it
+      was, and that matters in ways you cannot fully calculate yet.
+    choices:
+      - id: report_crack_and_let_others_decide
+        label: Report the crack to whoever is most qualified to advise. This is beyond you alone.
+        consequences:
+          - type: world_fact
+            target: shrine_keeper_known
+            value: true
+          - type: faction
+            target: village_folk
+            value: 1
+        exhaustionCost: 1
+        nextNodeId: null
+      - id: keep_monitoring_it_yourself
+        label: Keep monitoring it yourself. You want to understand it before you involve others.
+        consequences:
+          - type: stat
+            target: cunning
+            value: 2
+          - type: world_fact
+            target: shrine_keeper_known
+            value: true
+        exhaustionCost: 1
         nextNodeId: null
