@@ -1,0 +1,21 @@
+id: ned_baker_1775698922099
+name: Ned
+archetypeId: baker
+traits:
+  strength: 4
+  cunning: 5
+  charisma: 6
+skills:
+  - baking
+  - cooking
+  - early-rising
+locationId: ''
+factions:
+  guild: 3
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true
