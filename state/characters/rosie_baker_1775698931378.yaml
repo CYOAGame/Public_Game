@@ -1,0 +1,20 @@
+id: rosie_baker_1775698931378
+name: Rosie
+archetypeId: baker
+traits:
+  strength: 4
+  cunning: 4
+  charisma: 8
+skills:
+  - baking
+  - cooking
+  - early-rising
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true

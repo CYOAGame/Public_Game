@@ -1,1 +1,31 @@
-[]
+- id: entry_1775699027428
+  date:
+    year: 845
+    season: spring
+    day: 1
+  characterId: ned_baker_1775698922099
+  eventTemplateId: the_recipe
+  choicesMade:
+    - check_the_book
+    - bring_evidence
+    - write_it_properly
+  consequences:
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: recipe_theft_investigated
+      value: true
+    - type: faction
+      target: guild
+      value: 1
+    - type: world_fact
+      target: recipe_dispute_to_guild
+      value: true
+    - type: faction
+      target: guild
+      value: 2
+    - type: world_fact
+      target: recipe_formally_recorded
+      value: true
+  summary: Ned made 3 choices.
