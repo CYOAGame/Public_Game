@@ -130,7 +130,7 @@ nodes:
         exhaustionCost: 2
         nextNodeId: resolution
       - id: offer_partnership
-        label: Surprise them: offer to share the recipe on formal terms, with credit
+        label: "Surprise them, offer to share the recipe on formal terms, with credit"
         consequences:
           - type: stat
             target: cunning
