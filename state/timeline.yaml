@@ -29,3 +29,28 @@
       target: recipe_formally_recorded
       value: true
   summary: Ned made 3 choices.
+- id: entry_1775959441855
+  date:
+    year: 845
+    season: spring
+    day: 1
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: the_exile_road
+  choicesMade:
+    - pass_by
+    - press_on
+    - pass_by
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: world_fact
+      target: exile_road_continues
+      value: true
+    - type: stat
+      target: strength
+      value: 1
+  summary: Drift made 3 choices.
