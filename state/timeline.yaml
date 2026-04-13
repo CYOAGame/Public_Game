@@ -1,507 +1,75 @@
-- id: entry_1775699027428
+- id: entry_1776123021306
   date:
-    year: 845
-    season: spring
-    day: 1
-  characterId: ned_baker_1775698922099
-  eventTemplateId: the_recipe
-  choicesMade:
-    - check_the_book
-    - bring_evidence
-    - write_it_properly
-  consequences:
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: recipe_theft_investigated
-      value: true
-    - type: faction
-      target: guild
-      value: 1
-    - type: world_fact
-      target: recipe_dispute_to_guild
-      value: true
-    - type: faction
-      target: guild
-      value: 2
-    - type: world_fact
-      target: recipe_formally_recorded
-      value: true
-  summary: Ned made 3 choices.
-- id: entry_1775959441855
-  date:
-    year: 845
-    season: spring
-    day: 1
+    year: 821
+    season: autumn
+    day: 17
   characterId: drift_wanderer_1775959358972
   eventTemplateId: the_exile_road
   choicesMade:
-    - pass_by
-    - press_on
-    - pass_by
+    - approach_openly
+    - accept_gratefully
+    - ask_their_name
+    - follow_their_advice
+    - approach_cautiously
+    - offer_work
+    - ask_their_name
+    - follow_their_advice
   consequences:
     - type: stat
-      target: strength
+      target: charisma
       value: 1
+    - type: world_fact
+      target: shelter_sought_openly
+      value: true
     - type: stat
-      target: strength
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{kind_stranger.id}'
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{kind_stranger.id}'
+      value: 2
+    - type: world_fact
+      target: kind_stranger_remembered
+      value: true
+    - type: stat
+      target: cunning
       value: 1
     - type: world_fact
       target: exile_road_continues
       value: true
     - type: stat
-      target: strength
-      value: 1
-  summary: Drift made 3 choices.
-- id: entry_1776050082820
-  date:
-    year: 845
-    season: spring
-    day: 1
-  characterId: livia_scholar_1776049980827
-  eventTemplateId: the_translation
-  choicesMade:
-    - consult_your_references
-    - continue_translating
-    - give_partial_translation
-  consequences:
-    - type: stat
-      target: cunning
-      value: 2
-    - type: world_fact
-      target: translation_begun
-      value: true
-    - type: stat
-      target: cunning
-      value: 2
-    - type: world_fact
-      target: translation_progressing
-      value: true
-    - type: stat
-      target: cunning
-      value: 2
-    - type: world_fact
-      target: translation_partial_delivered
-      value: true
-  summary: Livia made 3 choices.
-- id: entry_1776051754565
-  date:
-    year: 845
-    season: spring
-    day: 1
-  characterId: patch_beggar_1776051653869
-  eventTemplateId: the-trial-of-loyalties
-  choicesMade:
-    - push_forward
-    - speak_for_accused
-    - hold_position
-    - approach_witness
-    - press_witness_now
-    - cannot_promise
-    - find_witness_choice
-    - thank_witness_carefully
-    - examine_evidence_choice
-    - note_seal_quietly
-  consequences:
-    - type: relationship
-      target: accused
-      value: 2
-    - type: relationship
-      target: accuser
-      value: -1
-    - type: relationship
-      target: accused
-      value: 1
-    - type: relationship
-      target: judge
-      value: 1
-    - type: relationship
-      target: witness
-      value: 1
-    - type: relationship
-      target: witness
-      value: 1
-    - type: relationship
-      target: witness
-      value: -1
-    - type: world_fact
-      target: witness_told_player
-      value: true
-    - type: world_fact
-      target: found_seal_impression
-      value: true
-    - type: stat
-      target: cunning
-      value: 2
-  summary: Patch made 10 choices.
-- id: entry_1776122433788
-  date:
-    year: 845
-    season: spring
-    day: 1
-  characterId: drift_wanderer_1775959358972
-  eventTemplateId: gathering_herbs
-  choicesMade:
-    - venture_deeper
-    - investigate_sound
-    - venture_deeper
-    - investigate_sound
-  consequences:
-    - type: stat
-      target: strength
-      value: 1
-    - type: world_fact
-      target: forest_depths_explored
-      value: true
-    - type: stat
       target: cunning
       value: 1
     - type: world_fact
-      target: forest_creature_encountered
+      target: shelter_sought_carefully
       value: true
     - type: stat
       target: strength
-      value: 1
-    - type: world_fact
-      target: forest_depths_explored
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: forest_creature_encountered
-      value: true
-  summary: Drift made 4 choices.
-- id: entry_1776122527755
-  date:
-    year: 855
-    season: summer
-    day: 25
-  characterId: drift_wanderer_1775959358972
-  eventTemplateId: wolf_den
-  choicesMade:
-    - find_another_way
-    - keep_it_between_you
-    - keep_clearing_to_self
-    - plan_to_return_to_clearing
-    - bring_hunter_to_clearing
-    - report_revelation_to_scholar
-    - ask_shepherd_to_watch_for_wolves
-    - let_sleeping_wolves_lie
-    - leave_it_for_now
-    - let_the_account_drift
-  consequences:
-    - type: stat
-      target: cunning
       value: 2
-    - type: world_fact
-      target: wolves_spared
-      value: true
     - type: relationship
-      target: '{hunter.id}'
-      value: 2
-    - type: stat
-      target: cunning
+      target: '{kind_stranger.id}'
       value: 1
     - type: world_fact
-      target: ashwood_secret_kept
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: wolf_clearing_found
-      value: true
-    - type: relationship
-      target: '{hunter.id}'
-      value: 2
-    - type: world_fact
-      target: ashwood_truth_shared
-      value: true
-    - type: world_fact
-      target: wolf_clearing_found
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: ashwood_truth_shared
-      value: true
-    - type: world_fact
-      target: wolf_clearing_found
-      value: true
-    - type: relationship
-      target: '{shepherd.id}'
-      value: 1
-    - type: world_fact
-      target: wolves_tracked
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: stat
-      target: cunning
-      value: 1
-    - type: stat
-      target: cunning
-      value: 1
-  summary: Drift made 10 choices.
-- id: entry_1776122618067
-  date:
-    year: 868
-    season: autumn
-    day: 23
-  characterId: drift_wanderer_1775959358972
-  eventTemplateId: caravan_arrival
-  choicesMade:
-    - offer_to_help_unload
-    - accept_offer
-    - speak_to_master
-    - answer_honestly
-    - speak_to_master
-    - answer_honestly
-    - speak_to_master
-    - answer_honestly
-  consequences:
-    - type: stat
-      target: strength
-      value: 1
-    - type: relationship
-      target: '{caravan_master.id}'
-      value: 2
-    - type: world_fact
-      target: caravan_arrived
-      value: true
-    - type: relationship
-      target: '{caravan_master.id}'
-      value: 2
-    - type: world_fact
-      target: caravan_insider
+      target: labor_offered_in_trade
       value: true
     - type: stat
       target: charisma
       value: 1
     - type: relationship
-      target: '{caravan_master.id}'
-      value: 1
+      target: '{kind_stranger.id}'
+      value: 2
     - type: world_fact
-      target: caravan_arrived
-      value: true
-    - type: relationship
-      target: '{caravan_master.id}'
-      value: 3
-    - type: world_fact
-      target: caravan_insider
+      target: kind_stranger_remembered
       value: true
     - type: stat
-      target: charisma
-      value: 1
-    - type: relationship
-      target: '{caravan_master.id}'
+      target: cunning
       value: 1
     - type: world_fact
-      target: caravan_arrived
-      value: true
-    - type: relationship
-      target: '{caravan_master.id}'
-      value: 3
-    - type: world_fact
-      target: caravan_insider
-      value: true
-    - type: stat
-      target: charisma
-      value: 1
-    - type: relationship
-      target: '{caravan_master.id}'
-      value: 1
-    - type: world_fact
-      target: caravan_arrived
-      value: true
-    - type: relationship
-      target: '{caravan_master.id}'
-      value: 3
-    - type: world_fact
-      target: caravan_insider
+      target: exile_road_continues
       value: true
   summary: Drift made 8 choices.
-- id: entry_1776122703531
-  date:
-    year: 884
-    season: winter
-    day: 16
-  characterId: drift_wanderer_1775959358972
-  eventTemplateId: traveler_arrives
-  choicesMade:
-    - take_to_guard
-    - pass_on_warning
-    - honest_answer_stranger
-    - listen_fully
-    - ask_whose_name
-    - need_to_see_proof
-    - commit_to_helping
-    - agree_to_carry_word
-  consequences:
-    - type: faction
-      target: town_guard
-      value: 2
-    - type: relationship
-      target: '{guard.id}'
-      value: 2
-    - type: world_fact
-      target: traveler_reported
-      value: true
-    - type: faction
-      target: town_guard
-      value: 1
-    - type: relationship
-      target: '{traveler.id}'
-      value: 1
-    - type: world_fact
-      target: satchel_warning_passed
-      value: true
-    - type: faction
-      target: town_guard
-      value: 1
-    - type: relationship
-      target: '{guard.id}'
-      value: 1
-    - type: relationship
-      target: '{traveler.id}'
-      value: 2
-    - type: stat
-      target: cunning
-      value: 1
-    - type: relationship
-      target: '{traveler.id}'
-      value: 1
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: fraud_documents_known
-      value: true
-    - type: relationship
-      target: '{traveler.id}'
-      value: 3
-    - type: world_fact
-      target: fraud_documents_known
-      value: true
-    - type: world_fact
-      target: helping_expose_fraud
-      value: true
-    - type: relationship
-      target: '{traveler.id}'
-      value: 2
-    - type: world_fact
-      target: millers_widow_contacted
-      value: true
-  summary: Drift made 8 choices.
-- id: entry_1776122863427
-  date:
-    year: 892
-    season: winter
-    day: 2
-  characterId: drift_wanderer_1775959358972
-  eventTemplateId: blessing_or_curse
-  choicesMade:
-    - seek_help
-    - use_it_sparingly
-    - tell_priest_about_marking
-    - accept_after_priest
-    - ask_wise_woman_to_help
-    - trust_wise_womans_guidance
-    - seek_help
-    - use_it_sparingly
-    - tell_priest_about_marking
-    - accept_after_priest
-    - ask_wise_woman_to_help
-  consequences:
-    - type: stat
-      target: cunning
-      value: 1
-    - type: relationship
-      target: '{wise_woman.id}'
-      value: 2
-    - type: world_fact
-      target: marking_investigated
-      value: true
-    - type: stat
-      target: cunning
-      value: 2
-    - type: world_fact
-      target: marking_understood
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: priest_knows_about_cellar
-      value: true
-    - type: stat
-      target: charisma
-      value: 2
-    - type: world_fact
-      target: shrine_keeper_role
-      value: true
-    - type: world_fact
-      target: marking_embraced
-      value: true
-    - type: world_fact
-      target: priest_knows_about_cellar
-      value: true
-    - type: relationship
-      target: '{wise_woman.id}'
-      value: 2
-    - type: world_fact
-      target: shrine_keeper_role
-      value: true
-    - type: relationship
-      target: '{wise_woman.id}'
-      value: 2
-    - type: world_fact
-      target: shrine_keeper_role
-      value: true
-    - type: world_fact
-      target: marking_understood
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: relationship
-      target: '{wise_woman.id}'
-      value: 2
-    - type: world_fact
-      target: marking_investigated
-      value: true
-    - type: stat
-      target: cunning
-      value: 2
-    - type: world_fact
-      target: marking_understood
-      value: true
-    - type: stat
-      target: cunning
-      value: 1
-    - type: world_fact
-      target: priest_knows_about_cellar
-      value: true
-    - type: stat
-      target: charisma
-      value: 2
-    - type: world_fact
-      target: shrine_keeper_role
-      value: true
-    - type: world_fact
-      target: marking_embraced
-      value: true
-    - type: world_fact
-      target: priest_knows_about_cellar
-      value: true
-    - type: relationship
-      target: '{wise_woman.id}'
-      value: 2
-    - type: world_fact
-      target: shrine_keeper_role
-      value: true
-  summary: Drift made 11 choices.
