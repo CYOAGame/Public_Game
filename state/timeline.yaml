@@ -397,3 +397,111 @@
       target: millers_widow_contacted
       value: true
   summary: Drift made 8 choices.
+- id: entry_1776122863427
+  date:
+    year: 892
+    season: winter
+    day: 2
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: blessing_or_curse
+  choicesMade:
+    - seek_help
+    - use_it_sparingly
+    - tell_priest_about_marking
+    - accept_after_priest
+    - ask_wise_woman_to_help
+    - trust_wise_womans_guidance
+    - seek_help
+    - use_it_sparingly
+    - tell_priest_about_marking
+    - accept_after_priest
+    - ask_wise_woman_to_help
+  consequences:
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: marking_investigated
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: marking_understood
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: priest_knows_about_cellar
+      value: true
+    - type: stat
+      target: charisma
+      value: 2
+    - type: world_fact
+      target: shrine_keeper_role
+      value: true
+    - type: world_fact
+      target: marking_embraced
+      value: true
+    - type: world_fact
+      target: priest_knows_about_cellar
+      value: true
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: shrine_keeper_role
+      value: true
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: shrine_keeper_role
+      value: true
+    - type: world_fact
+      target: marking_understood
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: marking_investigated
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: marking_understood
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: priest_knows_about_cellar
+      value: true
+    - type: stat
+      target: charisma
+      value: 2
+    - type: world_fact
+      target: shrine_keeper_role
+      value: true
+    - type: world_fact
+      target: marking_embraced
+      value: true
+    - type: world_fact
+      target: priest_knows_about_cellar
+      value: true
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: shrine_keeper_role
+      value: true
+  summary: Drift made 11 choices.

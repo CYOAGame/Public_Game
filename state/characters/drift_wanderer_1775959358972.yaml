@@ -3,8 +3,8 @@ name: Drift
 archetypeId: wanderer
 traits:
   strength: 10
-  cunning: 17
-  charisma: 10
+  cunning: 29
+  charisma: 14
 skills:
   - navigation
   - survival
@@ -35,6 +35,14 @@ relationships:
     axes:
       trust: 7
       affection: 2
+  guard_contact:
+    tags: []
+    axes:
+      trust: 1
+  hilda_farmer_1776122820863:
+    tags: []
+    axes:
+      trust: 10
 birthDate:
   year: 800
   season: spring
