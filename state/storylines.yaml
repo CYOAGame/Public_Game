@@ -1,54 +1,54 @@
 sealed_depths:
   currentChapter: 1
-  tension: 62
+  tension: 71
   lastPlayerSession: null
   lastEscalationDate: null
   npcDriverId: null
 faith_and_superstition:
-  currentChapter: 1
-  tension: 61
+  currentChapter: 2
+  tension: 3
   lastPlayerSession: entry_1776050282180
   lastEscalationDate: null
-  npcDriverId: null
+  npcDriverId: drift_wanderer_1775959358972
 demon_war:
   currentChapter: 2
-  tension: 16
+  tension: 29
   lastPlayerSession: null
   lastEscalationDate: null
   npcDriverId: livia_scholar_1776049980827
 guild_conflict:
   currentChapter: 2
-  tension: 3
+  tension: 14
   lastPlayerSession: entry_1776050183285
   lastEscalationDate: null
   npcDriverId: ned_baker_1775698922099
 town_politics:
   currentChapter: 1
-  tension: 34
+  tension: 61
   lastPlayerSession: entry_1776050501328
   lastEscalationDate: null
   npcDriverId: null
 traveler_mystery:
   currentChapter: 1
-  tension: 58
+  tension: 70
   lastPlayerSession: null
   lastEscalationDate: null
   npcDriverId: null
 market_conspiracy:
   currentChapter: 2
-  tension: 10
+  tension: 18
   lastPlayerSession: null
   lastEscalationDate: null
   npcDriverId: lydia_merchant_1776050141039
 trial_of_loyalties:
   currentChapter: 1
-  tension: 60
-  lastPlayerSession: null
+  tension: 0
+  lastPlayerSession: entry_1776051754565
   lastEscalationDate: null
   npcDriverId: null
 wolf_hunt:
   currentChapter: 1
-  tension: 0
+  tension: 13
   lastPlayerSession: entry_1776050602464
   lastEscalationDate: null
   npcDriverId: null

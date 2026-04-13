@@ -1,0 +1,20 @@
+id: voss_soldier_1776051660719
+name: Voss
+archetypeId: soldier
+traits:
+  strength: 9
+  cunning: 5
+  charisma: 4
+skills:
+  - swordsmanship
+  - tactics
+  - endurance
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true
