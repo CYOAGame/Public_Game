@@ -32,6 +32,10 @@ warned_guild: true
 corruption_reported: true
 corruption_tied_to_guild: true
 agreed_to_testify: true
-loyalties_tested: true
+wolves_tracked: true
 forest_depths_explored: true
-herbs_gathered: true
+forest_creature_encountered: true
+loyalties_tested: true
+wolves_spared: true
+ashwood_secret_kept: true
+wolf_clearing_found: true
