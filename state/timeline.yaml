@@ -247,3 +247,153 @@
       target: cunning
       value: 1
   summary: Drift made 10 choices.
+- id: entry_1776122618067
+  date:
+    year: 868
+    season: autumn
+    day: 23
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: caravan_arrival
+  choicesMade:
+    - offer_to_help_unload
+    - accept_offer
+    - speak_to_master
+    - answer_honestly
+    - speak_to_master
+    - answer_honestly
+    - speak_to_master
+    - answer_honestly
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 2
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 2
+    - type: world_fact
+      target: caravan_insider
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 1
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 3
+    - type: world_fact
+      target: caravan_insider
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 1
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 3
+    - type: world_fact
+      target: caravan_insider
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 1
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 3
+    - type: world_fact
+      target: caravan_insider
+      value: true
+  summary: Drift made 8 choices.
+- id: entry_1776122703531
+  date:
+    year: 884
+    season: winter
+    day: 16
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: traveler_arrives
+  choicesMade:
+    - take_to_guard
+    - pass_on_warning
+    - honest_answer_stranger
+    - listen_fully
+    - ask_whose_name
+    - need_to_see_proof
+    - commit_to_helping
+    - agree_to_carry_word
+  consequences:
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{guard.id}'
+      value: 2
+    - type: world_fact
+      target: traveler_reported
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 1
+    - type: world_fact
+      target: satchel_warning_passed
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: relationship
+      target: '{guard.id}'
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: fraud_documents_known
+      value: true
+    - type: relationship
+      target: '{traveler.id}'
+      value: 3
+    - type: world_fact
+      target: fraud_documents_known
+      value: true
+    - type: world_fact
+      target: helping_expose_fraud
+      value: true
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: world_fact
+      target: millers_widow_contacted
+      value: true
+  summary: Drift made 8 choices.
