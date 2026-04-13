@@ -5,3 +5,7 @@ exile_road_continues: true
 translation_begun: true
 translation_progressing: true
 translation_partial_delivered: true
+guild_dispute: true
+omen_felt: true
+omen_investigated: true
+food_stockpiled: true

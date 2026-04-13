@@ -3,7 +3,7 @@ name: Livia
 archetypeId: scholar
 traits:
   strength: 2
-  cunning: 14
+  cunning: 17
   charisma: 6
 skills:
   - reading
@@ -11,7 +11,15 @@ skills:
   - languages
 locationId: ''
 factions: {}
-relationships: {}
+relationships:
+  garrick_blacksmith_1776050141039:
+    tags: []
+    axes:
+      trust: 2
+  oswin_farmer_1776050141039:
+    tags: []
+    axes:
+      trust: 2
 birthDate:
   year: 800
   season: spring

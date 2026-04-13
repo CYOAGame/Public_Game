@@ -1,0 +1,20 @@
+id: lydia_merchant_1776050141039
+name: Lydia
+archetypeId: merchant
+traits:
+  strength: 5
+  cunning: 9
+  charisma: 7
+skills:
+  - haggling
+  - appraisal
+  - navigation
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true
