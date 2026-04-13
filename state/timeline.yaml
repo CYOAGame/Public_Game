@@ -73,3 +73,129 @@
       target: exile_road_continues
       value: true
   summary: Drift made 8 choices.
+- id: entry_1776123204728
+  date:
+    year: 835
+    season: autumn
+    day: 17
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: ancient_tree
+  choicesMade:
+    - study_carvings
+    - keep_the_knowledge
+    - study_carvings
+    - keep_the_knowledge
+    - study_carvings
+    - keep_the_knowledge
+  consequences:
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: ancient_tree_studied
+      value: true
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: confluence_map_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: ancient_tree_studied
+      value: true
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: confluence_map_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: ancient_tree_studied
+      value: true
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: confluence_map_known
+      value: true
+  summary: Drift made 6 choices.
+- id: entry_1776123281823
+  date:
+    year: 845
+    season: spring
+    day: 19
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: traveler_arrives
+  choicesMade:
+    - help_and_hide
+    - ask_whats_inside
+    - ask_whose_name
+    - believe_them
+    - agree_to_carry_word
+    - confront_riders
+    - go_to_guard_after
+  consequences:
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 3
+    - type: world_fact
+      target: traveler_hidden
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: world_fact
+      target: fraud_documents_known
+      value: true
+    - type: world_fact
+      target: helping_expose_fraud
+      value: true
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: world_fact
+      target: millers_widow_contacted
+      value: true
+    - type: stat
+      target: charisma
+      value: 2
+    - type: world_fact
+      target: riders_confronted
+      value: true
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: world_fact
+      target: riders_reported
+      value: true
+  summary: Drift made 7 choices.
