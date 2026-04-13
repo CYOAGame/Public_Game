@@ -1,0 +1,19 @@
+id: hilda_farmer_1776122820863
+name: Hilda
+archetypeId: farmer
+traits:
+  strength: 6
+  cunning: 4
+  charisma: 6
+skills:
+  - farming
+  - animal-care
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true
