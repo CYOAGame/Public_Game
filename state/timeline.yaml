@@ -85,3 +85,61 @@
       target: translation_partial_delivered
       value: true
   summary: Livia made 3 choices.
+- id: entry_1776050183285
+  date:
+    year: 864
+    season: summer
+    day: 1
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: guild_tensions
+  choicesMade:
+    - watch_and_leave
+  consequences:
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: guild_dispute
+      value: true
+  summary: Livia made 1 choice.
+- id: entry_1776050282180
+  date:
+    year: 864
+    season: summer
+    day: 5
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: bad_omen
+  choicesMade:
+    - feel_genuine_fear
+    - admit_it
+    - take_it_seriously
+    - make_preparations
+  consequences:
+    - type: world_fact
+      target: omen_felt
+      value: true
+    - type: world_fact
+      target: omen_investigated
+      value: true
+    - type: relationship
+      target: '{neighbor.id}'
+      value: 2
+    - type: world_fact
+      target: omen_felt
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{elder.id}'
+      value: 2
+    - type: world_fact
+      target: omen_investigated
+      value: true
+    - type: world_fact
+      target: food_stockpiled
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+  summary: Livia made 4 choices.
