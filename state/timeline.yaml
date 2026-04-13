@@ -245,3 +245,53 @@
       target: ashwood_truth_shared
       value: true
   summary: Livia made 5 choices.
+- id: entry_1776051754565
+  date:
+    year: 845
+    season: spring
+    day: 1
+  characterId: patch_beggar_1776051653869
+  eventTemplateId: the-trial-of-loyalties
+  choicesMade:
+    - push_forward
+    - speak_for_accused
+    - hold_position
+    - approach_witness
+    - press_witness_now
+    - cannot_promise
+    - find_witness_choice
+    - thank_witness_carefully
+    - examine_evidence_choice
+    - note_seal_quietly
+  consequences:
+    - type: relationship
+      target: accused
+      value: 2
+    - type: relationship
+      target: accuser
+      value: -1
+    - type: relationship
+      target: accused
+      value: 1
+    - type: relationship
+      target: judge
+      value: 1
+    - type: relationship
+      target: witness
+      value: 1
+    - type: relationship
+      target: witness
+      value: 1
+    - type: relationship
+      target: witness
+      value: -1
+    - type: world_fact
+      target: witness_told_player
+      value: true
+    - type: world_fact
+      target: found_seal_impression
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+  summary: Patch made 10 choices.
