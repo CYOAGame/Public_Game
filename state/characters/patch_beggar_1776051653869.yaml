@@ -1,0 +1,36 @@
+id: patch_beggar_1776051653869
+name: Patch
+archetypeId: beggar
+traits:
+  strength: 4
+  cunning: 7
+  charisma: 5
+skills:
+  - observation
+  - begging
+  - eavesdropping
+locationId: ''
+factions: {}
+relationships:
+  accused:
+    tags: []
+    axes:
+      trust: 3
+  accuser:
+    tags: []
+    axes:
+      trust: -1
+  judge:
+    tags: []
+    axes:
+      trust: 1
+  witness:
+    tags: []
+    axes:
+      trust: 1
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true

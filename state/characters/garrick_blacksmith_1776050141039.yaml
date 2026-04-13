@@ -1,0 +1,19 @@
+id: garrick_blacksmith_1776050141039
+name: Garrick
+archetypeId: blacksmith
+traits:
+  strength: 8
+  cunning: 4
+  charisma: 6
+skills:
+  - forging
+  - haggling
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true
