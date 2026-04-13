@@ -2,9 +2,9 @@ id: livia_scholar_1776049980827
 name: Livia
 archetypeId: scholar
 traits:
-  strength: 2
-  cunning: 26
-  charisma: 8
+  strength: 3
+  cunning: 33
+  charisma: 11
 skills:
   - reading
   - history
@@ -13,7 +13,7 @@ locationId: ''
 factions:
   nobility: 1
   village_folk: 4
-  town_guard: 1
+  town_guard: 10
 relationships:
   garrick_blacksmith_1776050141039:
     tags: []
@@ -27,6 +27,23 @@ relationships:
     tags: []
     axes:
       trust: 3
+  voss_soldier_1776120462780:
+    tags: []
+    axes:
+      trust: 3
+  lydia_merchant_1776050141039:
+    tags: []
+    axes:
+      trust: 1
+      affection: 6
+  aldric_soldier_1776121404563:
+    tags: []
+    axes:
+      fear: -2
+  brenna_soldier_1776121404563:
+    tags: []
+    axes:
+      respect: 3
 birthDate:
   year: 800
   season: spring

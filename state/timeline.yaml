@@ -295,3 +295,155 @@
       target: cunning
       value: 2
   summary: Patch made 10 choices.
+- id: entry_1776121090773
+  date:
+    year: 869
+    season: spring
+    day: 23
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: traveler_arrives
+  choicesMade:
+    - take_to_guard
+    - pass_on_warning
+    - honest_answer_stranger
+    - listen_fully
+    - ask_what_they_need
+    - offer_to_go_with_them
+    - buy_time_misdirect
+  consequences:
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{guard.id}'
+      value: 2
+    - type: world_fact
+      target: traveler_reported
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 1
+    - type: world_fact
+      target: satchel_warning_passed
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: relationship
+      target: '{guard.id}'
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{traveler.id}'
+      value: 2
+    - type: world_fact
+      target: escorting_traveler
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: riders_misdirected
+      value: true
+  summary: Livia made 7 choices.
+- id: entry_1776121693217
+  date:
+    year: 875
+    season: winter
+    day: 20
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: guard_corruption
+  choicesMade:
+    - refuse
+    - confront_directly
+    - demand_repayment
+    - stay_involved
+    - stall_for_time
+    - pay_in_morning
+    - change_mind_report
+    - add_context_about_guild
+    - accept_fully
+    - stay_visible
+    - stay_involved
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: faction
+      target: town_guard
+      value: -2
+    - type: world_fact
+      target: corruption_refused
+      value: true
+    - type: stat
+      target: charisma
+      value: 2
+    - type: relationship
+      target: '{corrupt_guard.id}'
+      value: -2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: corruption_paid
+      value: false
+    - type: world_fact
+      target: warned_guild
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: corruption_paid
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: world_fact
+      target: corruption_reported
+      value: true
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: corruption_tied_to_guild
+      value: true
+    - type: faction
+      target: town_guard
+      value: 3
+    - type: relationship
+      target: '{captain.id}'
+      value: 3
+    - type: world_fact
+      target: corruption_reported
+      value: true
+    - type: world_fact
+      target: agreed_to_testify
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: world_fact
+      target: warned_guild
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+  summary: Livia made 11 choices.

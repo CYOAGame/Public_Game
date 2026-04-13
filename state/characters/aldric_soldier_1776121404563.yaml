@@ -1,0 +1,20 @@
+id: aldric_soldier_1776121404563
+name: Aldric
+archetypeId: soldier
+traits:
+  strength: 9
+  cunning: 5
+  charisma: 2
+skills:
+  - swordsmanship
+  - tactics
+  - endurance
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true

@@ -20,3 +20,15 @@ ashwood_truth_shared: true
 shrine_disturbed: true
 witness_told_player: true
 found_seal_impression: true
+spoke_at_meeting: true
+traveler_reported: true
+satchel_warning_passed: true
+escorting_traveler: true
+riders_misdirected: true
+depths_explored: true
+corruption_refused: true
+corruption_paid: true
+warned_guild: true
+corruption_reported: true
+corruption_tied_to_guild: true
+agreed_to_testify: true
