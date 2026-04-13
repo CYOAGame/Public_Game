@@ -54,3 +54,34 @@
       target: strength
       value: 1
   summary: Drift made 3 choices.
+- id: entry_1776050082820
+  date:
+    year: 845
+    season: spring
+    day: 1
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: the_translation
+  choicesMade:
+    - consult_your_references
+    - continue_translating
+    - give_partial_translation
+  consequences:
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: translation_begun
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: translation_progressing
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: translation_partial_delivered
+      value: true
+  summary: Livia made 3 choices.

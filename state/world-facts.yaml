@@ -2,3 +2,6 @@ recipe_theft_investigated: true
 recipe_dispute_to_guild: true
 recipe_formally_recorded: true
 exile_road_continues: true
+translation_begun: true
+translation_progressing: true
+translation_partial_delivered: true
