@@ -1,0 +1,20 @@
+id: kira_soldier_1776123267786
+name: Kira
+archetypeId: soldier
+traits:
+  strength: 7
+  cunning: 3
+  charisma: 5
+skills:
+  - swordsmanship
+  - tactics
+  - endurance
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true

@@ -63,3 +63,8 @@ shelter_sought_openly: true
 kind_stranger_remembered: true
 shelter_sought_carefully: true
 labor_offered_in_trade: true
+ancient_tree_studied: true
+confluence_map_known: true
+traveler_hidden: true
+riders_confronted: true
+riders_reported: true
