@@ -55,3 +55,11 @@ marking_understood: true
 priest_knows_about_cellar: true
 shrine_keeper_role: true
 marking_embraced: true
+sided_with_accuser_publicly: true
+investigated_stores: true
+knows_key_holders: true
+witness_convinced: true
+shelter_sought_openly: true
+kind_stranger_remembered: true
+shelter_sought_carefully: true
+labor_offered_in_trade: true
