@@ -2,8 +2,8 @@ id: drift_wanderer_1775959358972
 name: Drift
 archetypeId: wanderer
 traits:
-  strength: 8
-  cunning: 11
+  strength: 9
+  cunning: 15
   charisma: 7
 skills:
   - navigation
@@ -11,7 +11,16 @@ skills:
   - storytelling
 locationId: ''
 factions: {}
-relationships: {}
+relationships:
+  brenna_soldier_1776121404563:
+    tags: []
+    axes:
+      respect: 2
+      trust: 2
+  '{shepherd.id}':
+    tags: []
+    axes:
+      trust: 1
 birthDate:
   year: 800
   season: spring
