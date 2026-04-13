@@ -1,0 +1,20 @@
+id: livia_scholar_1776049980827
+name: Livia
+archetypeId: scholar
+traits:
+  strength: 2
+  cunning: 14
+  charisma: 6
+skills:
+  - reading
+  - history
+  - languages
+locationId: ''
+factions: {}
+relationships: {}
+birthDate:
+  year: 800
+  season: spring
+  day: 1
+deathDate: null
+alive: true
