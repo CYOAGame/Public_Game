@@ -143,3 +143,105 @@
       target: cunning
       value: 1
   summary: Livia made 4 choices.
+- id: entry_1776050501328
+  date:
+    year: 866
+    season: spring
+    day: 23
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: town_meeting
+  choicesMade:
+    - arrive_late_deliberately
+    - identify_the_recorder
+    - watch_what_they_write
+    - use_knowledge_quietly
+    - take_to_magistrate
+  consequences:
+    - type: stat
+      target: cunning
+      value: 2
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: meeting_observer_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: political_player_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: political_player_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: nobility
+      value: 1
+    - type: world_fact
+      target: magistrate_ally
+      value: true
+  summary: Livia made 5 choices.
+- id: entry_1776050602464
+  date:
+    year: 866
+    season: autumn
+    day: 26
+  characterId: livia_scholar_1776049980827
+  eventTemplateId: wolf_sighting
+  choicesMade:
+    - warn_shepherds
+    - tell_hunter
+    - report_and_wait
+    - tell_everything
+    - correct_the_story
+  consequences:
+    - type: faction
+      target: village_folk
+      value: 2
+    - type: relationship
+      target: '{shepherd.id}'
+      value: 3
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{hunter.id}'
+      value: 1
+    - type: world_fact
+      target: upright_creature_reported
+      value: true
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: world_fact
+      target: ashwood_alert_raised
+      value: true
+    - type: relationship
+      target: '{shepherd.id}'
+      value: 1
+    - type: relationship
+      target: '{hunter.id}'
+      value: 2
+    - type: faction
+      target: village_folk
+      value: 1
+    - type: world_fact
+      target: ashwood_truth_shared
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: village_folk
+      value: 1
+    - type: world_fact
+      target: ashwood_truth_shared
+      value: true
+  summary: Livia made 5 choices.

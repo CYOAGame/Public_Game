@@ -9,3 +9,11 @@ guild_dispute: true
 omen_felt: true
 omen_investigated: true
 food_stockpiled: true
+refugees_sheltered: true
+meeting_observer_known: true
+political_player_known: true
+magistrate_ally: true
+price_fixing_discovered: true
+upright_creature_reported: true
+ashwood_alert_raised: true
+ashwood_truth_shared: true

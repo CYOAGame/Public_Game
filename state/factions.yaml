@@ -1,14 +1,14 @@
 - id: town_guard
-  mood: 5
+  mood: 6
 - id: craftsmen_guild
   mood: 6
 - id: merchant_guild
   mood: 7
 - id: village_folk
-  mood: 6
+  mood: 10
 - id: church_of_light
   mood: 5
 - id: underworld
   mood: 3
 - id: nobility
-  mood: 6
+  mood: 7
