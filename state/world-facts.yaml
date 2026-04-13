@@ -68,3 +68,6 @@ confluence_map_known: true
 traveler_hidden: true
 riders_confronted: true
 riders_reported: true
+symbols_studied: true
+wolves_killed: true
+ashwood_stone_examined: true
