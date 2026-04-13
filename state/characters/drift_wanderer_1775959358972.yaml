@@ -2,8 +2,8 @@ id: drift_wanderer_1775959358972
 name: Drift
 archetypeId: wanderer
 traits:
-  strength: 7
-  cunning: 5
+  strength: 8
+  cunning: 11
   charisma: 7
 skills:
   - navigation
