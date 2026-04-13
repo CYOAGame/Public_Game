@@ -32,3 +32,6 @@ warned_guild: true
 corruption_reported: true
 corruption_tied_to_guild: true
 agreed_to_testify: true
+loyalties_tested: true
+forest_depths_explored: true
+herbs_gathered: true

@@ -2,16 +2,28 @@
 
 **Spring, Day 1, Year 845**
 
-The road is wet and the weight of your pack has found every sore point on your shoulders. You have been walking since before the town's bells, and the town is far enough behind you now that you can stop calculating whether anyone recognized your face. The margin is not yet comfortable. It may never be comfortable. You come over a rise and see a farmhouse with smoke in the chimney, and Rosie in the yard, who looks up and sees you and does not look away, which is already more than most people do.
+You head into the forest south of town with a basket and a purpose the healer's list, a commission for Hilda, or just the need to get out of walls for a while. The Ashwood in morning is another world: mist between the roots, birds you cannot see. You find the first patch of what you came for. Then the path splits in three directions and you realise you have not paid attention for twenty minutes.
 
-> Keep walking. You have learned not to trust the open door.
+> Go deeper the good herbs are never near the path
 
-The road continues and so do you. By midday you have found a place to rest that is not a barn: a hollow at the base of an old wall, dry if not warm, hidden if not comfortable. You eat what you have. You have been in worse places, and you have been in better places, and the difference between the two is not always the place but what you carry into it. Today you carry the memory of the farmhouse you passed and the question of what refusing the open door costs you, over time.
+Half an hour into the deep wood, the path disappears. The trees are older here, bark grey and rough as stone. Your basket is nearly full you found everything and more. Then you hear something large move in the undergrowth ahead. It stops. You stop. The forest waits.
 
-> Press on. You need more distance from the last town.
+> Back away without making noise you have what you need
 
 There is still daylight. The story is not yet finished.
 
-> Keep walking. You have learned not to trust the open door.
+> Move slowly and look for landmarks find the right herbs first
 
-The road continues and so do you. By midday you have found a place to rest that is not a barn: a hollow at the base of an old wall, dry if not warm, hidden if not comfortable. You eat what you have. You have been in worse places, and you have been in better places, and the difference between the two is not always the place but what you carry into it. Today you carry the memory of the farmhouse you passed and the question of what refusing the open door costs you, over time.
+An hour of patient work fills half the basket. You find yarrow, a cluster of dried weld, and pressed against a mossy log something you do not recognise: dark leaves shaped like hands, smelling faintly of copper. Hilda will either know it or want to.
+
+> Leave the unknown plant alone you know better
+
+There is still daylight. The story is not yet finished.
+
+> Move slowly and look for landmarks find the right herbs first
+
+An hour of patient work fills half the basket. You find yarrow, a cluster of dried weld, and pressed against a mossy log something you do not recognise: dark leaves shaped like hands, smelling faintly of copper. Hilda will either know it or want to.
+
+> Leave the unknown plant alone you know better
+
+The day draws to a close.

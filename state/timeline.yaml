@@ -447,3 +447,166 @@
       target: cunning
       value: 1
   summary: Livia made 11 choices.
+- id: entry_1776122168734
+  date: &ref_0
+    year: 845
+    season: spring
+    day: 1
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: gathering_herbs
+  choicesMade:
+    - venture_deeper
+    - back_away_slowly
+    - search_carefully
+    - leave_it
+    - search_carefully
+    - leave_it
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: world_fact
+      target: forest_depths_explored
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+  summary: Drift made 6 choices.
+- id: entry_1776122181467
+  date: *ref_0
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: gathering_herbs
+  choicesMade:
+    - venture_deeper
+    - back_away_slowly
+    - search_carefully
+    - leave_it
+    - search_carefully
+    - leave_it
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: world_fact
+      target: forest_depths_explored
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+  summary: Drift made 6 choices.
+- id: entry_1776122185653
+  date: *ref_0
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: gathering_herbs
+  choicesMade:
+    - venture_deeper
+    - back_away_slowly
+    - search_carefully
+    - leave_it
+    - search_carefully
+    - leave_it
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: world_fact
+      target: forest_depths_explored
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+  summary: Drift made 6 choices.
+- id: entry_1776122196054
+  date: *ref_0
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: gathering_herbs
+  choicesMade:
+    - venture_deeper
+    - back_away_slowly
+    - search_carefully
+    - leave_it
+    - search_carefully
+    - leave_it
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: world_fact
+      target: forest_depths_explored
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: herbs_gathered
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+  summary: Drift made 6 choices.
