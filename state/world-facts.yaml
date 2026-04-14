@@ -83,3 +83,10 @@ ridge_larger_pattern_found: true
 ridge_lights_recorded: true
 ridge_origin_known: true
 ridge_site_watched: true
+investigated_well: true
+well_restored: true
+well_sabotaged: true
+sabotage_investigation_ongoing: true
+sabotage_pattern_known: true
+alley_confronted: true
+merchant_a_warned_you: true
