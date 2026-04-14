@@ -617,3 +617,201 @@
       target: corruption_evidence_gathered
       value: true
   summary: Drift made 46 choices.
+- id: entry_1776125193011
+  date:
+    year: 831
+    season: autumn
+    day: 16
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: secret_alliance
+  choicesMade:
+    - decline
+    - assure_silence
+    - use_neutrality_as_cover
+    - step_back_and_observe
+    - step_back_from_alliance
+    - decline
+    - assure_silence
+    - use_neutrality_as_cover
+    - step_back_and_observe
+    - step_back_from_alliance
+    - decline
+    - assure_silence
+    - use_neutrality_as_cover
+    - step_back_and_observe
+    - step_back_from_alliance
+    - ask_for_details
+    - join_armed_with_names
+    - stay_fully_committed
+    - take_quiet_credit
+    - build_independent_position
+    - build_on_the_foundation
+  consequences:
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{conspirator.id}'
+      value: -1
+    - type: relationship
+      target: '{conspirator.id}'
+      value: 1
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: political_player_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{conspirator.id}'
+      value: -1
+    - type: relationship
+      target: '{conspirator.id}'
+      value: 1
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: political_player_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{conspirator.id}'
+      value: -1
+    - type: relationship
+      target: '{conspirator.id}'
+      value: 1
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: political_player_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{conspirator.id}'
+      value: 1
+    - type: world_fact
+      target: joined_secret_alliance
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: joined_secret_alliance
+      value: true
+    - type: faction
+      target: craftsmen_guild
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: craftsmen_guild
+      value: 1
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: political_player_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: alliance_formed
+      value: true
+  summary: Drift made 21 choices.
+- id: entry_1776125508562
+  date:
+    year: 837
+    season: winter
+    day: 18
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: quiet_morning
+  choicesMade:
+    - stay_in
+    - signal_wait
+    - ask_who_else_knows
+    - accept_the_trust
+    - look_for_more_marks
+    - agree_go_down
+    - write_it_down
+    - give_partial_account
+    - ask_about_the_traveler
+    - go_back_at_dusk
+  consequences:
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{neighbor.id}'
+      value: 2
+    - type: world_fact
+      target: ridge_marks_discovered
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: ridge_searched_thoroughly
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: ridge_larger_pattern_found
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: ridge_lights_recorded
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: ridge_origin_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: world_fact
+      target: ridge_site_watched
+      value: true
+  summary: Drift made 10 choices.
