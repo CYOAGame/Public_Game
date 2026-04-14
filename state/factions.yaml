@@ -5,7 +5,7 @@
 - id: merchant_guild
   mood: 7
 - id: village_folk
-  mood: 8
+  mood: 16
 - id: church_of_light
   mood: 5
 - id: underworld

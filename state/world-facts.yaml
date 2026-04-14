@@ -90,3 +90,4 @@ sabotage_investigation_ongoing: true
 sabotage_pattern_known: true
 alley_confronted: true
 merchant_a_warned_you: true
+sabotage_exposed: true
