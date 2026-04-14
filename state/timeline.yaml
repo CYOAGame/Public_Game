@@ -354,3 +354,130 @@
       target: sabotage_investigation_ongoing
       value: true
   summary: Drift made 6 choices.
+- id: entry_1776127587112
+  date:
+    year: 860
+    season: summer
+    day: 15
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: caravan_arrival
+  choicesMade:
+    - offer_to_help_unload
+    - thank_and_go
+    - offer_to_help_unload
+    - thank_and_go
+    - offer_to_help_unload
+    - thank_and_go
+    - offer_to_help_unload
+    - thank_and_go
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 2
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 2
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 2
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: relationship
+      target: '{caravan_master.id}'
+      value: 2
+    - type: world_fact
+      target: caravan_arrived
+      value: true
+    - type: stat
+      target: strength
+      value: 1
+  summary: Drift made 8 choices.
+- id: entry_1776127922438
+  date:
+    year: 866
+    season: summer
+    day: 5
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: ancient_tree
+  choicesMade:
+    - study_carvings
+    - keep_the_knowledge
+    - study_carvings
+    - keep_the_knowledge
+    - study_carvings
+    - keep_the_knowledge
+  consequences:
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: ancient_tree_studied
+      value: true
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: confluence_map_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: ancient_tree_studied
+      value: true
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: confluence_map_known
+      value: true
+    - type: stat
+      target: cunning
+      value: 2
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: ancient_tree_studied
+      value: true
+    - type: relationship
+      target: '{scholar.id}'
+      value: 2
+    - type: world_fact
+      target: confluence_map_known
+      value: true
+  summary: Drift made 6 choices.
