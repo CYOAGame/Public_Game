@@ -2,8 +2,8 @@ id: drift_wanderer_1775959358972
 name: Drift
 archetypeId: wanderer
 traits:
-  strength: 25
-  cunning: 104
+  strength: 33
+  cunning: 110
   charisma: 58
 skills:
   - navigation
@@ -27,7 +27,7 @@ relationships:
   lydia_merchant_1776050141039:
     tags: []
     axes:
-      trust: 28
+      trust: 48
       affection: 2
   aldric_soldier_1776122653450:
     tags: []
