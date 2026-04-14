@@ -177,3 +177,443 @@
       target: wolf_clearing_found
       value: true
   summary: Drift made 13 choices.
+- id: entry_1776124189455
+  date:
+    year: 814
+    season: summer
+    day: 14
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: blessing_or_curse
+  choicesMade:
+    - seek_help
+    - ask_how_to_remove_it
+    - perform_shrine_rite
+    - thank_wise_woman
+    - stay_curious_about_what_was_happening
+    - seek_help
+    - ask_how_to_remove_it
+    - return_artifact_path
+  consequences:
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: marking_investigated
+      value: true
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 1
+    - type: world_fact
+      target: marking_removal_sought
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: marking_removal_sought
+      value: true
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: marking_removal_sought
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: marking_understood
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 2
+    - type: world_fact
+      target: marking_investigated
+      value: true
+    - type: relationship
+      target: '{wise_woman.id}'
+      value: 1
+    - type: world_fact
+      target: marking_removal_sought
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: marking_removal_sought
+      value: true
+    - type: world_fact
+      target: shrine_honored
+      value: true
+  summary: Drift made 8 choices.
+- id: entry_1776125108038
+  date:
+    year: 818
+    season: spring
+    day: 17
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: captain_investigation
+  choicesMade:
+    - full_truth
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - full_truth
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - accept_protection
+    - stay_steady
+    - maintain_relationship_with_captain
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - full_truth
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - accept_protection
+    - stay_steady
+    - express_satisfaction
+    - ask_about_other_complaints
+    - agree_to_be_first
+    - ask_about_other_witnesses
+    - commit_to_gathering_witnesses
+  consequences:
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 3
+    - type: relationship
+      target: '{corrupt_guard.id}'
+      value: -3
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 3
+    - type: relationship
+      target: '{corrupt_guard.id}'
+      value: -3
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: relationship
+      target: '{captain.id}'
+      value: 3
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 3
+    - type: relationship
+      target: '{corrupt_guard.id}'
+      value: -3
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 1
+    - type: stat
+      target: strength
+      value: 1
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: relationship
+      target: '{captain.id}'
+      value: 2
+    - type: stat
+      target: cunning
+      value: 1
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: testified_truthfully
+      value: true
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: world_fact
+      target: corruption_evidence_gathered
+      value: true
+    - type: stat
+      target: charisma
+      value: 2
+    - type: faction
+      target: town_guard
+      value: 2
+    - type: world_fact
+      target: corruption_evidence_gathered
+      value: true
+  summary: Drift made 46 choices.
