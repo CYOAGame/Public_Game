@@ -71,3 +71,7 @@ riders_reported: true
 symbols_studied: true
 wolves_killed: true
 ashwood_stone_examined: true
+marking_removal_sought: true
+shrine_honored: true
+testified_truthfully: true
+corruption_evidence_gathered: true
