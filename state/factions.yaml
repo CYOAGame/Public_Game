@@ -1,7 +1,7 @@
 - id: town_guard
   mood: 55
 - id: craftsmen_guild
-  mood: 6
+  mood: 8
 - id: merchant_guild
   mood: 7
 - id: village_folk

@@ -3,8 +3,8 @@ name: Drift
 archetypeId: wanderer
 traits:
   strength: 23
-  cunning: 69
-  charisma: 49
+  cunning: 100
+  charisma: 53
 skills:
   - navigation
   - survival
@@ -13,6 +13,7 @@ locationId: ''
 factions:
   town_guard: 56
   village_folk: 2
+  craftsmen_guild: 2
 relationships:
   brenna_soldier_1776121404563:
     tags: []
@@ -27,6 +28,7 @@ relationships:
     tags: []
     axes:
       trust: 28
+      affection: 2
   aldric_soldier_1776122653450:
     tags: []
     axes:
@@ -76,6 +78,11 @@ relationships:
     tags: []
     axes:
       rivalry: -9
+  marcus_merchant_1776122588391:
+    tags: []
+    axes:
+      rivalry: -3
+      trust: 4
 birthDate:
   year: 800
   season: spring
