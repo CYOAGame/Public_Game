@@ -290,3 +290,67 @@
       target: merchant_a
       value: -1
   summary: Drift made 7 choices.
+- id: entry_1776127166888
+  date:
+    year: 845
+    season: spring
+    day: 1
+  characterId: drift_wanderer_1775959358972
+  eventTemplateId: well_runs_dry
+  choicesMade:
+    - investigate
+    - clear_it
+    - share_what_you_know_publicly
+    - continue_investigating
+    - bring_pattern_to_elder
+    - push_for_more
+  consequences:
+    - type: stat
+      target: strength
+      value: 1
+    - type: faction
+      target: village_folk
+      value: 2
+    - type: world_fact
+      target: investigated_well
+      value: true
+    - type: faction
+      target: village_folk
+      value: 2
+    - type: world_fact
+      target: well_restored
+      value: true
+    - type: world_fact
+      target: well_sabotaged
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: village_folk
+      value: 2
+    - type: world_fact
+      target: sabotage_exposed
+      value: true
+    - type: stat
+      target: cunning
+      value: 1
+    - type: world_fact
+      target: sabotage_investigation_ongoing
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: faction
+      target: village_folk
+      value: 2
+    - type: world_fact
+      target: sabotage_pattern_known
+      value: true
+    - type: stat
+      target: charisma
+      value: 1
+    - type: world_fact
+      target: sabotage_investigation_ongoing
+      value: true
+  summary: Drift made 6 choices.

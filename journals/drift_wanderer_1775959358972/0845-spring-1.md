@@ -2,28 +2,28 @@
 
 **Spring, Day 1, Year 845**
 
-You head into the forest south of town with a basket and a purpose the healer's list, a commission for Hilda, or just the need to get out of walls for a while. The Ashwood in morning is another world: mist between the roots, birds you cannot see. You find the first patch of what you came for. Then the path splits in three directions and you realise you have not paid attention for twenty minutes.
+The morning line at the well is gone because there is no water to draw. Lydia stands at the rim looking down with a grim expression. "It has not been dry in my lifetime," they say. Around the square, people look worried. Someone says the north creek is still running, but the walk is long and the path is rough for anyone carrying. The day is already warming.
 
-> Go deeper the good herbs are never near the path
+> Offer to climb down and see what is wrong
 
-Half an hour into the deep wood, the path disappears. The trees are older here, bark grey and rough as stone. Your basket is nearly full you found everything and more. Then you hear something large move in the undergrowth ahead. It stops. You stop. The forest waits.
+You descend on a rope. The stone walls are damp but not wet, the water table has simply dropped, or been blocked. At the bottom, wedged in a crack where the secondary channel runs in, you find a bundle of cloth stuffed with packed sand, deliberately forced into place. It would take effort to do this. It would take knowledge of where the channel sits. Someone did this on purpose, and they knew this well well.
 
-> Back away without making noise you have what you need
+> Clear the blockage and climb back up
 
-There is still daylight. The story is not yet finished.
+The well runs again by evening. Water comes up clear and cold and people queue with their buckets, quieter than usual. Lydia makes a short speech about community resilience, which would be more stirring if everyone had not noticed that it took outside interference to make the well stop, not a drought. Someone asks who did it. Lydia does not answer. You know more than they said. The question is what you do with it.
 
-> Move slowly and look for landmarks find the right herbs first
+> Speak up and share what you have learned with the gathered town
 
-An hour of patient work fills half the basket. You find yarrow, a cluster of dried weld, and pressed against a mossy log something you do not recognise: dark leaves shaped like hands, smelling faintly of copper. Hilda will either know it or want to.
+Over the next two days, the town processes what happened. Some people are angry. Some are frightened by the idea that someone would do this deliberately. A few, quietly, say the well was probably always going to fail eventually and the sabotage story is an excuse for poor maintenance. The truth of it settles into the community's memory as whatever version is repeated most often. Your version, and how loudly you said it, is part of that.
 
-> Leave the unknown plant alone you know better
+> Continue pulling the thread, the sabotage pattern is bigger than the well
 
-There is still daylight. The story is not yet finished.
+You start asking careful questions about the other incidents Lydia mentioned. The mill wheel pin failure in harvest season: the pin showed tool marks, not metal fatigue, a smith confirms this quietly when asked. The grain store lock: a locksmith says the mechanism was packed with fine grit, not rust. Deliberate. Professional. Someone with specific technical knowledge and access to multiple parts of the town has been running an experiment. On this town.
 
-> Move slowly and look for landmarks find the right herbs first
+> Bring the full pattern to Lydia and demand a council response
 
-An hour of patient work fills half the basket. You find yarrow, a cluster of dried weld, and pressed against a mossy log something you do not recognise: dark leaves shaped like hands, smelling faintly of copper. Hilda will either know it or want to.
+The council meets within the day. Lydia chairs it. You present what you found. The council is quiet in the particular way of people who suspected something and hoped to be wrong. A motion is passed to post a formal watch on the well, the mill, and the grain store. It is not enough. Everyone in the room knows it is not enough. But it is what a council can do with what it has, and it is better than nothing.
 
-> Leave the unknown plant alone you know better
+> Push the council for more, a watch is not an investigation
 
-The day draws to a close.
+The guard's follow-up is thorough but slow. Three days later, they find the person who left town quickly, or at least find where they were staying: a rented room above the tannery, paid for two months. Empty now. Clean. The only thing left is a mark on the inside of the shutter, the same symbol from the cloth in the well. Whatever this is, it connects to something older and wider than one dry morning in one village.
